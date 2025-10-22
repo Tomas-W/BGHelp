@@ -3,7 +3,9 @@ package com.example.bghelp.di
 import com.example.bghelp.data.local.TargetDao
 import com.example.bghelp.data.local.TaskDao
 import com.example.bghelp.data.repository.TargetRepository
+import com.example.bghelp.data.repository.TargetRepositoryImpl
 import com.example.bghelp.data.repository.TaskRepository
+import com.example.bghelp.data.repository.TaskRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,12 +20,12 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideTaskRepository(taskDao: TaskDao): TaskRepository {
-        return TaskRepository(taskDao)
+        return TaskRepositoryImpl(taskDao)
     }
 
     @Provides
     @Singleton
     fun provideTargetRepository(targetDao: TargetDao): TargetRepository {
-        return TargetRepository(targetDao)
+        return TargetRepositoryImpl(targetDao)
     }
 }

@@ -81,9 +81,6 @@ fun TopBar(taskViewModel: TaskViewModel) {
                         vibrate = AlarmMode.OFF,
                         snoozeTime = 0
                     )
-                    scope.launch {
-                        taskViewModel.addTask(temporaryTask)
-                    }
                 }
             )
 

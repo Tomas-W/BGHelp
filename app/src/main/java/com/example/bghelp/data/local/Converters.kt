@@ -1,6 +1,8 @@
-package com.example.bghelp.utils
+package com.example.bghelp.data.local
 
 import androidx.room.TypeConverter
+import com.example.bghelp.utils.AlarmMode
+import com.example.bghelp.utils.Coordinate
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 

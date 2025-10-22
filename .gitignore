@@ -35,20 +35,12 @@ proguard/
 # Android Studio captures folder
 captures/
 
-# IntelliJ
+# IntelliJ/Android Studio
 *.iml
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/gradle.xml
-.idea/assetWizardSettings.xml
-.idea/dictionaries
-.idea/libraries
-.idea/jarRepositories.xml
-# Android Studio 3 in .gitignore file.
-.idea/caches
-.idea/modules.xml
-# Comment next line if keeping position of elements in Navigation Editor is relevant for you
-.idea/navEditor.xml
+.idea/
+
+# VS Code
+.vscode/
 
 # Keystore files
 # Uncomment the following lines if you do not want to check your keystore files in.
@@ -87,9 +79,40 @@ lint/tmp/
 # Android Profiling
 *.hprof
 
+# Room schemas (optional - you can commit these to track DB changes)
+/app/schemas/
+
+# Additional Android/Kotlin files
+*.kotlin_module
+*.kotlin_metadata
+*.kotlin_builtins
+
+# NDK
+obj/
+
+# IntelliJ IDEA additional files
+*.iws
+/out/
+
 # OS-specific
 .DS_Store
 Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# Room schemas (optional - you can commit these to track DB changes)
-/app/schemas/
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Backup files
+*.bak
+*.swp
+*.swo
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Test results
+test-results/

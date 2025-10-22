@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter
 
 
 fun Long.toDayHeader(): String {
-    val date = Instant.ofEpochSecond(this)
+    val date = Instant.ofEpochMilli(this)  // Use milliseconds
         .atZone(ZoneId.systemDefault())
         .toLocalDate()
 
@@ -27,12 +27,12 @@ fun Long.toDayHeader(): String {
 
 fun Long.isInFuture(): Boolean {
     val providedTime = this
-    val now: Long = Instant.now().epochSecond
+    val now: Long = Instant.now().toEpochMilli()  // Use milliseconds
     return providedTime > now
 }
 
 fun Long.toTaskTime(): String {
-    return Instant.ofEpochSecond(this)
+    return Instant.ofEpochMilli(this)  // Use milliseconds
         .atZone(ZoneId.systemDefault())
         .toLocalTime()
         .format(DateTimeFormatter.ofPattern("HH:mm"))
@@ -41,7 +41,7 @@ fun Long.toTaskTime(): String {
 fun getEpochRange(date: Instant = Instant.now()): Pair<Long, Long> {
     val zone = ZoneId.systemDefault()
     val today = date.atZone(zone).toLocalDate()
-    val startOfDay = today.atStartOfDay(zone).toEpochSecond()
-    val endOfDay = today.plusDays(1).atStartOfDay(zone).toEpochSecond() - 1
+    val startOfDay = today.atStartOfDay(zone).toInstant().toEpochMilli()  // Use milliseconds
+    val endOfDay = today.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli() - 1  // Use milliseconds
     return Pair(startOfDay, endOfDay)
 }
