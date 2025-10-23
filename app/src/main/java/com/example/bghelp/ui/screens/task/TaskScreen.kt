@@ -49,7 +49,6 @@ fun AddButtonRow(taskViewModel: TaskViewModel) {
     val oneMinute: Long = 60 * 1000  // 60 seconds in milliseconds
     val oneHour: Long = 60 * 60 * 1000  // 1 hour in milliseconds
     val oneDay: Long = 24 * 60 * 60 * 1000  // 1 day in milliseconds
-    val oneWeek: Long = 7 * 24 * 60 * 60 * 1000  // 1 week in milliseconds
     Row(
         modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
