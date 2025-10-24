@@ -25,15 +25,13 @@ data class Task(
     override val vibrate: AlarmMode,
     override val snoozeTime: Int
 ) : SchedulableItem {
-    
-    // Implement SchedulableItem properties
+    // SchedulableItem properties
     override val date: Long
         get() = dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-    
+
     val isExpired: Boolean
         get() = dateTime.isBefore(LocalDateTime.now())
-    
+
     val hasAlarm: Boolean
         get() = sound != AlarmMode.OFF || vibrate != AlarmMode.OFF
-    
 }

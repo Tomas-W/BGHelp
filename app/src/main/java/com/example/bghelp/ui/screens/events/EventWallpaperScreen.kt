@@ -11,9 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-/**
- * Events Wallpaper screen - simple placeholder screen
- */
 @Composable
 fun EventWallpaperScreen(
     modifier: Modifier = Modifier

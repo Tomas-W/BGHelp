@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Text -->
+    <dimen name="text_s">14sp</dimen>
+    <dimen name="text_m">18sp</dimen>
+    <dimen name="text_l">22sp</dimen>
+    <dimen name="text_xl">26sp</dimen>
+    
+    <!-- Padding -->
+    <dimen name="padding_s">8dp</dimen>
+    <dimen name="padding_m">16dp</dimen>
+    <dimen name="padding_l">24dp</dimen>
+    <dimen name="padding_xl">32dp</dimen>
+    
+    <!-- Icon -->
+    <dimen name="icon_s">24dp</dimen>
+    <dimen name="icon_m">32dp</dimen>
+    <dimen name="icon_l">48dp</dimen>
+    <dimen name="icon_xl">64dp</dimen>
+    
+    <!-- Button -->
+    <dimen name="button_h_s">36dp</dimen>
+    <dimen name="button_h_m">48dp</dimen>
+    <dimen name="button_h_l">56dp</dimen>
+    
+    <!-- Card -->
+    <dimen name="card_corner_radius">8dp</dimen>
+    <dimen name="card_corner_radius_s">4dp</dimen>
+    <dimen name="card_corner_radius_l">12dp</dimen>
+    
+    <!-- Divider and separator -->
+    <dimen name="divider_height">1dp</dimen>
+    <dimen name="separator_height">8dp</dimen>
+</resources>

@@ -13,22 +13,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.bghelp.R
 import com.example.bghelp.ui.theme.MainBlue
+import com.example.bghelp.ui.theme.Sizes
+import com.example.bghelp.ui.theme.TextStyles
 
 @Composable
 fun TopBar(
@@ -39,13 +34,15 @@ fun TopBar(
     onSettingsClick: () -> Unit = {}
 ) {
     Column {
+        // System bar
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
-                .background(Color.Black)
+                .background(MainBlue)
         )
 
+        // Bar content
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -54,42 +51,41 @@ fun TopBar(
                 .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Wallpaper icon
             if (showWallpaperIcon) {
                 IconButton(onClick = onScreenshotClick) {
                     Image(
                         painter = painterResource(id = R.drawable.screenshot),
                         contentDescription = "Wallpaper",
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.size(Sizes.Icon.Large)
                     )
                 }
             } else {
+                // Back icon
                 IconButton(onClick = onBackClick) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        tint = Color.White,
-                        contentDescription = "Go Back",
-                        modifier = Modifier.size(28.dp)
+                    Image(
+                        painter = painterResource(id = R.drawable.back),
+                        contentDescription = "Back",
+                        modifier = Modifier.size(Sizes.Icon.Large)
                     )
                 }
             }
 
+            // Title
             Text(
                 text = title,
-                color = Color.White,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
+                style = TextStyles.White.Bold.Large,
                 modifier = Modifier.padding(start = 12.dp)
             )
-            
-            // Spacer to push settings to the right
-            androidx.compose.foundation.layout.Spacer(modifier = Modifier.weight(1f))
-            
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Options icon
             IconButton(onClick = onSettingsClick) {
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    tint = Color.White,
+                Image(
+                    painter = painterResource(R.drawable.options_inactive),
                     contentDescription = "Options",
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(Sizes.Icon.Large)
                 )
             }
         }

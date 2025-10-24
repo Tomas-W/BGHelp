@@ -22,16 +22,15 @@ import com.example.bghelp.utils.Coordinate
 import java.time.Instant
 import java.time.ZoneId
 
-
 @Composable
 fun TargetScreen(targetViewModel: TargetViewModel = hiltViewModel()) {
     val targets by targetViewModel.targetsInRange.collectAsState(initial = emptyList())
-//    val allTargets by targetViewModel.getAllTargets.collectAsState(initial = emptyList())
+    // val allTargets by targetViewModel.getAllTargets.collectAsState(initial = emptyList())
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 0.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
+            .padding(top = 0.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
     ) {
         Column {
             AddButtonRow(targetViewModel)
@@ -42,13 +41,12 @@ fun TargetScreen(targetViewModel: TargetViewModel = hiltViewModel()) {
     }
 }
 
-
 @Composable
 fun AddButtonRow(targetViewModel: TargetViewModel) {
     val now: Long = 0
-    val oneMinute: Long = 60 * 1000  // 60 seconds in milliseconds
-    val oneHour: Long = 60 * 60 * 1000  // 1 hour in milliseconds
-    val oneDay: Long = 24 * 60 * 60 * 1000  // 1 day in milliseconds
+    val oneMinute: Long = 60 * 1000 // 60 seconds in milliseconds
+    val oneHour: Long = 60 * 60 * 1000 // 1 hour in milliseconds
+    val oneDay: Long = 24 * 60 * 60 * 1000 // 1 day in milliseconds
     Row(
         modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -60,7 +58,6 @@ fun AddButtonRow(targetViewModel: TargetViewModel) {
     }
 }
 
-
 @Composable
 fun AddTargetButton(
     targetViewModel: TargetViewModel,
@@ -69,9 +66,9 @@ fun AddTargetButton(
 ) {
     Button(
         onClick = {
-            val now: Long = Instant.now().toEpochMilli()  // Use milliseconds
+            val now: Long = Instant.now().toEpochMilli() // Use milliseconds
             val date = now + time
-            val localDateTime = Instant.ofEpochMilli(date)  // Use ofEpochMilli
+            val localDateTime = Instant.ofEpochMilli(date) // Use ofEpochMilli
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime()
             val coords = listOf(Coordinate(53.5, -4.7))
@@ -89,7 +86,7 @@ fun AddTargetButton(
                 )
             )
         }
-        ) {
+    ) {
         Text(text)
     }
 }

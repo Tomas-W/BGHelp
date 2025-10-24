@@ -1,5 +1,6 @@
 package com.example.bghelp.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,24 +15,23 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.bghelp.R
 import com.example.bghelp.ui.theme.SecondaryBlue
 import com.example.bghelp.ui.theme.SecondaryGrey
+import com.example.bghelp.ui.theme.Sizes
+import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.utils.AlarmMode
 import com.example.bghelp.utils.SchedulableItem
 import com.example.bghelp.utils.isInFuture
 import com.example.bghelp.utils.toDayHeader
 import com.example.bghelp.utils.toTaskTime
-
 
 @Composable
 fun <T: SchedulableItem> TimeRow(item: T, onDelete: (T) -> Unit) {
@@ -39,44 +39,43 @@ fun <T: SchedulableItem> TimeRow(item: T, onDelete: (T) -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
+        // Time & Snooze time
         Row {
             Text(
                 text = item.date.toTaskTime(),
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                color = Color.Black,
+                style = TextStyles.Default.Bold.Medium,
                 modifier = Modifier.padding(end = 8.dp)
             )
             if (item.snoozeTime > 0) {
                 Text(
                     text = " +${item.snoozeTime}",
-                    fontSize = 16.sp,
-                    color = Color.Red
+                    style = TextStyles.Error.ExtraSmall
                 )
             }
         }
 
-        Row() {
+        // Sound & Vibrate icons
+        Row {
             if (item.sound != AlarmMode.OFF) {
-                Icon(
-                    imageVector = Icons.Default.PlayArrow,
-                    tint = Color.Black,
-                    contentDescription = "Play"
+                Image(
+                    painter = painterResource(R.drawable.sound),
+                    contentDescription = item.sound.value,
+                    modifier = Modifier.size(Sizes.Icon.Medium)
                 )
             } else {
-                Spacer(modifier = Modifier.size(24.dp))
+                Spacer(modifier = Modifier.size(Sizes.Icon.Medium))
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
             if (item.vibrate != AlarmMode.OFF) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    tint = Color.Black,
-                    contentDescription = "Menu"
+                Image(
+                    painter = painterResource(R.drawable.vibrate),
+                    contentDescription = item.vibrate.value,
+                    modifier = Modifier.size(Sizes.Icon.Medium)
                 )
             } else {
-                Spacer(modifier = Modifier.size(24.dp))
+                Spacer(modifier = Modifier.size(Sizes.Icon.Medium))
             }
             
             Spacer(modifier = Modifier.width(8.dp))
@@ -95,8 +94,7 @@ fun <T: SchedulableItem> TimeRow(item: T, onDelete: (T) -> Unit) {
 fun Message(message: String) {
     Text(
         text = message,
-        fontSize = 18.sp,
-        color = Color.Black
+        style = TextStyles.Default.Medium
     )
 }
 

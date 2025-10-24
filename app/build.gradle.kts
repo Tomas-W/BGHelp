@@ -54,6 +54,7 @@ dependencies {
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation.runtime.ktx)
 
     // Room
     implementation(libs.androidx.room.ktx)
@@ -71,6 +72,9 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    
+    // Accompanist System UI Controller
+    implementation(libs.accompanist.systemuicontroller)
 
     // Tests
     testImplementation(libs.junit)

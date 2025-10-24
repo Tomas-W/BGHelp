@@ -21,16 +21,15 @@ import com.example.bghelp.utils.AlarmMode
 import java.time.Instant
 import java.time.ZoneId
 
-
 @Composable
 fun TaskScreen(taskViewModel: TaskViewModel = hiltViewModel()) {
     val tasks by taskViewModel.tasksInRange.collectAsState(initial = emptyList())
-//    val allTasks by taskViewModel.getAllTasks.collectAsState(initial = emptyList())
+    // val allTasks by taskViewModel.getAllTasks.collectAsState(initial = emptyList())
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 0.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
+            .padding(top = 0.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
     ) {
         Column {
             AddButtonRow(taskViewModel)
@@ -42,17 +41,16 @@ fun TaskScreen(taskViewModel: TaskViewModel = hiltViewModel()) {
     }
 }
 
-
 @Composable
 fun AddButtonRow(taskViewModel: TaskViewModel) {
     val now: Long = 0
-    val oneMinute: Long = 60 * 1000  // 60 seconds in milliseconds
-    val oneHour: Long = 60 * 60 * 1000  // 1 hour in milliseconds
-    val oneDay: Long = 24 * 60 * 60 * 1000  // 1 day in milliseconds
+    val oneMinute: Long = 60 * 1000 // 60 seconds in milliseconds
+    val oneHour: Long = 60 * 60 * 1000 // 1 hour in milliseconds
+    val oneDay: Long = 24 * 60 * 60 * 1000 // 1 day in milliseconds
     Row(
         modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+    ) {
         AddTaskButton(taskViewModel = taskViewModel, time = now, text = "Now")
         AddTaskButton(taskViewModel = taskViewModel, time = oneMinute, text = "Min")
         AddTaskButton(taskViewModel = taskViewModel, time = oneHour, text = "Hour")
@@ -60,18 +58,17 @@ fun AddButtonRow(taskViewModel: TaskViewModel) {
     }
 }
 
-
 @Composable
 fun AddTaskButton(
     taskViewModel: TaskViewModel,
     time: Long,
     text: String
-    ) {
-        Button(
+) {
+    Button(
         onClick = {
-            val now: Long = Instant.now().toEpochMilli()  // Use milliseconds
+            val now: Long = Instant.now().toEpochMilli() // Use milliseconds
             val date = now + time
-            val localDateTime = Instant.ofEpochMilli(date)  // Use ofEpochMilli
+            val localDateTime = Instant.ofEpochMilli(date) // Use ofEpochMilli
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime()
             taskViewModel.addTask(
@@ -81,12 +78,11 @@ fun AddTaskButton(
                     expired = false,
                     alarmName = "AlarmOne",
                     sound = AlarmMode.CONTINUOUS,
-                    vibrate = AlarmMode.OFF,
-                    snoozeTime = 0
+                    vibrate = AlarmMode.ONCE,
+                    snoozeTime = 55
                 )
             )
-        },
-
+        }
     ) {
         Text(text)
     }

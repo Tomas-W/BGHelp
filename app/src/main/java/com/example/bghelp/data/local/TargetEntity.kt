@@ -2,11 +2,11 @@ package com.example.bghelp.data.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.bghelp.constants.DatabaseConstants as DB
 import com.example.bghelp.utils.AlarmMode
 import com.example.bghelp.utils.Coordinate
 
-
-@Entity(tableName = "target_table")
+@Entity(tableName = DB.TARGET_TABLE)
 data class TargetEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,

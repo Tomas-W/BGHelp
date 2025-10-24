@@ -1,26 +1,51 @@
 package com.example.bghelp.ui.theme
 
-import android.app.Activity
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = MainBlue,
+    secondary = SecondaryBlue,
+    tertiary = SecondaryGrey,
+    background = BackgroundGrey,
+    surface = BackgroundGrey
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = MainBlue, // Main brand color for buttons, FABs, active states
+    onPrimary = TextWhite, // Text/icons on primary colored elements
+    // primaryContainer = MainBlue.copy(alpha = 0.1f), // Subtle primary backgrounds
+    // onPrimaryContainer = MainBlue, // Text on primary container backgrounds
+    secondary = SecondaryBlue, // Secondary brand color for accent elements
+    // onSecondary = Color.Black, // Text/icons on secondary colored elements
+    // secondaryContainer = SecondaryBlue.copy(alpha = 0.1f), // Subtle secondary backgrounds
+    // onSecondaryContainer = SecondaryBlue, // Text on secondary container backgrounds
+    tertiary = SecondaryGrey, // Third brand color for additional accents
+    // onTertiary = Color.Black, // Text/icons on tertiary colored elements
+    // tertiaryContainer = SecondaryGrey.copy(alpha = 0.1f), // Subtle tertiary backgrounds
+    // onTertiaryContainer = SecondaryGrey, // Text on tertiary container backgrounds
+    error = ErrorRed, // Error state color
+    // onError = Color.White, // Text/icons on error colored elements
+    // errorContainer = Color(220, 53, 69).copy(alpha = 0.1f), // Subtle error backgrounds
+    // onErrorContainer = Color(220, 53, 69), // Text on error container backgrounds
+    background = BackgroundGrey, // Main app background color
+    onBackground = TextBlack, // Default text color on background
+    surface = BackgroundGrey, // Card, sheet, and dialog background color
+    onSurface = TextBlack, // Text on cards, sheets, dialogs, disabled elements
+    // surfaceVariant = BackgroundGrey.copy(alpha = 0.8f), // Alternative surface backgrounds
+    // onSurfaceVariant = Color(65, 65, 65), // Text on surface variant backgrounds
+    surfaceContainer = BottomNavColor, // Navigation bar and container background color
+    // surfaceContainerHigh = BottomNavColor.copy(alpha = 0.9f), // High elevation containers
+    // surfaceContainerHighest = BottomNavColor.copy(alpha = 0.8f), // Highest elevation containers
+    outline = SecondaryGrey, // Border/outline color
+    // outlineVariant = Color(210, 210, 210).copy(alpha = 0.5f), // Alternative outline
+    // inverseSurface = Color.Black, // Inverse surface backgrounds
+    // inverseOnSurface = Color.White, // Text on inverse surface backgrounds
+    // inversePrimary = MainBlue.copy(alpha = 0.8f), // Primary color in inverse contexts
+    // scrim = Color.Black.copy(alpha = 0.5f) // Overlay/backdrop color
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -34,21 +59,12 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun ComposablesTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+fun BGHelpTheme(
+    darkTheme: Boolean = false,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    val colorScheme = LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,

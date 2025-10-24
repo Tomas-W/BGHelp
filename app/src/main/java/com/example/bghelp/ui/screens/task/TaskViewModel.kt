@@ -2,13 +2,12 @@ package com.example.bghelp.ui.screens.task
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bghelp.domain.model.Task
-import com.example.bghelp.domain.model.CreateTask
 import com.example.bghelp.data.repository.TaskRepository
+import com.example.bghelp.domain.model.CreateTask
+import com.example.bghelp.domain.model.Task
 import com.example.bghelp.utils.getEpochRange
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -19,11 +18,10 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import javax.inject.Inject
 
-
 @HiltViewModel
 class TaskViewModel @Inject constructor(
     private val taskRepository: TaskRepository
-): ViewModel() {
+) : ViewModel() {
 
     fun addTask(createTask: CreateTask) {
         viewModelScope.launch {
@@ -48,11 +46,11 @@ class TaskViewModel @Inject constructor(
         _selectedDate
             .flatMapLatest { date ->
                 val (start, end) = if (date == null) {
-                    getEpochRange()  // Default range
+                    getEpochRange() // Default range
                 } else {
                     getEpochRange(date)
                 }
-                taskRepository.getTasksByDateRange(start, end)  // ← Database-level filtering
+                taskRepository.getTasksByDateRange(start, end) // ← Database-level filtering
             }
             .stateIn(
                 scope = viewModelScope,

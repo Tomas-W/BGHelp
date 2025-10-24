@@ -6,9 +6,7 @@ import com.example.bghelp.utils.Coordinate
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-
 class Converters {
-
     private val gson = Gson()
 
     // Alarm mode
@@ -23,6 +21,7 @@ class Converters {
     fun fromCoordinatesList(coords: List<Coordinate>): String {
         return gson.toJson(coords)
     }
+
     @TypeConverter
     fun toCoordinatesList(json: String): List<Coordinate> {
         val type = object : TypeToken<List<Coordinate>>() {}.type

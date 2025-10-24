@@ -9,9 +9,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-/**
- * Create Alarm screen for setting up new alarms
- */
 @Composable
 fun CreateAlarmScreen(
     onAlarmCreated: () -> Unit,

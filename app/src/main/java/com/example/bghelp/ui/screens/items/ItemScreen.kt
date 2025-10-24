@@ -11,9 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-/**
- * Items screen - simple placeholder screen
- */
 @Composable
 fun ItemScreen(
     modifier: Modifier = Modifier

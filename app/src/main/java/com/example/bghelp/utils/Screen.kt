@@ -1,9 +1,5 @@
 package com.example.bghelp.utils
 
-/**
- * Sealed class defining all screens in the app with their titles and routes
- * Organized hierarchically by feature for better maintainability
- */
 sealed class Screen(
     val title: String,
     val route: String
@@ -47,9 +43,6 @@ sealed class Screen(
     }
     
     companion object {
-        /**
-         * Get screen by route for type-safe navigation
-         */
         fun getScreenByRoute(route: String?): Screen {
             return when (route) {
                 Tasks.Home.route -> Tasks.Home
@@ -73,58 +66,40 @@ sealed class Screen(
                 else -> Tasks.Home // Default to Tasks instead of Empty
             }
         }
-        
-        /**
-         * Get all bottom navigation screens (4 main features)
-         */
+
         val bottomNavScreens = listOf(
             Tasks.Home,
             Targets.Home,
             Items.Home,
             Events.Home
         )
-        
-        /**
-         * Get all add/create screens
-         */
+
         val addScreens = listOf(
             Tasks.Add,
             Targets.Add,
             Items.Add,
             Events.Add
         )
-        
-        /**
-         * Get all calendar screens
-         */
+
         val calendarScreens = listOf(
             Tasks.Calendar,
             Targets.Calendar,
             Items.Calendar,
             Events.Calendar
         )
-        
-        /**
-         * Get all wallpaper screens
-         */
+
         val wallpaperScreens = listOf(
             Tasks.Wallpaper,
             Targets.Wallpaper,
             Items.Wallpaper,
             Events.Wallpaper
         )
-        
-        /**
-         * Get all options screens
-         */
+
         val optionsScreens = listOf(
             Options.Settings,
             Options.CreateAlarm
         )
-        
-        /**
-         * Get all feature home screens (4 main features)
-         */
+
         val featureHomes = listOf(
             Tasks.Home,
             Targets.Home,

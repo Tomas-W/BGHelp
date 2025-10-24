@@ -2,10 +2,10 @@ package com.example.bghelp.data.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.bghelp.constants.DatabaseConstants as DB
 import com.example.bghelp.utils.AlarmMode
 
-
-@Entity(tableName = "task_table")
+@Entity(tableName = DB.TASK_TABLE)
 data class TaskEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
