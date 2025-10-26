@@ -57,7 +57,7 @@ class TargetRepositoryImpl(private val targetDao: TargetDao) : TargetRepository 
 
         return Target(
             id = id,
-            dateTime = localDateTime,
+            date = localDateTime,
             message = message,
             expired = expired,
             coordinates = coordinates,
@@ -71,7 +71,7 @@ class TargetRepositoryImpl(private val targetDao: TargetDao) : TargetRepository 
 
     // Domain → Entity
     private fun Target.toEntity(): TargetEntity {
-        val epochMillis = dateTime.atZone(ZoneId.systemDefault())
+        val epochMillis = date.atZone(ZoneId.systemDefault())
             .toInstant()
             .toEpochMilli()
 

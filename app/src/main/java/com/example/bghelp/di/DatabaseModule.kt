@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.bghelp.constants.DatabaseConstants as DB
 import com.example.bghelp.data.local.AppDatabase
+import com.example.bghelp.data.local.ItemDao
 import com.example.bghelp.data.local.TargetDao
 import com.example.bghelp.data.local.TaskDao
 import dagger.Module
@@ -40,5 +41,11 @@ object DatabaseModule {
     @Singleton
     fun provideTargetDao(database: AppDatabase): TargetDao {
         return database.targetDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideItemDao(database: AppDatabase): ItemDao {
+        return database.itemDao()
     }
 }

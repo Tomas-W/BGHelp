@@ -5,7 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.example.bghelp.constants.DatabaseConstants
+import com.example.bghelp.constants.DatabaseConstants as DB
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -20,33 +20,33 @@ abstract class TaskDao {
     abstract suspend fun deleteTask(task: TaskEntity)
 
     @Query("""
-        SELECT * FROM ${DatabaseConstants.TASK_TABLE}
+        SELECT * FROM ${DB.TASK_TABLE}
         WHERE id=:id
         """)
-    abstract fun getTaskById(id: Int): Flow<TaskEntity?>
+    abstract fun getTaskById(id: Int) : Flow<TaskEntity?>
 
     @Query("""
-        SELECT * FROM ${DatabaseConstants.TASK_TABLE}
+        SELECT * FROM ${DB.TASK_TABLE}
         ORDER BY date
         ASC
         """)
-    abstract fun getAllTasks(): Flow<List<TaskEntity>>
+    abstract fun getAllTasks() : Flow<List<TaskEntity>>
 
     @Query("""
-        SELECT * FROM ${DatabaseConstants.TASK_TABLE} 
+        SELECT * FROM ${DB.TASK_TABLE} 
         WHERE date BETWEEN :startDate
         AND :endDate
         ORDER BY date
         ASC
         """)
-    abstract fun getTasksByDateRange(startDate: Long, endDate: Long): Flow<List<TaskEntity>>
+    abstract fun getTasksByDateRange(startDate: Long, endDate: Long) : Flow<List<TaskEntity>>
 
     @Query("""
-        SELECT * FROM ${DatabaseConstants.TASK_TABLE}
+        SELECT * FROM ${DB.TASK_TABLE}
         WHERE date > :currentTime
         ORDER BY date
         ASC
         LIMIT 1
         """)
-    abstract fun getNextTask(currentTime: Long): Flow<TaskEntity?>
+    abstract fun getNextTask(currentTime: Long) : Flow<TaskEntity?>
 }

@@ -1,4 +1,4 @@
-package com.example.bghelp.utils
+package com.example.bghelp.ui.navigation
 
 sealed class Screen(
     val title: String,

@@ -1,7 +1,6 @@
 package com.example.bghelp.ui.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,8 +26,8 @@ import com.example.bghelp.ui.theme.SecondaryBlue
 import com.example.bghelp.ui.theme.SecondaryGrey
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
-import com.example.bghelp.utils.AlarmMode
-import com.example.bghelp.utils.SchedulableItem
+import com.example.bghelp.domain.model.AlarmMode
+import com.example.bghelp.domain.model.SchedulableItem
 import com.example.bghelp.utils.isInFuture
 import com.example.bghelp.utils.toDayHeader
 import com.example.bghelp.utils.toTaskTime
@@ -60,10 +59,10 @@ fun <T: SchedulableItem> TimeRow(item: T, onDelete: (T) -> Unit) {
                 Image(
                     painter = painterResource(R.drawable.sound),
                     contentDescription = item.sound.value,
-                    modifier = Modifier.size(Sizes.Icon.Medium)
+                    modifier = Modifier.size(Sizes.Icon.Small)
                 )
             } else {
-                Spacer(modifier = Modifier.size(Sizes.Icon.Medium))
+                Spacer(modifier = Modifier.size(Sizes.Icon.Small))
             }
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -72,10 +71,10 @@ fun <T: SchedulableItem> TimeRow(item: T, onDelete: (T) -> Unit) {
                 Image(
                     painter = painterResource(R.drawable.vibrate),
                     contentDescription = item.vibrate.value,
-                    modifier = Modifier.size(Sizes.Icon.Medium)
+                    modifier = Modifier.size(Sizes.Icon.Small)
                 )
             } else {
-                Spacer(modifier = Modifier.size(Sizes.Icon.Medium))
+                Spacer(modifier = Modifier.size(Sizes.Icon.Small))
             }
             
             Spacer(modifier = Modifier.width(8.dp))
@@ -102,11 +101,9 @@ fun Message(message: String) {
 fun <T: SchedulableItem> Item(item: T, onDelete: (T) -> Unit) {
     val taskBackgroundColor = if (item.date.isInFuture()) { SecondaryBlue } else { SecondaryGrey }
 
-    Column(
-        modifier = Modifier
-            .background(taskBackgroundColor)
-            .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
-            .fillMaxWidth()
+    SchedulableContainer(
+        modifier = Modifier,
+        backgroundColor = taskBackgroundColor
     ) {
         TimeRow(item, onDelete)
         Message(item.message)

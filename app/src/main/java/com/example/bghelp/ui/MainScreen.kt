@@ -14,7 +14,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.bghelp.ui.components.BottomNavigationBar
 import com.example.bghelp.ui.components.TopBar
-import com.example.bghelp.utils.Screen
+import com.example.bghelp.ui.navigation.Screen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -24,7 +24,6 @@ fun MainScreen() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    // Get current navigation state
     val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
     val optionsBackStackEntry by navController.currentBackStackEntryAsState()
 

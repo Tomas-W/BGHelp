@@ -2,16 +2,15 @@ package com.example.bghelp.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.bghelp.ui.screens.events.AddEventModal
 import com.example.bghelp.ui.screens.events.EventScreen
 import com.example.bghelp.ui.screens.events.EventWallpaperScreen
-import com.example.bghelp.ui.screens.items.AddItemModal
 import com.example.bghelp.ui.screens.items.ItemScreen
 import com.example.bghelp.ui.screens.items.ItemWallpaperScreen
 import com.example.bghelp.ui.screens.options.CreateAlarmScreen
@@ -22,7 +21,7 @@ import com.example.bghelp.ui.screens.task.TaskWallpaperScreen
 import com.example.bghelp.ui.screens.target.AddTargetScreen
 import com.example.bghelp.ui.screens.target.TargetScreen
 import com.example.bghelp.ui.screens.target.TargetWallpaperScreen
-import com.example.bghelp.utils.Screen
+import com.example.bghelp.ui.navigation.Screen
 
 @Composable
 fun BottomNavHost(
@@ -36,7 +35,9 @@ fun BottomNavHost(
     ) {
         composable(Screen.Tasks.Home.route) { TaskScreen() }
         composable(Screen.Targets.Home.route) { TargetScreen() }
-        composable(Screen.Items.Home.route) { ItemScreen() }
+        composable(Screen.Items.Home.route) { 
+            ItemScreen(viewModel = hiltViewModel()) 
+        }
         composable(Screen.Events.Home.route) { EventScreen() }
     }
 }
@@ -64,7 +65,7 @@ fun OverlayNavHost(
 
         // Modal screens
         composable(Screen.Items.Add.route) {
-            AddItemModal(onItemCreated = { navController.popBackStack() })
+            AddEventModal(onEventCreated = { navController.popBackStack() })
         }
 
         composable(Screen.Events.Add.route) {

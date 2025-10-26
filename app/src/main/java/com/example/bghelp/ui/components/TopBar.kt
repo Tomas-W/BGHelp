@@ -57,7 +57,7 @@ fun TopBar(
                     Image(
                         painter = painterResource(id = R.drawable.screenshot),
                         contentDescription = "Wallpaper",
-                        modifier = Modifier.size(Sizes.Icon.Large)
+                        modifier = Modifier.size(Sizes.Icon.ExtraLarge)
                     )
                 }
             } else {
@@ -66,7 +66,7 @@ fun TopBar(
                     Image(
                         painter = painterResource(id = R.drawable.back),
                         contentDescription = "Back",
-                        modifier = Modifier.size(Sizes.Icon.Large)
+                        modifier = Modifier.size(Sizes.Icon.ExtraLarge)
                     )
                 }
             }
@@ -85,7 +85,7 @@ fun TopBar(
                 Image(
                     painter = painterResource(R.drawable.options_inactive),
                     contentDescription = "Options",
-                    modifier = Modifier.size(Sizes.Icon.Large)
+                    modifier = Modifier.size(Sizes.Icon.ExtraLarge)
                 )
             }
         }

@@ -1,7 +1,7 @@
 package com.example.bghelp.domain.model
 
-import com.example.bghelp.utils.AlarmMode
-import com.example.bghelp.utils.SchedulableItem
+import com.example.bghelp.domain.model.AlarmMode
+import com.example.bghelp.domain.model.SchedulableItem
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -17,7 +17,7 @@ data class CreateTask(
 
 data class Task(
     override val id: Int,
-    val dateTime: LocalDateTime,
+    override val date: LocalDateTime,
     override val message: String,
     val expired: Boolean,
     val alarmName: String?,
@@ -25,12 +25,8 @@ data class Task(
     override val vibrate: AlarmMode,
     override val snoozeTime: Int
 ) : SchedulableItem {
-    // SchedulableItem properties
-    override val date: Long
-        get() = dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-
     val isExpired: Boolean
-        get() = dateTime.isBefore(LocalDateTime.now())
+        get() = date.isBefore(LocalDateTime.now())
 
     val hasAlarm: Boolean
         get() = sound != AlarmMode.OFF || vibrate != AlarmMode.OFF

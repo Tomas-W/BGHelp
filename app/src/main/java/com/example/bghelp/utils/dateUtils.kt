@@ -2,18 +2,24 @@ package com.example.bghelp.utils
 
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 
-fun Long.toDayHeader(): String {
-    val date = Instant.ofEpochMilli(this)  // Use milliseconds
-        .atZone(ZoneId.systemDefault())
-        .toLocalDate()
+fun getEpochRange(date: LocalDateTime = LocalDateTime.now()): Pair<Long, Long> {
+    val zone = ZoneId.systemDefault()
+    val today = date.toLocalDate()
+    val startOfDay = today.atStartOfDay(zone).toInstant().toEpochMilli()
+    val endOfDay = today.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli() - 1
+    return Pair(startOfDay, endOfDay)
+}
 
+fun LocalDateTime.toDayHeader(): String {
+    val date = this.toLocalDate()
     val today = LocalDate.now()
-    val monthDayFormatter = DateTimeFormatter.ofPattern("MMM dd")
-    val weekdayFormatter = DateTimeFormatter.ofPattern("EEE") // "Mon", "Tue", etc.
+    val monthDayFormatter = DateTimeFormatter.ofPattern("MMM dd") // "Jan 01"
+    val weekdayFormatter = DateTimeFormatter.ofPattern("EEE") // "Mon"
 
     val prefix = when (date) {
         today.minusDays(1) -> "Yesterday"
@@ -25,23 +31,12 @@ fun Long.toDayHeader(): String {
     return "$prefix, ${date.format(monthDayFormatter)}"
 }
 
-fun Long.isInFuture(): Boolean {
-    val providedTime = this
-    val now: Long = Instant.now().toEpochMilli()  // Use milliseconds
-    return providedTime > now
+
+fun LocalDateTime.isInFuture(): Boolean {
+    return this.isAfter(LocalDateTime.now())
 }
 
-fun Long.toTaskTime(): String {
-    return Instant.ofEpochMilli(this)  // Use milliseconds
-        .atZone(ZoneId.systemDefault())
-        .toLocalTime()
-        .format(DateTimeFormatter.ofPattern("HH:mm"))
-}
-
-fun getEpochRange(date: Instant = Instant.now()): Pair<Long, Long> {
-    val zone = ZoneId.systemDefault()
-    val today = date.atZone(zone).toLocalDate()
-    val startOfDay = today.atStartOfDay(zone).toInstant().toEpochMilli()  // Use milliseconds
-    val endOfDay = today.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli() - 1  // Use milliseconds
-    return Pair(startOfDay, endOfDay)
+fun LocalDateTime.toTaskTime(): String {
+    return this.toLocalTime()
+        .format(DateTimeFormatter.ofPattern("HH:mm")) // 15:44
 }

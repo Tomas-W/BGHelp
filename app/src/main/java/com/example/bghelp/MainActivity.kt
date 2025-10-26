@@ -21,14 +21,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Enable edge-to-edge mode
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
             val systemUiController = rememberSystemUiController()
             
             SideEffect {
-                // Only set navigation bar color since TopBar handles status bar
+                // set NavigationBar color - StatusBar set by TopBar
                 systemUiController.setNavigationBarColor(
                     color = BackgroundGrey,
                     darkIcons = true

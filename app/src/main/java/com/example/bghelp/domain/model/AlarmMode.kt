@@ -1,5 +1,4 @@
-package com.example.bghelp.utils
-
+package com.example.bghelp.domain.model
 
 enum class AlarmMode(val value: String) {
     OFF("off"),

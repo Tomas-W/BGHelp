@@ -1,7 +1,10 @@
 package com.example.bghelp.di
 
+import com.example.bghelp.data.local.ItemDao
 import com.example.bghelp.data.local.TargetDao
 import com.example.bghelp.data.local.TaskDao
+import com.example.bghelp.data.repository.ItemRepository
+import com.example.bghelp.data.repository.ItemRepositoryImpl
 import com.example.bghelp.data.repository.TargetRepository
 import com.example.bghelp.data.repository.TargetRepositoryImpl
 import com.example.bghelp.data.repository.TaskRepository
@@ -25,5 +28,11 @@ object RepositoryModule {
     @Singleton
     fun provideTargetRepository(targetDao: TargetDao): TargetRepository {
         return TargetRepositoryImpl(targetDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideItemRepository(itemDao: ItemDao): ItemRepository {
+        return ItemRepositoryImpl(itemDao)
     }
 }

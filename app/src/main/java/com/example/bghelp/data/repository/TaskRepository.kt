@@ -57,7 +57,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
 
         return Task(
             id = id,
-            dateTime = localDateTime,
+            date = localDateTime,
             message = message,
             expired = expired,
             alarmName = alarmName,
@@ -69,7 +69,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
 
     // Domain → Entity
     private fun Task.toEntity(): TaskEntity {
-        val epochMillis = dateTime.atZone(ZoneId.systemDefault())
+        val epochMillis = date.atZone(ZoneId.systemDefault())
             .toInstant()
             .toEpochMilli()
 

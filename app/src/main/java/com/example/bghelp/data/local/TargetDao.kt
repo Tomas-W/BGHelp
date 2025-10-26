@@ -23,14 +23,14 @@ abstract class TargetDao {
         SELECT * FROM ${DB.TARGET_TABLE}
         WHERE id=:id
         """)
-    abstract fun getTargetById(id: Int): Flow<TargetEntity?>
+    abstract fun getTargetById(id: Int) : Flow<TargetEntity?>
 
     @Query("""
         SELECT * FROM ${DB.TARGET_TABLE}
         ORDER BY date
         ASC
         """)
-    abstract fun getAllTargets(): Flow<List<TargetEntity>>
+    abstract fun getAllTargets() : Flow<List<TargetEntity>>
 
     @Query("""
         SELECT * FROM ${DB.TARGET_TABLE}
@@ -39,7 +39,7 @@ abstract class TargetDao {
         ORDER BY date
         ASC
         """)
-    abstract fun getTargetByDateRange(startDate: Long, endDate: Long): Flow<List<TargetEntity>>
+    abstract fun getTargetByDateRange(startDate: Long, endDate: Long) : Flow<List<TargetEntity>>
 
     @Query("""
         SELECT * FROM ${DB.TARGET_TABLE}
@@ -48,5 +48,5 @@ abstract class TargetDao {
         ASC
         LIMIT 1
         """)
-    abstract fun getNextTarget(currentTime: Long): Flow<TargetEntity?>
+    abstract fun getNextTarget(currentTime: Long) : Flow<TargetEntity?>
 }

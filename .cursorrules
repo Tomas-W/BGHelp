@@ -1,0 +1,175 @@
+# BGHelp - Android Jetpack Compose App
+
+## Flexibility Notice
+Maintain consistency with the existing project architecture while applying best practices. Adapt patterns to fit the current structure rather than enforcing rigid rules.
+
+## Tech Stack
+- Kotlin 2.0.21 + Jetpack Compose (Material 3)
+- MVVM + Repository Pattern
+- Hilt for dependency injection
+- Room database with Flow
+- Navigation Compose
+- Coroutines for async operations
+
+## Project Structure
+```
+app/src/main/java/com/example/bghelp/
+├── data/local/              # Room: DAOs, Entities, Database
+├── data/repository/         # Repository interfaces + implementations
+├── domain/model/            # Domain models (Item, Task, Target, Event)
+├── di/                      # Hilt modules
+├── ui/
+│   ├── components/          # Reusable composables
+│   ├── screens/[feature]/   # Feature folders: Screen, ViewModel, components
+│   ├── navigation/          # Sealed class navigation
+│   └── theme/               # Colors, TextStyles, Theme
+└── utils/
+```
+
+## Core Principles
+- Unidirectional data flow: UI → ViewModel → Repository → Data Source
+- StateFlow for reactive UI state
+- Entity ↔ Domain model separation in repositories
+- State hoisting in composables
+- ViewModelScope for coroutine lifecycle
+
+## Code Style
+
+### General
+- **Always use double quotes** for strings: `"text"` not `'text'`
+- Use meaningful names, minimal comments (explain why, not what)
+- Follow Material Design 3 guidelines
+
+### Naming Conventions
+- **Classes/Composables**: PascalCase (`ItemScreen`, `ItemViewModel`)
+- **Functions/Variables**: camelCase (`addItem`, `allItems`)
+- **Constants**: UPPER_SNAKE_CASE in objects (`DB_NAME`)
+- **Database fields**: snake_case (`item_group`, `created_at`)
+- **Files**: `*Screen.kt`, `*ViewModel.kt`, `*Repository.kt`, `*Dao.kt`, `*Entity.kt`
+
+## Layer-Specific Patterns
+
+### Data Layer
+```kotlin
+// DAO: abstract class, Flow for queries, suspend for writes
+@Dao
+abstract class ItemDao {
+    @Query("SELECT * FROM ${DB.ITEM_TABLE}")
+    abstract fun getAllItems(): Flow<List<ItemEntity>>
+    
+    @Insert
+    abstract suspend fun addItem(item: ItemEntity)
+}
+
+// Repository: interface + implementation, map Entity ↔ Domain
+interface ItemRepository {
+    fun getAllItems(): Flow<List<Item>>
+}
+
+class ItemRepositoryImpl(private val dao: ItemDao) : ItemRepository {
+    override fun getAllItems(): Flow<List<Item>> =
+        dao.getAllItems().map { it.map { entity -> entity.toDomain() } }
+}
+```
+
+### Domain Layer
+```kotlin
+// Immutable data classes
+data class Item(val id: Int, val name: String, ...)
+data class CreateItem(val name: String, ...) // Without id
+```
+
+### ViewModel Layer
+```kotlin
+@HiltViewModel
+class ItemViewModel @Inject constructor(
+    private val repository: ItemRepository
+) : ViewModel() {
+    // StateFlow with stateIn for UI state
+    val allItems: StateFlow<List<Item>> = repository.getAllItems()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    
+    // Actions launch in viewModelScope
+    fun addItem(item: CreateItem) {
+        viewModelScope.launch { repository.addItem(item) }
+    }
+}
+```
+
+### UI Layer (Compose)
+```kotlin
+@Composable
+fun ItemScreen(
+    viewModel: ItemViewModel,
+    modifier: Modifier = Modifier
+) {
+    val items by viewModel.allItems.collectAsState()
+    
+    // Use project containers: LazyColumnContainer, ScreenContainer,
+    // HighlightedContainerLarge, HighlightedContainerSmall
+    LazyColumnContainer {
+        items(items) { item ->
+            Text(item.name, style = TextStyles.Default.Medium)
+        }
+    }
+}
+```
+
+## Compose Best Practices
+- Use `remember` and `derivedStateOf` appropriately
+- Optimize recomposition with proper keys in lists
+- State hoisting: pass state down, events up
+- Use `LaunchedEffect` for side effects
+- Proper modifier ordering
+- Always provide `contentDescription` for icons
+
+## Custom Components
+
+### Text Styling
+```kotlin
+// Use TextStyles hierarchy: [Color].[Variant].[Size]
+TextStyles.Default.Medium      // Black, medium
+TextStyles.Grey.Bold.Large     // Grey, bold, large
+TextStyles.Error.Small         // Red, small
+// Colors: Default, Grey, White, Error, Warning, Success, Info
+// Sizes: ExtraSmall, Small, Medium, Large, ExtraLarge
+```
+
+### Navigation
+```kotlin
+// Sealed class hierarchy with feature grouping
+sealed class Screen(val title: String, val route: String) {
+    sealed class Items(...) : Screen(...) {
+        object Home : Items("Items", "items")
+        object Add : Items("Add Item", "items/add")
+    }
+}
+```
+
+## Dependency Injection (Hilt)
+```kotlin
+@Module
+@InstallIn(SingletonComponent::class)
+object DatabaseModule {
+    @Provides @Singleton
+    fun provideDatabase(@ApplicationContext context: Context): AppDatabase = ...
+}
+
+// ViewModels: @HiltViewModel with @Inject constructor
+```
+
+## Performance & Testing
+- Minimize recomposition with proper state management
+- Use lazy loading: `LazyColumn`, `LazyRow`
+- Handle nullable types explicitly: `items[key] ?: emptyList()`
+- Write unit tests for ViewModels and Repositories
+- Use Compose testing framework for UI tests
+
+## Domain Context
+App manages four entities (Tasks, Targets, Items, Events) - each follows the same pattern: Screen → ViewModel → Repository → DAO → Entity.
+
+## Important Notes
+- Handle loading/error states in UI
+- Use string resources for user-facing text (when possible)
+- Database uses `.fallbackToDestructiveMigration(true)` currently
+- Import with aliases when long constant names: `import DatabaseConstants as DB`

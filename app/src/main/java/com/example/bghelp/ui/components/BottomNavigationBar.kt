@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.bghelp.R
-import com.example.bghelp.utils.Screen
+import com.example.bghelp.ui.navigation.Screen
 import com.example.bghelp.ui.theme.BottomNavSelected
 import com.example.bghelp.ui.theme.BottomNavUnselected
 import com.example.bghelp.ui.theme.SecondaryBlue
@@ -36,6 +36,7 @@ private fun RowScope.NavigationItem(
     currentRoute: String?,
     onClick: () -> Unit
 ) {
+    // Map route to icon
     val iconRes = when (screen) {
         Screen.Tasks.Home -> if (currentRoute == screen.route) R.drawable.tasks_filled else R.drawable.tasks_outlined
         Screen.Targets.Home -> if (currentRoute == screen.route) R.drawable.targets_filled else R.drawable.targets_outlined
@@ -83,7 +84,6 @@ fun BottomNavigationBar(
     isOptionsActive: Boolean = false,
     onRequestNavigateTo: ((String) -> Unit)? = null,
 ) {
-
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = if (isOptionsActive) null else navBackStackEntry?.destination?.route
 
@@ -102,6 +102,7 @@ fun BottomNavigationBar(
             }
         }
     }
+    // Offset by android navigationBar
     val padding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val totHeight = padding + 64.dp
     NavigationBar(
@@ -111,30 +112,35 @@ fun BottomNavigationBar(
             .padding(bottom = padding),
         windowInsets = WindowInsets(0, 12)
     ) {
+        // Home
         NavigationItem(
             screen = Screen.Events.Home,
             currentRoute = currentRoute,
             onClick = { navigateTo(Screen.Events.Home.route) }
         )
 
+        // Tasks
         NavigationItem(
             screen = Screen.Tasks.Home,
             currentRoute = currentRoute,
             onClick = { navigateTo(Screen.Tasks.Home.route) }
         )
-        
+
+        // Targets
         NavigationItem(
             screen = Screen.Targets.Home,
             currentRoute = currentRoute,
             onClick = { navigateTo(Screen.Targets.Home.route) }
         )
-        
+
+         // Items
         NavigationItem(
             screen = Screen.Items.Home,
             currentRoute = currentRoute,
             onClick = { navigateTo(Screen.Items.Home.route) }
         )
-        
+
+        // Events
         NavigationItem(
             screen = Screen.Events.Home,
             currentRoute = currentRoute,

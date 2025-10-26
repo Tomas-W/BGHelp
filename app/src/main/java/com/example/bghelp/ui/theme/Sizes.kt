@@ -1,6 +1,5 @@
 package com.example.bghelp.ui.theme
 
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 
@@ -17,6 +16,7 @@ object Sizes {
         val Medium = 22.dp
         val Large = 26.dp
         val ExtraLarge = 32.dp
+        val MegaLarge = 54.dp
     }
     
     object Button {

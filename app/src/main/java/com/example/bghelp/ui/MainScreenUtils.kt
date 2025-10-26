@@ -1,8 +1,7 @@
 package com.example.bghelp.ui
 
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import com.example.bghelp.utils.Screen
+import com.example.bghelp.ui.navigation.Screen
 
 fun getCurrentScreen(bottomRoute: String?, optionsRoute: String?): Screen {
     val effectiveRoute = if (optionsRoute != null && optionsRoute != "empty") {
