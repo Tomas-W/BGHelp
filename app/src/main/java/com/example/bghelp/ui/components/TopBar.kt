@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
+import com.example.bghelp.constants.UiConstants as UI
 import com.example.bghelp.ui.theme.MainBlue
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
@@ -33,12 +34,14 @@ fun TopBar(
     onBackClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {}
 ) {
+    val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+
     Column {
         // System bar
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
+                .height(statusBarHeight)
                 .background(MainBlue)
         )
 
@@ -47,7 +50,7 @@ fun TopBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MainBlue)
-                .height(56.dp)
+                .height(UI.TOP_BAR_HEIGHT.dp)
                 .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

@@ -4,9 +4,15 @@ sealed class Screen(
     val title: String,
     val route: String
 ) {
+    // Home Feature Screens
+    sealed class Home(title: String, route: String) : Screen(title, route) {
+        object Main : Home("Home", "home")
+        object Wallpaper : Home("Home Wallpaper", "home/wallpaper")
+    }
+
     // Tasks Feature Screens
     sealed class Tasks(title: String, route: String) : Screen(title, route) {
-        object Home : Tasks("Tasks", "tasks")
+        object Main : Tasks("Tasks", "tasks")
         object Add : Tasks("Add Task", "tasks/add")
         object Calendar : Tasks("Tasks Calendar", "tasks/calendar")
         object Wallpaper : Tasks("Tasks Wallpaper", "tasks/wallpaper")
@@ -14,7 +20,7 @@ sealed class Screen(
     
     // Targets Feature Screens
     sealed class Targets(title: String, route: String) : Screen(title, route) {
-        object Home : Targets("Targets", "targets")
+        object Main : Targets("Targets", "targets")
         object Add : Targets("Add Target", "targets/add")
         object Calendar : Targets("Targets Calendar", "targets/calendar")
         object Wallpaper : Targets("Targets Wallpaper", "targets/wallpaper")
@@ -22,7 +28,7 @@ sealed class Screen(
     
     // Items Feature Screens
     sealed class Items(title: String, route: String) : Screen(title, route) {
-        object Home : Items("Items", "items")
+        object Main : Items("Items", "items")
         object Add : Items("Add Item", "items/add")
         object Calendar : Items("Items Calendar", "items/calendar")
         object Wallpaper : Items("Items Wallpaper", "items/wallpaper")
@@ -30,7 +36,7 @@ sealed class Screen(
     
     // Events Feature Screens
     sealed class Events(title: String, route: String) : Screen(title, route) {
-        object Home : Events("Events", "events")
+        object Main : Events("Events", "events")
         object Add : Events("Add Event", "events/add")
         object Calendar : Events("Events Calendar", "events/calendar")
         object Wallpaper : Events("Events Wallpaper", "events/wallpaper")
@@ -45,33 +51,36 @@ sealed class Screen(
     companion object {
         fun getScreenByRoute(route: String?): Screen {
             return when (route) {
-                Tasks.Home.route -> Tasks.Home
+                Home.Main.route -> Home.Main
+                Home.Wallpaper.route -> Home.Wallpaper
+                Tasks.Main.route -> Tasks.Main
                 Tasks.Add.route -> Tasks.Add
                 Tasks.Calendar.route -> Tasks.Calendar
                 Tasks.Wallpaper.route -> Tasks.Wallpaper
-                Targets.Home.route -> Targets.Home
+                Targets.Main.route -> Targets.Main
                 Targets.Add.route -> Targets.Add
                 Targets.Calendar.route -> Targets.Calendar
                 Targets.Wallpaper.route -> Targets.Wallpaper
-                Items.Home.route -> Items.Home
+                Items.Main.route -> Items.Main
                 Items.Add.route -> Items.Add
                 Items.Calendar.route -> Items.Calendar
                 Items.Wallpaper.route -> Items.Wallpaper
-                Events.Home.route -> Events.Home
+                Events.Main.route -> Events.Main
                 Events.Add.route -> Events.Add
                 Events.Calendar.route -> Events.Calendar
                 Events.Wallpaper.route -> Events.Wallpaper
                 Options.Settings.route -> Options.Settings
                 Options.CreateAlarm.route -> Options.CreateAlarm
-                else -> Tasks.Home // Default to Tasks instead of Empty
+                else -> Tasks.Main // Default to Tasks instead of Empty
             }
         }
 
         val bottomNavScreens = listOf(
-            Tasks.Home,
-            Targets.Home,
-            Items.Home,
-            Events.Home
+            Home.Main,
+            Tasks.Main,
+            Targets.Main,
+            Items.Main,
+            Events.Main
         )
 
         val addScreens = listOf(
@@ -89,6 +98,7 @@ sealed class Screen(
         )
 
         val wallpaperScreens = listOf(
+            Home.Wallpaper,
             Tasks.Wallpaper,
             Targets.Wallpaper,
             Items.Wallpaper,
@@ -100,11 +110,11 @@ sealed class Screen(
             Options.CreateAlarm
         )
 
-        val featureHomes = listOf(
-            Tasks.Home,
-            Targets.Home,
-            Items.Home,
-            Events.Home
+        val featureMains = listOf(
+            Tasks.Main,
+            Targets.Main,
+            Items.Main,
+            Events.Main
         )
     }
 }

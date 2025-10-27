@@ -33,6 +33,9 @@ class TargetViewModel @Inject constructor(
     private val _selectedWeek = MutableStateFlow<LocalDate>(LocalDate.now().with(DayOfWeek.MONDAY))
     val selectedWeek: StateFlow<LocalDate> = _selectedWeek.asStateFlow()
 
+    private val _savedScrollIndex = MutableStateFlow(0)
+    private val _savedScrollOffset = MutableStateFlow(0)
+
     val monthYear: StateFlow<String> = selectedWeek
         .map { it.format(DateTimeFormatter.ofPattern("MMMM ''yy")) }
         .stateIn(
@@ -40,7 +43,7 @@ class TargetViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = ""
         )
-    
+
     val weekNumber: StateFlow<String> = selectedWeek
         .map { "week ${it.get(WeekFields.ISO.weekOfYear())}" }
         .stateIn(
@@ -58,6 +61,34 @@ class TargetViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+    
+    fun goToPreviousWeek() {
+        updateSelectedWeek(_selectedWeek.value.minusWeeks(1))
+    }
+
+    fun goToNextWeek() {
+        updateSelectedWeek(_selectedWeek.value.plusWeeks(1))
+    }
+
+    fun goToDay(day: LocalDate) {
+        updateSelectedDate(day.atStartOfDay())
+    }
+
+    fun updateSelectedWeek(week: LocalDate) {
+        _selectedWeek.value = week
+    }
+
+    fun updateSelectedDate(date: LocalDateTime) {
+        _selectedDate.value = date
+    }
+
+    fun saveScrollPosition(index: Int, offset: Int) {
+        _savedScrollIndex.value = index
+        _savedScrollOffset.value = offset
+    }
+
+    fun getSavedScrollIndex(): Int = _savedScrollIndex.value
+    fun getSavedScrollOffset(): Int = _savedScrollOffset.value
 
     fun addTarget(createTarget: CreateTarget) {
         viewModelScope.launch {
@@ -84,14 +115,6 @@ class TargetViewModel @Inject constructor(
                 initialValue = emptyList()
             )
 
-    fun updateSelectedWeek(date: LocalDate) {
-        _selectedWeek.value = date
-    }
-
-    fun updateSelectedDate(date: LocalDateTime) {
-        _selectedDate.value = date
-    }
-
     val getAllTargets: StateFlow<List<Target>> =
         targetRepository.getAllTargets()
             .stateIn(
@@ -99,24 +122,4 @@ class TargetViewModel @Inject constructor(
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = emptyList()
             )
-
-    fun goToPreviousWeek() {
-        updateSelectedWeek(_selectedWeek.value.minusWeeks(1))
-    }
-
-    fun goToNextWeek() {
-        updateSelectedWeek(_selectedWeek.value.plusWeeks(1))
-    }
-
-    fun goToDay(day: LocalDate) {
-        updateSelectedDate(day.atStartOfDay())
-    }
-
-    fun isDaySelected(day: LocalDate): Boolean {
-        return _selectedDate.value.toLocalDate() == day
-    }
-
-    fun isDayToday(day: LocalDate): Boolean {
-        return LocalDate.now() == day
-    }
 }

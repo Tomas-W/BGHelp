@@ -3,6 +3,7 @@ package com.example.bghelp.ui
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
+import com.example.bghelp.constants.UiConstants as UI
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextBlack
 import com.example.bghelp.ui.theme.TextGrey
@@ -30,10 +32,18 @@ fun DrawerScreen(
     onNavigateToScreen: (String) -> Unit,
     closeDrawer: () -> Unit
 ) {
+    val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    val navigationBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    val totalTop = statusBarHeight + UI.TOP_BAR_HEIGHT.dp
+    val totalBottom = navigationBarHeight + UI.BOTTOM_BAR_HEIGHT.dp
+
     ModalDrawerSheet(
         modifier = Modifier
             .width(300.dp)
-            .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
+            .padding(
+                top = totalTop,
+                bottom = totalBottom),
+        windowInsets = WindowInsets(0)
     ) {
         Column(modifier = Modifier.padding(top = 24.dp, end = 54.dp)) {
             Screen.optionsScreens.forEach { screen ->

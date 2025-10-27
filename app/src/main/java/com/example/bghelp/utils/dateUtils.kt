@@ -6,6 +6,19 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
+// Cache today's date to avoid repeated calls
+private var cachedToday: LocalDate? = null
+private var lastCacheTime: Long = 0L
+
+private fun getToday(): LocalDate {
+    val currentTime = System.currentTimeMillis()
+    // Cache for 60 seconds to avoid excessive date changes
+    if (cachedToday == null || currentTime - lastCacheTime > 60_000) {
+        cachedToday = LocalDate.now()
+        lastCacheTime = currentTime
+    }
+    return cachedToday!!
+}
 
 fun getEpochRange(date: LocalDateTime = LocalDateTime.now()): Pair<Long, Long> {
     val zone = ZoneId.systemDefault()
@@ -17,7 +30,7 @@ fun getEpochRange(date: LocalDateTime = LocalDateTime.now()): Pair<Long, Long> {
 
 fun LocalDateTime.toDayHeader(): String {
     val date = this.toLocalDate()
-    val today = LocalDate.now()
+    val today = getToday()  // Use cached today instead of LocalDate.now()
     val monthDayFormatter = DateTimeFormatter.ofPattern("MMM dd") // "Jan 01"
     val weekdayFormatter = DateTimeFormatter.ofPattern("EEE") // "Mon"
 
@@ -30,7 +43,6 @@ fun LocalDateTime.toDayHeader(): String {
 
     return "$prefix, ${date.format(monthDayFormatter)}"
 }
-
 
 fun LocalDateTime.isInFuture(): Boolean {
     return this.isAfter(LocalDateTime.now())

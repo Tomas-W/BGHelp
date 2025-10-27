@@ -24,11 +24,12 @@ fun navigateToOptionsScreen(navController: NavController, route: String) {
 
 fun navigateToWallpaperScreen(navController: NavController, currentScreen: Screen) {
     val wallpaperRoute = when (currentScreen) {
+        is Screen.Home -> Screen.Home.Wallpaper.route
         is Screen.Tasks -> Screen.Tasks.Wallpaper.route
         is Screen.Targets -> Screen.Targets.Wallpaper.route
         is Screen.Items -> Screen.Items.Wallpaper.route
         is Screen.Events -> Screen.Events.Wallpaper.route
-        else -> Screen.Tasks.Wallpaper.route
+        else -> Screen.Home.Wallpaper.route
     }
     navController.navigate(wallpaperRoute) {
         launchSingleTop = true

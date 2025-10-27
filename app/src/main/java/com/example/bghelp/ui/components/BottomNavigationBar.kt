@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -15,6 +14,7 @@ import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
@@ -23,12 +23,26 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.bghelp.R
+import com.example.bghelp.constants.UiConstants as UI
 import com.example.bghelp.ui.navigation.Screen
 import com.example.bghelp.ui.theme.BottomNavSelected
 import com.example.bghelp.ui.theme.BottomNavUnselected
 import com.example.bghelp.ui.theme.SecondaryBlue
 import com.example.bghelp.ui.theme.Sizes
 
+@Composable
+private fun getIconResource(screen: Screen, currentRoute: String?): Int {
+    val isSelected = currentRoute == screen.route
+    return remember(screen, isSelected) {
+        when (screen) {
+            Screen.Tasks.Main -> if (isSelected) R.drawable.tasks_filled else R.drawable.tasks_outlined
+            Screen.Targets.Main -> if (isSelected) R.drawable.targets_filled else R.drawable.targets_outlined
+            Screen.Items.Main -> if (isSelected) R.drawable.items_filled else R.drawable.items_outlined
+            Screen.Events.Main -> if (isSelected) R.drawable.events_filled else R.drawable.events_outlined
+            else -> R.drawable.tasks_outlined
+        }
+    }
+}
 
 @Composable
 private fun RowScope.NavigationItem(
@@ -36,17 +50,11 @@ private fun RowScope.NavigationItem(
     currentRoute: String?,
     onClick: () -> Unit
 ) {
-    // Map route to icon
-    val iconRes = when (screen) {
-        Screen.Tasks.Home -> if (currentRoute == screen.route) R.drawable.tasks_filled else R.drawable.tasks_outlined
-        Screen.Targets.Home -> if (currentRoute == screen.route) R.drawable.targets_filled else R.drawable.targets_outlined
-        Screen.Items.Home -> if (currentRoute == screen.route) R.drawable.items_filled else R.drawable.items_outlined
-        Screen.Events.Home -> if (currentRoute == screen.route) R.drawable.events_filled else R.drawable.events_outlined
-        else -> R.drawable.tasks_outlined
-    }
+    val isSelected = currentRoute == screen.route
+    val iconRes = getIconResource(screen, currentRoute)
     
     NavigationBarItem(
-        selected = currentRoute == screen.route,
+        selected = isSelected,
         onClick = onClick,
         icon = { 
             Image(
@@ -54,15 +62,15 @@ private fun RowScope.NavigationItem(
                 contentDescription = screen.title,
                 modifier = Modifier.size(Sizes.Icon.Large),
                 colorFilter = ColorFilter.tint(
-                    if (currentRoute == screen.route) BottomNavSelected else BottomNavUnselected
+                    if (isSelected) BottomNavSelected else BottomNavUnselected
                 )
             )
         },
         label = { 
             Text(
                 text = screen.title,
-                color = if (currentRoute == screen.route) BottomNavSelected else BottomNavUnselected,
-                fontWeight = if (currentRoute == screen.route) FontWeight.Bold else FontWeight.Normal,
+                color = if (isSelected) BottomNavSelected else BottomNavUnselected,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
             )
         },
         colors = NavigationBarItemColors(
@@ -85,7 +93,9 @@ fun BottomNavigationBar(
     onRequestNavigateTo: ((String) -> Unit)? = null,
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = if (isOptionsActive) null else navBackStackEntry?.destination?.route
+    val currentRoute = remember(isOptionsActive, navBackStackEntry?.destination?.route) {
+        if (isOptionsActive) null else navBackStackEntry?.destination?.route
+    }
 
     fun navigateTo(route: String) {
         if (isOptionsActive && onRequestNavigateTo != null) {
@@ -102,49 +112,48 @@ fun BottomNavigationBar(
             }
         }
     }
-    // Offset by android navigationBar
-    val padding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-    val totHeight = padding + 64.dp
+
+    val navigationBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    val totalHeight = remember(navigationBarHeight) { navigationBarHeight + UI.BOTTOM_BAR_HEIGHT.dp }
     NavigationBar(
         modifier = modifier
             .fillMaxWidth()
-            .height(totHeight)
-            .padding(bottom = padding),
-        windowInsets = WindowInsets(0, 12)
+            .height(totalHeight),
+        windowInsets = WindowInsets(bottom = navigationBarHeight, top = 6.dp),
     ) {
         // Home
         NavigationItem(
-            screen = Screen.Events.Home,
+            screen = Screen.Home.Main,
             currentRoute = currentRoute,
-            onClick = { navigateTo(Screen.Events.Home.route) }
+            onClick = { navigateTo(Screen.Home.Main.route) }
         )
 
         // Tasks
         NavigationItem(
-            screen = Screen.Tasks.Home,
+            screen = Screen.Tasks.Main,
             currentRoute = currentRoute,
-            onClick = { navigateTo(Screen.Tasks.Home.route) }
+            onClick = { navigateTo(Screen.Tasks.Main.route) }
         )
 
         // Targets
         NavigationItem(
-            screen = Screen.Targets.Home,
+            screen = Screen.Targets.Main,
             currentRoute = currentRoute,
-            onClick = { navigateTo(Screen.Targets.Home.route) }
+            onClick = { navigateTo(Screen.Targets.Main.route) }
         )
 
          // Items
         NavigationItem(
-            screen = Screen.Items.Home,
+            screen = Screen.Items.Main,
             currentRoute = currentRoute,
-            onClick = { navigateTo(Screen.Items.Home.route) }
+            onClick = { navigateTo(Screen.Items.Main.route) }
         )
 
         // Events
         NavigationItem(
-            screen = Screen.Events.Home,
+            screen = Screen.Events.Main,
             currentRoute = currentRoute,
-            onClick = { navigateTo(Screen.Events.Home.route) }
+            onClick = { navigateTo(Screen.Events.Main.route) }
         )
     }
 }

@@ -22,6 +22,8 @@ import com.example.bghelp.ui.screens.target.AddTargetScreen
 import com.example.bghelp.ui.screens.target.TargetScreen
 import com.example.bghelp.ui.screens.target.TargetWallpaperScreen
 import com.example.bghelp.ui.navigation.Screen
+import com.example.bghelp.ui.screens.home.HomeScreen
+import com.example.bghelp.ui.screens.home.HomeWallpaperScreen
 
 @Composable
 fun BottomNavHost(
@@ -30,15 +32,16 @@ fun BottomNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Tasks.Home.route,
+        startDestination = Screen.Tasks.Main.route,
         modifier = modifier
     ) {
-        composable(Screen.Tasks.Home.route) { TaskScreen() }
-        composable(Screen.Targets.Home.route) { TargetScreen() }
-        composable(Screen.Items.Home.route) { 
+        composable(Screen.Home.Main.route) { HomeScreen() }
+        composable(Screen.Tasks.Main.route) { TaskScreen() }
+        composable(Screen.Targets.Main.route) { TargetScreen() }
+        composable(Screen.Items.Main.route) {
             ItemScreen(viewModel = hiltViewModel()) 
         }
-        composable(Screen.Events.Home.route) { EventScreen() }
+        composable(Screen.Events.Main.route) { EventScreen() }
     }
 }
 
@@ -94,6 +97,7 @@ fun OverlayNavHost(
         }
 
         // Wallpaper screens for each feature
+        composable(Screen.Home.Wallpaper.route) { HomeWallpaperScreen() }
         composable(Screen.Tasks.Wallpaper.route) { TaskWallpaperScreen() }
         composable(Screen.Targets.Wallpaper.route) { TargetWallpaperScreen() }
         composable(Screen.Items.Wallpaper.route) { ItemWallpaperScreen() }

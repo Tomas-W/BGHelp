@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.WeekFields
 import javax.inject.Inject
@@ -34,9 +33,9 @@ class TaskViewModel @Inject constructor(
     private val _selectedWeek = MutableStateFlow<LocalDate>(LocalDate.now().with(DayOfWeek.MONDAY))
     val selectedWeek: StateFlow<LocalDate> = _selectedWeek.asStateFlow()
 
-    private val _displayedDay = MutableStateFlow<LocalDateTime>(LocalDateTime.now())
-    val displayedDay: StateFlow<LocalDateTime> = _displayedDay.asStateFlow()
-    
+    private val _savedScrollIndex = MutableStateFlow(0)
+    private val _savedScrollOffset = MutableStateFlow(0)
+
     val monthYear: StateFlow<String> = selectedWeek
         .map { it.format(DateTimeFormatter.ofPattern("MMMM ''yy")) }
         .stateIn(
@@ -44,7 +43,7 @@ class TaskViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = ""
         )
-    
+
     val weekNumber: StateFlow<String> = selectedWeek
         .map { "week ${it.get(WeekFields.ISO.weekOfYear())}" }
         .stateIn(
@@ -75,14 +74,6 @@ class TaskViewModel @Inject constructor(
         updateSelectedDate(day.atStartOfDay())
     }
 
-    fun isDaySelected(day: LocalDate): Boolean {
-        return _selectedDate.value.toLocalDate() == day
-    }
-
-    fun isDayToday(day: LocalDate): Boolean {
-        return LocalDate.now() == day
-    }
-
     fun updateSelectedWeek(week: LocalDate) {
         _selectedWeek.value = week
     }
@@ -90,6 +81,14 @@ class TaskViewModel @Inject constructor(
     fun updateSelectedDate(date: LocalDateTime) {
         _selectedDate.value = date
     }
+
+    fun saveScrollPosition(index: Int, offset: Int) {
+        _savedScrollIndex.value = index
+        _savedScrollOffset.value = offset
+    }
+
+    fun getSavedScrollIndex(): Int = _savedScrollIndex.value
+    fun getSavedScrollOffset(): Int = _savedScrollOffset.value
 
     fun addTask(createTask: CreateTask) {
         viewModelScope.launch {

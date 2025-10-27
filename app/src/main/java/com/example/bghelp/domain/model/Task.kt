@@ -25,9 +25,9 @@ data class Task(
     override val vibrate: AlarmMode,
     override val snoozeTime: Int
 ) : SchedulableItem {
-    val isExpired: Boolean
-        get() = date.isBefore(LocalDateTime.now())
-
+    // Removed isExpired - it called LocalDateTime.now() on every access
+    // Use date.isBefore(LocalDateTime.now()) directly in UI when needed
+    
     val hasAlarm: Boolean
         get() = sound != AlarmMode.OFF || vibrate != AlarmMode.OFF
 }
