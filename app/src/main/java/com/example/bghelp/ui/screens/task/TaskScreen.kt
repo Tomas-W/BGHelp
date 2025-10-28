@@ -36,6 +36,7 @@ fun TaskScreen(taskViewModel: TaskViewModel = hiltViewModel()) {
     // Task items
     val selectedTasks by taskViewModel.tasksInRange.collectAsState(initial = emptyList())
     val selectedDate by taskViewModel.selectedDate.collectAsState()
+    val expandedTaskIds by taskViewModel.expandedTaskIds.collectAsState()
     // Week navigation
     val navSelectedDate by remember { derivedStateOf { selectedDate.toLocalDate() } }
     val navMonthYear by taskViewModel.monthYear.collectAsState()
@@ -83,7 +84,12 @@ fun TaskScreen(taskViewModel: TaskViewModel = hiltViewModel()) {
                         key = { task -> task.id },
                         contentType = { "task" }
                         ) { task ->
-                        DayComponent(task, onDelete = taskViewModel::deleteTask)
+                        DayComponent(
+                            item = task,
+                            isExpanded = expandedTaskIds.contains(task.id),
+                            onToggleExpanded = taskViewModel::toggleTaskExpanded,
+                            onDelete = taskViewModel::deleteTask
+                        )
                     }
                 } else {
                     item {
@@ -131,7 +137,8 @@ fun AddTaskButton(
             taskViewModel.addTask(
                 CreateTask(
                     date = localDateTime,
-                    message = "Test Task $localDateTime",
+                    title = "Order Zweistra",
+                    description = null,
                     expired = false,
                     alarmName = "AlarmOne",
                     sound = AlarmMode.CONTINUOUS,

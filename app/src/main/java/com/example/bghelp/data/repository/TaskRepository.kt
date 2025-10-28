@@ -58,7 +58,8 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
         return Task(
             id = id,
             date = localDateTime,
-            message = message,
+            title = title,
+            description = description,
             expired = expired,
             alarmName = alarmName,
             sound = sound,
@@ -76,7 +77,8 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
         return TaskEntity(
             id = id,
             date = epochMillis,
-            message = message,
+            title = title,
+            description = description,
             expired = expired,
             alarmName = alarmName,
             sound = sound,
@@ -94,7 +96,8 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
         return TaskEntity(
             id = 0, // db will auto-generate
             date = epochMillis,
-            message = message,
+            title = title,
+            description = description,
             expired = expired,
             alarmName = alarmName,
             sound = sound,

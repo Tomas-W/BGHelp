@@ -10,7 +10,8 @@ data class TaskEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val date: Long,
-    val message: String,
+    val title: String,
+    val description: String?,
     val expired: Boolean,
     val alarmName: String?,
     val sound: AlarmMode,

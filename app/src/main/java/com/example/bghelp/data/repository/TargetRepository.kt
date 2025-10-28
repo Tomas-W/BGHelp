@@ -58,7 +58,8 @@ class TargetRepositoryImpl(private val targetDao: TargetDao) : TargetRepository 
         return Target(
             id = id,
             date = localDateTime,
-            message = message,
+            title = title,
+            description = description,
             expired = expired,
             coordinates = coordinates,
             alertDistance = alertDistance,
@@ -78,7 +79,8 @@ class TargetRepositoryImpl(private val targetDao: TargetDao) : TargetRepository 
         return TargetEntity(
             id = id,
             date = epochMillis,
-            message = message,
+            title = title,
+            description = description,
             expired = expired,
             coordinates = coordinates,
             alertDistance = alertDistance,
@@ -98,7 +100,8 @@ class TargetRepositoryImpl(private val targetDao: TargetDao) : TargetRepository 
         return TargetEntity(
             id = 0, // db will auto-generate
             date = epochMillis,
-            message = message,
+            title = title,
+            description = description,
             expired = expired,
             coordinates = coordinates,
             alertDistance = alertDistance,

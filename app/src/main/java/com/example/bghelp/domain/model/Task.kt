@@ -7,7 +7,8 @@ import java.time.ZoneId
 
 data class CreateTask(
     val date: LocalDateTime,
-    val message: String,
+    val title: String,
+    val description: String? = null,
     val expired: Boolean = false,
     val alarmName: String? = null,
     val sound: AlarmMode = AlarmMode.OFF,
@@ -18,7 +19,8 @@ data class CreateTask(
 data class Task(
     override val id: Int,
     override val date: LocalDateTime,
-    override val message: String,
+    override val title: String,
+    override val description: String?,
     val expired: Boolean,
     val alarmName: String?,
     override val sound: AlarmMode,

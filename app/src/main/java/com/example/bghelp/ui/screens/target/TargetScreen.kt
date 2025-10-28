@@ -37,6 +37,7 @@ fun TargetScreen(targetViewModel: TargetViewModel = hiltViewModel()) {
     // Target items
     val selectedTargets by targetViewModel.targetsInRange.collectAsState(initial = emptyList())
     val selectedDate by targetViewModel.selectedDate.collectAsState()
+    val expandedTargetIds by targetViewModel.expandedTargetIds.collectAsState()
     // Week nav
     val navSelectedDate by remember { derivedStateOf { selectedDate.toLocalDate() } }
     val navMonthYear by targetViewModel.monthYear.collectAsState()
@@ -84,7 +85,12 @@ fun TargetScreen(targetViewModel: TargetViewModel = hiltViewModel()) {
                         key = { target -> target.id },
                         contentType = { "target" }
                         ) { target ->
-                        DayComponent(target, onDelete = targetViewModel::deleteTarget)
+                        DayComponent(
+                            item = target,
+                            isExpanded = expandedTargetIds.contains(target.id),
+                            onToggleExpanded = targetViewModel::toggleTargetExpanded,
+                            onDelete = targetViewModel::deleteTarget
+                        )
                     }
                 } else {
                     item {
@@ -133,7 +139,8 @@ fun AddTargetButton(
             targetViewModel.addTarget(
                 CreateTarget(
                     date = localDateTime,
-                    message = "Test Target $localDateTime",
+                    title = "Test Target",
+                    description = "Created at $localDateTime",
                     expired = false,
                     coordinates = coords,
                     alertDistance = 300,

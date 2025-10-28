@@ -11,7 +11,8 @@ data class TargetEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val date: Long,
-    val message: String,
+    val title: String,
+    val description: String?,
     val expired: Boolean,
     val coordinates: List<Coordinate>,
     val alertDistance: Int,

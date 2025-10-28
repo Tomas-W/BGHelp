@@ -36,6 +36,9 @@ class TaskViewModel @Inject constructor(
     private val _savedScrollIndex = MutableStateFlow(0)
     private val _savedScrollOffset = MutableStateFlow(0)
 
+    private val _expandedTaskIds = MutableStateFlow<Set<Int>>(emptySet())
+    val expandedTaskIds: StateFlow<Set<Int>> = _expandedTaskIds.asStateFlow()
+
     val monthYear: StateFlow<String> = selectedWeek
         .map { it.format(DateTimeFormatter.ofPattern("MMMM ''yy")) }
         .stateIn(
@@ -89,6 +92,14 @@ class TaskViewModel @Inject constructor(
 
     fun getSavedScrollIndex(): Int = _savedScrollIndex.value
     fun getSavedScrollOffset(): Int = _savedScrollOffset.value
+
+    fun toggleTaskExpanded(taskId: Int) {
+        _expandedTaskIds.value = if (_expandedTaskIds.value.contains(taskId)) {
+            _expandedTaskIds.value - taskId
+        } else {
+            _expandedTaskIds.value + taskId
+        }
+    }
 
     fun addTask(createTask: CreateTask) {
         viewModelScope.launch {

@@ -36,6 +36,9 @@ class TargetViewModel @Inject constructor(
     private val _savedScrollIndex = MutableStateFlow(0)
     private val _savedScrollOffset = MutableStateFlow(0)
 
+    private val _expandedTargetIds = MutableStateFlow<Set<Int>>(emptySet())
+    val expandedTargetIds: StateFlow<Set<Int>> = _expandedTargetIds.asStateFlow()
+
     val monthYear: StateFlow<String> = selectedWeek
         .map { it.format(DateTimeFormatter.ofPattern("MMMM ''yy")) }
         .stateIn(
@@ -89,6 +92,14 @@ class TargetViewModel @Inject constructor(
 
     fun getSavedScrollIndex(): Int = _savedScrollIndex.value
     fun getSavedScrollOffset(): Int = _savedScrollOffset.value
+
+    fun toggleTargetExpanded(targetId: Int) {
+        _expandedTargetIds.value = if (_expandedTargetIds.value.contains(targetId)) {
+            _expandedTargetIds.value - targetId
+        } else {
+            _expandedTargetIds.value + targetId
+        }
+    }
 
     fun addTarget(createTarget: CreateTarget) {
         viewModelScope.launch {

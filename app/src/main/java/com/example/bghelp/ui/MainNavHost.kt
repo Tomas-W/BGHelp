@@ -87,13 +87,7 @@ fun OverlayNavHost(
         }
 
         composable(Screen.Options.CreateAlarm.route) {
-            CreateAlarmScreen(
-                onAlarmCreated = {
-                    navController.navigate(Screen.Options.Settings.route) {
-                        launchSingleTop = true
-                    }
-                }
-            )
+            CreateAlarmScreen()
         }
 
         // Wallpaper screens for each feature

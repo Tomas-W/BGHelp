@@ -1,11 +1,14 @@
 package com.example.bghelp.ui.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -26,21 +29,27 @@ import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.SchedulableItem
+import com.example.bghelp.ui.theme.TextSizes
 import com.example.bghelp.utils.isInFuture
 import com.example.bghelp.utils.toTaskTime
 
 @Composable
 fun <T: SchedulableItem> DayComponent(
     item: T,
+    isExpanded: Boolean,
+    onToggleExpanded: (Int) -> Unit,
     onDelete: (T) -> Unit
 ) {
     val taskBackgroundColor = remember(key1 = item.date) {
         if (item.date.isInFuture()) SecondaryBlue else SecondaryGrey
     }
     val deleteCallback = remember(key1 = item.id) { { onDelete(item) } }
+    val toggleCallback = remember(key1 = item.id) { { onToggleExpanded(item.id) } }
 
     SchedulableContainer(
-        modifier = Modifier,
+        modifier = Modifier
+            .animateContentSize()
+            .clickable(onClick = toggleCallback),
         backgroundColor = taskBackgroundColor
     ) {
         Row(
@@ -50,7 +59,11 @@ fun <T: SchedulableItem> DayComponent(
             TimeInfo(item = item)
             AlarmIcons(item = item, onDelete = deleteCallback)
         }
-        Message(item.message)
+        TitleAndDescription(
+            title = item.title,
+            description = item.description,
+            isExpanded = isExpanded
+        )
     }
 }
 
@@ -72,11 +85,25 @@ fun TimeInfo(item: SchedulableItem) {
 }
 
 @Composable
-fun Message(message: String) {
-    Text(
-        text = message,
-        style = TextStyles.Default.Medium
-    )
+fun TitleAndDescription(
+    title: String,
+    description: String?,
+    isExpanded: Boolean
+) {
+    Column {
+        Text(
+            text = title,
+            style = TextStyles.Default.Medium
+        )
+        if (isExpanded && description != null) {
+            Text(
+                text = description,
+                style = TextStyles.Default.Italic.Medium
+            )
+        } else if (isExpanded) {
+            Spacer(modifier = Modifier.height(TextSizes.MEDIUM.dp))
+        }
+    }
 }
 
 @Composable
@@ -128,4 +155,3 @@ private fun DeleteIcon(onDelete: () -> Unit) {
         modifier = Modifier.clickable(onClick = onDelete)
     )
 }
-

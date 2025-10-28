@@ -8,7 +8,8 @@ import java.time.ZoneId
 
 data class CreateTarget(
     val date: LocalDateTime,
-    val message: String,
+    val title: String,
+    val description: String? = null,
     val expired: Boolean = false,
     val coordinates: List<Coordinate> = emptyList(),
     val alertDistance: Int = 0,
@@ -21,7 +22,8 @@ data class CreateTarget(
 data class Target(
     override val id: Int,
     override val date: LocalDateTime,
-    override val message: String,
+    override val title: String,
+    override val description: String?,
     val expired: Boolean,
     val coordinates: List<Coordinate>,
     val alertDistance: Int,
