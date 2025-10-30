@@ -59,7 +59,7 @@ fun OverlayNavHost(
 
         // Add screens (full screens)
         composable(Screen.Tasks.Add.route) {
-            AddTaskScreen(onTaskCreated = { navController.popBackStack() })
+            AddTaskScreen()
         }
 
         composable(Screen.Targets.Add.route) {
