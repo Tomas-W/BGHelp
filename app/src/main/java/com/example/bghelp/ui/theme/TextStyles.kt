@@ -178,7 +178,7 @@ object TextStyles {
     }
 
     // Info (Blue)
-    object Info {
+    object MainBlue {
         val ExtraSmall = create(TextSizes.EXTRA_SMALL, color = InfoBlue)
         val Small = create(TextSizes.SMALL, color = InfoBlue)
         val Medium = create(TextSizes.MEDIUM, color = InfoBlue)

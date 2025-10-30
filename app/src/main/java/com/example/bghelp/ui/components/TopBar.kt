@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,7 +23,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
 import com.example.bghelp.constants.UiConstants as UI
-import com.example.bghelp.ui.theme.MainBlue
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 
@@ -42,14 +42,14 @@ fun TopBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(statusBarHeight)
-                .background(MainBlue)
+                .background(MaterialTheme.colorScheme.primary)
         )
 
         // Bar content
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MainBlue)
+                .background(MaterialTheme.colorScheme.primary)
                 .height(UI.TOP_BAR_HEIGHT.dp)
                 .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically

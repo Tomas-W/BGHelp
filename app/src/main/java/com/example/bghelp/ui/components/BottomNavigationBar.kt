@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
@@ -27,7 +28,6 @@ import com.example.bghelp.constants.UiConstants as UI
 import com.example.bghelp.ui.navigation.Screen
 import com.example.bghelp.ui.theme.BottomNavSelected
 import com.example.bghelp.ui.theme.BottomNavUnselected
-import com.example.bghelp.ui.theme.SecondaryBlue
 import com.example.bghelp.ui.theme.Sizes
 
 @Composable
@@ -62,25 +62,27 @@ private fun RowScope.NavigationItem(
                 contentDescription = screen.title,
                 modifier = Modifier.size(Sizes.Icon.Large),
                 colorFilter = ColorFilter.tint(
-                    if (isSelected) BottomNavSelected else BottomNavUnselected
+                    if (isSelected) MaterialTheme.colorScheme.onSurface
+                     else MaterialTheme.colorScheme.onTertiary
                 )
             )
         },
         label = { 
             Text(
                 text = screen.title,
-                color = if (isSelected) BottomNavSelected else BottomNavUnselected,
+                color = if (isSelected) MaterialTheme.colorScheme.onSurface
+                        else MaterialTheme.colorScheme.onTertiary,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
             )
         },
         colors = NavigationBarItemColors(
-            selectedIconColor = BottomNavSelected,
-            selectedTextColor = BottomNavSelected,
-            unselectedIconColor = BottomNavUnselected,
-            unselectedTextColor = BottomNavUnselected,
-            selectedIndicatorColor = SecondaryBlue,
-            disabledIconColor = BottomNavUnselected,
-            disabledTextColor = BottomNavUnselected
+            selectedIconColor = MaterialTheme.colorScheme.onBackground,
+            selectedTextColor = MaterialTheme.colorScheme.onBackground,
+            unselectedIconColor = MaterialTheme.colorScheme.onTertiary,
+            unselectedTextColor = MaterialTheme.colorScheme.onTertiary,
+            selectedIndicatorColor = MaterialTheme.colorScheme.secondary,
+            disabledIconColor = MaterialTheme.colorScheme.onTertiary,
+            disabledTextColor = MaterialTheme.colorScheme.onTertiary
         )
     )
 }

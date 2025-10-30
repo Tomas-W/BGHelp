@@ -11,6 +11,7 @@ val MainBlue = Color(51, 102, 178)
 val SecondaryBlue = Color(200, 220, 245)
 val BackgroundGrey = Color(237, 237, 237)
 val SecondaryGrey = Color(210, 210, 210)
+val TertiaryGrey = Color(175, 175, 175)
 
 
 val testBlue = Color(221, 232, 240)

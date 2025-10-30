@@ -24,6 +24,7 @@ import com.example.bghelp.ui.screens.target.TargetWallpaperScreen
 import com.example.bghelp.ui.navigation.Screen
 import com.example.bghelp.ui.screens.home.HomeScreen
 import com.example.bghelp.ui.screens.home.HomeWallpaperScreen
+import com.example.bghelp.ui.screens.items.AddItemScreen
 
 @Composable
 fun BottomNavHost(
@@ -59,7 +60,7 @@ fun OverlayNavHost(
 
         // Add screens (full screens)
         composable(Screen.Tasks.Add.route) {
-            AddTaskScreen(onTaskCreated = { navController.popBackStack() })
+            AddTaskScreen()
         }
 
         composable(Screen.Targets.Add.route) {
@@ -68,7 +69,7 @@ fun OverlayNavHost(
 
         // Modal screens
         composable(Screen.Items.Add.route) {
-            AddEventModal(onEventCreated = { navController.popBackStack() })
+            AddItemScreen(onItemCreated = { navController.popBackStack() })
         }
 
         composable(Screen.Events.Add.route) {

@@ -1,10 +1,12 @@
 package com.example.bghelp.ui.theme
 
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.CompositionLocalProvider
 
 private val DarkColorScheme = darkColorScheme(
     primary = MainBlue,
@@ -20,11 +22,11 @@ private val LightColorScheme = lightColorScheme(
     // primaryContainer = MainBlue.copy(alpha = 0.1f), // Subtle primary backgrounds
     // onPrimaryContainer = MainBlue, // Text on primary container backgrounds
     secondary = SecondaryBlue, // Secondary brand color for accent elements
-    // onSecondary = Color.Black, // Text/icons on secondary colored elements
+    onSecondary = TextBlack, // Text/icons on secondary colored elements
     // secondaryContainer = SecondaryBlue.copy(alpha = 0.1f), // Subtle secondary backgrounds
     // onSecondaryContainer = SecondaryBlue, // Text on secondary container backgrounds
     tertiary = SecondaryGrey, // Third brand color for additional accents
-    // onTertiary = Color.Black, // Text/icons on tertiary colored elements
+    onTertiary = TextGrey, // Text/icons on tertiary colored elements
     // tertiaryContainer = SecondaryGrey.copy(alpha = 0.1f), // Subtle tertiary backgrounds
     // onTertiaryContainer = SecondaryGrey, // Text on tertiary container backgrounds
     error = ErrorRed, // Error state color
@@ -37,7 +39,7 @@ private val LightColorScheme = lightColorScheme(
     onSurface = TextBlack, // Text on cards, sheets, dialogs, disabled elements
     // surfaceVariant = BackgroundGrey.copy(alpha = 0.8f), // Alternative surface backgrounds
     // onSurfaceVariant = Color(65, 65, 65), // Text on surface variant backgrounds
-    surfaceContainer = BottomNavColor, // Navigation bar and container background color
+    surfaceContainer = BackgroundGrey, // Navigation bar and container background color
     // surfaceContainerHigh = BottomNavColor.copy(alpha = 0.9f), // High elevation containers
     // surfaceContainerHighest = BottomNavColor.copy(alpha = 0.8f), // Highest elevation containers
     outline = SecondaryGrey, // Border/outline color
@@ -45,19 +47,10 @@ private val LightColorScheme = lightColorScheme(
     // inverseSurface = Color.Black, // Inverse surface backgrounds
     // inverseOnSurface = Color.White, // Text on inverse surface backgrounds
     // inversePrimary = MainBlue.copy(alpha = 0.8f), // Primary color in inverse contexts
-    // scrim = Color.Black.copy(alpha = 0.5f) // Overlay/backdrop color
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+     scrim = TertiaryGrey // Overlay/backdrop color
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BGHelpTheme(
     darkTheme: Boolean = false,
@@ -65,10 +58,12 @@ fun BGHelpTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = LightColorScheme
-
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    
+    CompositionLocalProvider(LocalRippleConfiguration provides null) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            content = content
+        )
+    }
 }

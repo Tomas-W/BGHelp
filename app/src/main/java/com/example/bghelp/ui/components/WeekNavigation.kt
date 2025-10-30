@@ -2,23 +2,18 @@ package com.example.bghelp.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.material3.ripple
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,13 +23,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
+import com.example.bghelp.ui.components.WithRipple
+import com.example.bghelp.ui.components.clickableWithUnboundedRipple
 import com.example.bghelp.ui.theme.BGHelpTheme
-import com.example.bghelp.ui.theme.ErrorRed
-import com.example.bghelp.ui.theme.MainBlue
-import com.example.bghelp.ui.theme.SecondaryBlue
-import com.example.bghelp.ui.theme.SuccessGreen
 import com.example.bghelp.ui.theme.TextGrey
-import com.example.bghelp.ui.theme.TextSizes
 import com.example.bghelp.ui.theme.TextStyles
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -45,9 +37,7 @@ private fun ClickableArrow(
     painterResource: Int,
     contentDescription: String,
     modifier: Modifier = Modifier
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    
+) = WithRipple {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
@@ -55,15 +45,7 @@ private fun ClickableArrow(
         Image(
             modifier = Modifier
                 .size(48.dp)
-                .clickable(
-                    onClick = onClick,
-                    interactionSource = interactionSource,
-                    indication = ripple(
-                        bounded = false,
-                        radius = 22.dp,
-                        color = MainBlue.copy(alpha = 0.3f)
-                    )
-                ),
+                .clickableWithUnboundedRipple(onClick = onClick),
             painter = painterResource(painterResource),
             contentScale = ContentScale.Fit,
             contentDescription = contentDescription,
@@ -127,7 +109,7 @@ fun WeekNavigationRow(
                     val isToday = day == today
                     val isSelected = day == selectedDate
                     val style = when {
-                        isToday -> TextStyles.Info.Bold.Large
+                        isToday -> TextStyles.MainBlue.Bold.Large
                         isSelected -> TextStyles.Default.Bold.Large
                         else -> TextStyles.Default.Medium
                     }

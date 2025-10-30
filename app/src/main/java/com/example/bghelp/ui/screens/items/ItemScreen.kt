@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,8 +26,6 @@ import com.example.bghelp.ui.components.HighlightedContainerSmall
 import com.example.bghelp.ui.components.LazyColumnContainer
 import com.example.bghelp.ui.components.MainContentContainer
 import com.example.bghelp.ui.components.MainHeader
-import com.example.bghelp.ui.theme.SecondaryBlue
-import com.example.bghelp.ui.theme.SecondaryGrey
 import com.example.bghelp.ui.theme.TextStyles
 
 @Composable
@@ -75,7 +74,8 @@ fun ItemScreen(
                     }
                     is ItemListItem.ItemData -> {
                         val item = listItem.item
-                        val color = if (!item.bought) SecondaryBlue else SecondaryGrey
+                        val color = if (!item.bought) MaterialTheme.colorScheme.secondary
+                                                 else MaterialTheme.colorScheme.tertiary
                         HighlightedContainerSmall(
                             backgroundColor = color
                         ) {

@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -23,8 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
-import com.example.bghelp.ui.theme.SecondaryBlue
-import com.example.bghelp.ui.theme.SecondaryGrey
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.domain.model.AlarmMode
@@ -40,9 +39,9 @@ fun <T: SchedulableItem> DayComponent(
     onToggleExpanded: (Int) -> Unit,
     onDelete: (T) -> Unit
 ) {
-    val taskBackgroundColor = remember(key1 = item.date) {
-        if (item.date.isInFuture()) SecondaryBlue else SecondaryGrey
-    }
+    val colorScheme = MaterialTheme.colorScheme
+    val taskBackgroundColor =
+        if (item.date.isInFuture()) colorScheme.secondary else colorScheme.tertiary
     val deleteCallback = remember(key1 = item.id) { { onDelete(item) } }
     val toggleCallback = remember(key1 = item.id) { { onToggleExpanded(item.id) } }
 

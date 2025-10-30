@@ -8,11 +8,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.material3.MaterialTheme
 import androidx.core.view.WindowCompat
 import com.example.bghelp.ui.MainScreen
 import com.example.bghelp.ui.theme.BGHelpTheme
-import com.example.bghelp.ui.theme.BackgroundGrey
-import com.example.bghelp.ui.theme.MainBlue
+import com.example.bghelp.ui.theme.SecondaryGrey
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
             SideEffect {
                 // set NavigationBar color - StatusBar set by TopBar
                 systemUiController.setNavigationBarColor(
-                    color = BackgroundGrey,
+                    color = SecondaryGrey,
                     darkIcons = true
                 )
             }
