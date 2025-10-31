@@ -1,11 +1,10 @@
-package com.example.bghelp.ui.screens.task.add
+package com.example.bghelp.ui.screens.task.add.date
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -35,6 +34,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableWithUnboundedRipple
+import com.example.bghelp.ui.screens.task.add.TimeField
+import com.example.bghelp.ui.screens.task.add.TimeSegment
 import com.example.bghelp.ui.theme.ErrorRed
 import com.example.bghelp.ui.theme.TextStyles
 import java.time.LocalTime
@@ -135,15 +136,15 @@ fun TimeSelectionInput(
     // Time select row
     Row(
         modifier = modifier
+            // Visuals for wrong endDate
             .clip(RoundedCornerShape(8.dp))
             .background(if (isError) errorBackgroundColor else Color.Transparent)
             .clickable {
                 if (selectedSegment != null) {
                     dismissKeyboard()
                 }
-            }
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.Center,
+            },
+        horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
         val hourText = remember(time.hour) { String.format(Locale.getDefault(), "%02d", time.hour) }
@@ -174,9 +175,8 @@ fun TimeSelectionInput(
 
         Text(
             text = ":",
-            style = TextStyles.Default.Large,
+            style = TextStyles.Default.Bold.Medium,
             modifier = Modifier.padding(horizontal = 2.dp),
-            color = MaterialTheme.colorScheme.onSurface
         )
 
         Box(

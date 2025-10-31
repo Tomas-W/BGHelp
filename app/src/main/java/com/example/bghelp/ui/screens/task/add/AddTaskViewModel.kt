@@ -15,8 +15,8 @@ import javax.inject.Inject
 class AddTaskViewModel @Inject constructor() : ViewModel() {
     
     // When selection
-    private val _whenSelection = MutableStateFlow(WhenSelection.AT_TIME)
-    val whenSelection: StateFlow<WhenSelection> = _whenSelection.asStateFlow()
+    private val _userDateSelection = MutableStateFlow(UserDateSelection.AT_TIME)
+    val userDateSelection: StateFlow<UserDateSelection> = _userDateSelection.asStateFlow()
 
     // Date selection
     private val _dateStartSelection = MutableStateFlow(LocalDate.now())
@@ -31,6 +31,10 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
 
     private val _timeEndSelection = MutableStateFlow<LocalTime?>(null)
     val timeEndSelection: StateFlow<LocalTime?> = _timeEndSelection.asStateFlow()
+
+    // Reminder selection
+    private val _userNotifySelection = MutableStateFlow(UserNotifySelection.OFF)
+    val userNotifySelection: StateFlow<UserNotifySelection> = _userNotifySelection.asStateFlow()
 
     // dateEnd & timeEnd visibility
     private val _isEndDateVisible = MutableStateFlow(false)
@@ -64,6 +68,19 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
     private val _isTimeRangeInvalid = MutableStateFlow(false)
     val isTimeRangeInvalid: StateFlow<Boolean> = _isTimeRangeInvalid.asStateFlow()
 
+    // Reminders
+    private var nextReminderId = 0
+    private val _startReminders = MutableStateFlow<List<Reminder>>(emptyList())
+    val startReminders: StateFlow<List<Reminder>> = _startReminders.asStateFlow()
+
+    private val _endReminders = MutableStateFlow<List<Reminder>>(emptyList())
+    val endReminders: StateFlow<List<Reminder>> = _endReminders.asStateFlow()
+
+    // Active reminder input tracking
+    data class ActiveReminderInput(val type: ReminderType, val id: Int)
+    private val _activeReminderInput = MutableStateFlow<ActiveReminderInput?>(null)
+    val activeReminderInput: StateFlow<ActiveReminderInput?> = _activeReminderInput.asStateFlow()
+
     init {
         updateTimeValidationState()
     }
@@ -91,8 +108,12 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
 
     // Actions
     fun toggleWhenSelection() {
-        _whenSelection.value = if (_whenSelection.value == WhenSelection.AT_TIME) 
-            WhenSelection.ALL_DAY else WhenSelection.AT_TIME
+        _userDateSelection.value = if (_userDateSelection.value == UserDateSelection.AT_TIME)
+            UserDateSelection.ALL_DAY else UserDateSelection.AT_TIME
+    }
+
+    fun toggleNotifySelection() {
+        _userNotifySelection.value = if (_userNotifySelection.value == UserNotifySelection.OFF) UserNotifySelection.ON else UserNotifySelection.OFF
     }
 
     fun setDateStart(date: LocalDate) {
@@ -159,17 +180,23 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
         } else {
             _activeDateField.value = field
             setCalendarVisible(true)
+            clearReminderInputSelection()
+            clearTimeInputSelection()
             _keyboardDismissKey.value++
         }
     }
 
     fun onTimeInputClicked() {
         setCalendarVisible(false)
+        clearReminderInputSelection()
     }
 
     fun setActiveTimeInput(field: TimeField?, segment: TimeSegment?) {
         _activeTimeField.value = field
         _activeTimeSegment.value = segment
+        if (field != null) {
+            clearReminderInputSelection()
+        }
     }
 
     fun clearTimeInputSelection() {
@@ -192,5 +219,79 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
         YearMonth.from(clickedDate).takeIf { it != _currentMonth.value }?.let {
             setCurrentMonth(it)
         }
+    }
+
+    // Reminder actions
+    fun addReminder(type: ReminderType) {
+        val newReminder = Reminder(
+            id = nextReminderId++,
+            value = 1,
+            timeUnit = TimeUnit.MINUTES
+        )
+        when (type) {
+            ReminderType.START -> {
+                _startReminders.value = _startReminders.value + newReminder
+            }
+            ReminderType.END -> {
+                _endReminders.value = _endReminders.value + newReminder
+            }
+        }
+    }
+
+    fun removeReminder(type: ReminderType, reminderId: Int) {
+        when (type) {
+            ReminderType.START -> {
+                _startReminders.value = _startReminders.value.filter { it.id != reminderId }
+            }
+            ReminderType.END -> {
+                _endReminders.value = _endReminders.value.filter { it.id != reminderId }
+            }
+        }
+    }
+
+    fun updateReminder(type: ReminderType, reminderId: Int, value: Int? = null, timeUnit: TimeUnit? = null) {
+        when (type) {
+            ReminderType.START -> {
+                _startReminders.value = _startReminders.value.map { reminder ->
+                    if (reminder.id == reminderId) {
+                        reminder.copy(
+                            value = value ?: reminder.value,
+                            timeUnit = timeUnit ?: reminder.timeUnit
+                        )
+                    } else {
+                        reminder
+                    }
+                }
+            }
+            ReminderType.END -> {
+                _endReminders.value = _endReminders.value.map { reminder ->
+                    if (reminder.id == reminderId) {
+                        reminder.copy(
+                            value = value ?: reminder.value,
+                            timeUnit = timeUnit ?: reminder.timeUnit
+                        )
+                    } else {
+                        reminder
+                    }
+                }
+            }
+        }
+    }
+
+    fun setActiveReminderInput(type: ReminderType, id: Int) {
+        _activeReminderInput.value = ActiveReminderInput(type, id)
+        setCalendarVisible(false)
+        clearTimeInputSelection()
+        _keyboardDismissKey.value++
+    }
+
+    fun clearReminderInputSelection() {
+        _activeReminderInput.value = null
+    }
+
+    fun clearAllInputSelections() {
+        clearTimeInputSelection()
+        clearReminderInputSelection()
+        setCalendarVisible(false)
     }
 }

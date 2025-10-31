@@ -1,4 +1,4 @@
-package com.example.bghelp.ui.screens.task.add
+package com.example.bghelp.ui.screens.task.add.date
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,6 +38,8 @@ import com.example.bghelp.ui.components.DropdownItem
 import com.example.bghelp.constants.UiConstants as UI
 import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableWithCalendarRipple
+import com.example.bghelp.ui.screens.task.add.AddTaskConstants
+import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import java.time.DayOfWeek
@@ -166,7 +168,7 @@ fun DateRangeCalendar(
             }
         }
 
-        AddTaskSpacerHalf()
+        AddTaskSpacerSmall()
 
         // Days of week header
         Row(

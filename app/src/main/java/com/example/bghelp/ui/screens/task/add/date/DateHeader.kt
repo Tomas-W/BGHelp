@@ -1,4 +1,4 @@
-package com.example.bghelp.ui.screens.task.add
+package com.example.bghelp.ui.screens.task.add.date
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,23 +17,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
-import com.example.bghelp.ui.components.DummyTwoToggle
+import com.example.bghelp.ui.components.SelectionToggle
+import com.example.bghelp.ui.screens.task.add.AddTaskConstants
+import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
+import com.example.bghelp.ui.screens.task.add.UserDateSelection
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 
 @Composable
-fun AtTimeAllDay(
+fun DateHeader(
     viewModel: AddTaskViewModel,
-    whenSelection: WhenSelection
+    userDateSelection: UserDateSelection
 ) {
-    val whenStringChoices = remember { mapOf(WhenSelection.AT_TIME to "At time", WhenSelection.ALL_DAY to "All day") }
-    val whenIconChoices = remember { mapOf(WhenSelection.AT_TIME to R.drawable.at_time, WhenSelection.ALL_DAY to R.drawable.all_day) }
+    val dateStringChoices = remember { mapOf(UserDateSelection.AT_TIME to "At time", UserDateSelection.ALL_DAY to "All day") }
+    val dateIconChoices = remember { mapOf(UserDateSelection.AT_TIME to R.drawable.at_time, UserDateSelection.ALL_DAY to R.drawable.all_day) }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(end = 24.dp)
+            .padding(end = AddTaskConstants.END_PADDING.dp)
             .clickable {
+                viewModel.clearAllInputSelections()
                 viewModel.toggleWhenSelection()
             },
         verticalAlignment = Alignment.CenterVertically
@@ -41,8 +45,8 @@ fun AtTimeAllDay(
         // Clock / Calendar icon
         Icon(
             modifier = Modifier.size(Sizes.Icon.Medium),
-            painter = painterResource(whenIconChoices[whenSelection]!!),
-            contentDescription = whenStringChoices[whenSelection]
+            painter = painterResource(dateIconChoices[userDateSelection]!!),
+            contentDescription = dateStringChoices[userDateSelection]
         )
 
         Spacer(modifier = Modifier.width(Sizes.Icon.Large))
@@ -55,14 +59,16 @@ fun AtTimeAllDay(
         ) {
             // At time / All day
             Text(
-                text = whenStringChoices[whenSelection]!!,
-                style = TextStyles.Default.Medium
+                text = dateStringChoices[userDateSelection]!!,
+                style = TextStyles.Grey.Bold.Medium
             )
              // Dummy toggle
-            DummyTwoToggle(
-                selectedIndex = whenSelection.ordinal,
+            SelectionToggle(
+                selectedIndex = userDateSelection.ordinal,
+                numberOfStates = dateStringChoices.size,
                 enabled = true,
-                onOverlayClick = {
+                onClick = {
+                    viewModel.clearAllInputSelections()
                     viewModel.toggleWhenSelection()
                 }
             )
