@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.bghelp.domain.model.CreateItem
 import com.example.bghelp.ui.components.HighlightedContainerSmall
 import com.example.bghelp.ui.components.LazyColumnContainer
@@ -30,7 +31,7 @@ import com.example.bghelp.ui.theme.TextStyles
 
 @Composable
 fun ItemScreen(
-    viewModel: ItemViewModel,
+    viewModel: ItemViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
     val flattenedItems by viewModel.flattenedItems.collectAsState()

@@ -1,4 +1,4 @@
-package com.example.bghelp.ui.screens.task
+package com.example.bghelp.ui.screens.task.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

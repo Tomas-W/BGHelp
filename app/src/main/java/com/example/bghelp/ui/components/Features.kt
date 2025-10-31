@@ -13,14 +13,17 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 
 @SuppressLint("RememberInComposition")
@@ -81,5 +84,23 @@ fun DummyTwoToggle(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun DropdownItem(
+    label: String,
+    onClick: () -> Unit,
+    textStyle: TextStyle
+) {
+    Row(
+        modifier = Modifier
+            .wrapContentWidth()
+            .height(48.dp)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = label, style = textStyle)
     }
 }

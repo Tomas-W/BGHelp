@@ -27,13 +27,14 @@ object Sizes {
             val Large = 160.dp
             val ExtraLarge = 240.dp
         }
-        object Height {
-            val ExtraSmall = 24.dp
-            val Small = 36.dp
-            val Medium = 48.dp
-            val Large = 56.dp
-            val ExtraLarge = 92.dp
-        }
+    }
+
+    object Size {
+        val ExtraSmall = 6.dp
+        val Small = 12.dp
+        val Medium = 18.dp
+        val Large = 24.dp
+        val ExtraLarge = 36.dp
     }
     
     object Padding {

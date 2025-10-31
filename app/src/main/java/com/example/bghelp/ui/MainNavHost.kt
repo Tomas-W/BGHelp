@@ -15,8 +15,8 @@ import com.example.bghelp.ui.screens.items.ItemScreen
 import com.example.bghelp.ui.screens.items.ItemWallpaperScreen
 import com.example.bghelp.ui.screens.options.CreateAlarmScreen
 import com.example.bghelp.ui.screens.options.SettingsScreen
-import com.example.bghelp.ui.screens.task.AddTaskScreen
-import com.example.bghelp.ui.screens.task.TaskScreen
+import com.example.bghelp.ui.screens.task.add.AddTaskScreen
+import com.example.bghelp.ui.screens.task.main.TaskScreen
 import com.example.bghelp.ui.screens.task.TaskWallpaperScreen
 import com.example.bghelp.ui.screens.target.AddTargetScreen
 import com.example.bghelp.ui.screens.target.TargetScreen
@@ -39,9 +39,7 @@ fun BottomNavHost(
         composable(Screen.Home.Main.route) { HomeScreen() }
         composable(Screen.Tasks.Main.route) { TaskScreen() }
         composable(Screen.Targets.Main.route) { TargetScreen() }
-        composable(Screen.Items.Main.route) {
-            ItemScreen(viewModel = hiltViewModel()) 
-        }
+        composable(Screen.Items.Main.route) { ItemScreen() }
         composable(Screen.Events.Main.route) { EventScreen() }
     }
 }

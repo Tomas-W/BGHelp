@@ -1,4 +1,4 @@
-package com.example.bghelp.ui.screens.task
+package com.example.bghelp.ui.screens.task.main
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
