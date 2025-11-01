@@ -1,15 +1,12 @@
-package com.example.bghelp.ui.screens.task.add.notify
+package com.example.bghelp.ui.screens.task.add.remind
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -39,6 +36,8 @@ import com.example.bghelp.constants.UiConstants as UI
 import com.example.bghelp.ui.components.DropdownItem
 import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableWithUnboundedRipple
+import com.example.bghelp.ui.screens.task.add.AddTaskConstants
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 import com.example.bghelp.ui.screens.task.add.TimeUnit
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
@@ -48,8 +47,8 @@ fun ReminderInput(
     modifier: Modifier = Modifier,
     value: Int,
     onValueChange: (Int) -> Unit,
-    minValue: Int = 1,
-    maxValue: Int = 999,
+    minValue: Int = AddTaskConstants.MIN_REMINDER,
+    maxValue: Int = AddTaskConstants.MAX_REMINDER,
     isActive: Boolean = false,
     onActiveChange: (Boolean) -> Unit = {}
 ) = WithRipple {
@@ -71,7 +70,9 @@ fun ReminderInput(
         inputBuffer = digits
         if (digits.isNotEmpty()) {
             val num = digits.toIntOrNull()?.let { clampValue(it) }
-            if (num != null) onValueChange(num)
+            if (num != null) {
+                onValueChange(num)
+            }
         }
     }
 
@@ -102,13 +103,16 @@ fun ReminderInput(
             focusRequester.requestFocus()
             keyboardController?.show()
             inputBuffer = ""
+        } else {
+            keyboardController?.hide()
+            focusManager.clearFocus()
         }
     }
 
     Row(
         modifier = modifier
             .width(60.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(Sizes.Corner.Small))
             .clickable {
                 if (isActive) {
                     dismissKeyboard()
@@ -149,11 +153,11 @@ fun TimeUnitDropdown(
     val units = remember { TimeUnit.entries }
     val unitLabels = remember {
         mapOf(
-            TimeUnit.MINUTES to "Minutes",
-            TimeUnit.HOURS to "Hours",
-            TimeUnit.DAYS to "Days",
-            TimeUnit.WEEKS to "Weeks",
-            TimeUnit.MONTHS to "Months"
+            TimeUnit.MINUTES to AddTaskStrings.MINUTES,
+            TimeUnit.HOURS to AddTaskStrings.HOURS,
+            TimeUnit.DAYS to AddTaskStrings.DAYS,
+            TimeUnit.WEEKS to AddTaskStrings.WEEKS,
+            TimeUnit.MONTHS to AddTaskStrings.MONTHS
         )
     }
     val dropdownHeight = (units.size * UI.DROPDOWN_ITEM_HEIGHT).dp

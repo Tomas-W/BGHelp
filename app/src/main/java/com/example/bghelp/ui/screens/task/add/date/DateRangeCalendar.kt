@@ -40,6 +40,7 @@ import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableWithCalendarRipple
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import java.time.DayOfWeek
@@ -85,7 +86,7 @@ fun DateRangeCalendar(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.arrow_left),
-                    contentDescription = "Previous month"
+                    contentDescription = AddTaskStrings.PREVIOUS_MONTH
                 )
             }
 
@@ -163,7 +164,7 @@ fun DateRangeCalendar(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.arrow_right),
-                    contentDescription = "Next month"
+                    contentDescription = AddTaskStrings.NEXT_MONTH
                 )
             }
         }
@@ -216,7 +217,7 @@ fun DateRangeCalendar(
                             modifier = Modifier
                                 .weight(1f)
                                 .aspectRatio(1f)
-                                .clip(RoundedCornerShape(8.dp))
+                                .clip(RoundedCornerShape(Sizes.Corner.Small))
                                 .background(
                                     // Highlight if in selection range
                                     color = if (inRange && !isStart && !isEnd) rangeBgColor else Color.Transparent

@@ -14,6 +14,18 @@ import javax.inject.Inject
 @HiltViewModel
 class AddTaskViewModel @Inject constructor() : ViewModel() {
     
+    // Title selection
+    private val _userTitleSelection = MutableStateFlow(UserTitleSelection.TITLE_ONLY)
+    val userTitleSelection: StateFlow<UserTitleSelection> = _userTitleSelection.asStateFlow()
+    
+    // Title text
+    private val _titleText = MutableStateFlow("")
+    val titleText: StateFlow<String> = _titleText.asStateFlow()
+    
+    // Info text
+    private val _infoText = MutableStateFlow("")
+    val infoText: StateFlow<String> = _infoText.asStateFlow()
+    
     // When selection
     private val _userDateSelection = MutableStateFlow(UserDateSelection.AT_TIME)
     val userDateSelection: StateFlow<UserDateSelection> = _userDateSelection.asStateFlow()
@@ -33,8 +45,16 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
     val timeEndSelection: StateFlow<LocalTime?> = _timeEndSelection.asStateFlow()
 
     // Reminder selection
-    private val _userNotifySelection = MutableStateFlow(UserNotifySelection.OFF)
-    val userNotifySelection: StateFlow<UserNotifySelection> = _userNotifySelection.asStateFlow()
+    private val _userRemindSelection = MutableStateFlow(UserRemindSelection.OFF)
+    val userRemindSelection: StateFlow<UserRemindSelection> = _userRemindSelection.asStateFlow()
+
+    // Sound selection
+    private val _userSoundSelection = MutableStateFlow(UserSoundSelection.OFF)
+    val userSoundSelection: StateFlow<UserSoundSelection> = _userSoundSelection.asStateFlow()
+
+    // Vibrate selection
+    private val _userVibrateSelection = MutableStateFlow(UserVibrateSelection.OFF)
+    val userVibrateSelection: StateFlow<UserVibrateSelection> = _userVibrateSelection.asStateFlow()
 
     // dateEnd & timeEnd visibility
     private val _isEndDateVisible = MutableStateFlow(false)
@@ -77,9 +97,14 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
     val endReminders: StateFlow<List<Reminder>> = _endReminders.asStateFlow()
 
     // Active reminder input tracking
-    data class ActiveReminderInput(val type: ReminderType, val id: Int)
+    data class ActiveReminderInput(val type: RemindType, val id: Int)
     private val _activeReminderInput = MutableStateFlow<ActiveReminderInput?>(null)
     val activeReminderInput: StateFlow<ActiveReminderInput?> = _activeReminderInput.asStateFlow()
+    
+    // Active title input tracking
+    enum class TitleInputType { TITLE, INFO }
+    private val _activeTitleInput = MutableStateFlow<TitleInputType?>(null)
+    val activeTitleInput: StateFlow<TitleInputType?> = _activeTitleInput.asStateFlow()
 
     init {
         updateTimeValidationState()
@@ -107,13 +132,44 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
     }
 
     // Actions
-    fun toggleWhenSelection() {
+    fun toggleTitleSelection() {
+        _userTitleSelection.value = if (_userTitleSelection.value == UserTitleSelection.TITLE_ONLY)
+            UserTitleSelection.TITLE_AND_INFO else UserTitleSelection.TITLE_ONLY
+    }
+    
+    fun setTitleText(text: String) {
+        _titleText.value = text
+    }
+    
+    fun setInfoText(text: String) {
+        _infoText.value = text
+    }
+    
+    fun toggleDateSelection() {
         _userDateSelection.value = if (_userDateSelection.value == UserDateSelection.AT_TIME)
             UserDateSelection.ALL_DAY else UserDateSelection.AT_TIME
     }
 
-    fun toggleNotifySelection() {
-        _userNotifySelection.value = if (_userNotifySelection.value == UserNotifySelection.OFF) UserNotifySelection.ON else UserNotifySelection.OFF
+    fun toggleRemindSelection() {
+        _userRemindSelection.value = if (_userRemindSelection.value == UserRemindSelection.OFF) UserRemindSelection.ON else UserRemindSelection.OFF
+    }
+
+    fun toggleSoundSelection() {
+        val soundMap = mapOf(
+            UserSoundSelection.OFF to UserSoundSelection.ONCE,
+            UserSoundSelection.ONCE to UserSoundSelection.CONTINUOUS,
+            UserSoundSelection.CONTINUOUS to UserSoundSelection.OFF
+        )
+        _userSoundSelection.value = soundMap[_userSoundSelection.value] ?: UserSoundSelection.OFF
+    }
+
+    fun toggleVibrateSelection() {
+        val soundMap = mapOf(
+            UserVibrateSelection.OFF to UserVibrateSelection.ONCE,
+            UserVibrateSelection.ONCE to UserVibrateSelection.CONTINUOUS,
+            UserVibrateSelection.CONTINUOUS to UserVibrateSelection.OFF
+        )
+        _userVibrateSelection.value = soundMap[_userVibrateSelection.value] ?: UserVibrateSelection.OFF
     }
 
     fun setDateStart(date: LocalDate) {
@@ -222,40 +278,42 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
     }
 
     // Reminder actions
-    fun addReminder(type: ReminderType) {
+    fun addReminder(type: RemindType) {
         val newReminder = Reminder(
             id = nextReminderId++,
-            value = 1,
+            value = AddTaskConstants.REMINDER_START,
             timeUnit = TimeUnit.MINUTES
         )
         when (type) {
-            ReminderType.START -> {
+            RemindType.START -> {
                 _startReminders.value = _startReminders.value + newReminder
             }
-            ReminderType.END -> {
+            RemindType.END -> {
                 _endReminders.value = _endReminders.value + newReminder
             }
         }
     }
 
-    fun removeReminder(type: ReminderType, reminderId: Int) {
+    fun removeReminder(type: RemindType, reminderId: Int) {
         when (type) {
-            ReminderType.START -> {
+            RemindType.START -> {
                 _startReminders.value = _startReminders.value.filter { it.id != reminderId }
             }
-            ReminderType.END -> {
+            RemindType.END -> {
                 _endReminders.value = _endReminders.value.filter { it.id != reminderId }
             }
         }
     }
 
-    fun updateReminder(type: ReminderType, reminderId: Int, value: Int? = null, timeUnit: TimeUnit? = null) {
+    fun updateReminder(type: RemindType, reminderId: Int, value: Int? = null, timeUnit: TimeUnit? = null) {
+        val validatedValue = value?.coerceIn(AddTaskConstants.MIN_REMINDER, AddTaskConstants.MAX_REMINDER)
+        
         when (type) {
-            ReminderType.START -> {
+            RemindType.START -> {
                 _startReminders.value = _startReminders.value.map { reminder ->
                     if (reminder.id == reminderId) {
                         reminder.copy(
-                            value = value ?: reminder.value,
+                            value = validatedValue ?: reminder.value,
                             timeUnit = timeUnit ?: reminder.timeUnit
                         )
                     } else {
@@ -263,11 +321,11 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
                     }
                 }
             }
-            ReminderType.END -> {
+            RemindType.END -> {
                 _endReminders.value = _endReminders.value.map { reminder ->
                     if (reminder.id == reminderId) {
                         reminder.copy(
-                            value = value ?: reminder.value,
+                            value = validatedValue ?: reminder.value,
                             timeUnit = timeUnit ?: reminder.timeUnit
                         )
                     } else {
@@ -278,7 +336,7 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun setActiveReminderInput(type: ReminderType, id: Int) {
+    fun setActiveReminderInput(type: RemindType, id: Int) {
         _activeReminderInput.value = ActiveReminderInput(type, id)
         setCalendarVisible(false)
         clearTimeInputSelection()
@@ -288,10 +346,23 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
     fun clearReminderInputSelection() {
         _activeReminderInput.value = null
     }
+    
+    fun setActiveTitleInput(type: TitleInputType) {
+        _activeTitleInput.value = type
+        setCalendarVisible(false)
+        clearTimeInputSelection()
+        clearReminderInputSelection()
+        _keyboardDismissKey.value++
+    }
+    
+    fun clearTitleInputSelection() {
+        _activeTitleInput.value = null
+    }
 
     fun clearAllInputSelections() {
         clearTimeInputSelection()
         clearReminderInputSelection()
+        clearTitleInputSelection()
         setCalendarVisible(false)
     }
 }

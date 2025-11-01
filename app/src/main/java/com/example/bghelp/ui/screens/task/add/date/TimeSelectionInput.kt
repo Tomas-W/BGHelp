@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,6 +36,7 @@ import com.example.bghelp.ui.components.clickableWithUnboundedRipple
 import com.example.bghelp.ui.screens.task.add.TimeField
 import com.example.bghelp.ui.screens.task.add.TimeSegment
 import com.example.bghelp.ui.theme.ErrorRed
+import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import java.time.LocalTime
 import java.util.Locale
@@ -128,6 +128,10 @@ fun TimeSelectionInput(
         if (selectedSegment != null) {
             focusRequester.requestFocus()
             keyboardController?.show()
+            inputBuffer = ""
+        } else {
+            keyboardController?.hide()
+            focusManager.clearFocus()
         }
     }
 

@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import com.example.bghelp.R
 import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableWithUnboundedRipple
@@ -29,6 +30,7 @@ import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.DateField
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 import com.example.bghelp.ui.screens.task.add.TimeField
 import com.example.bghelp.ui.screens.task.add.UserDateSelection
 import com.example.bghelp.ui.theme.Sizes
@@ -65,7 +67,7 @@ private fun DateSelection(viewModel: AddTaskViewModel) {
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Spacer(modifier = Modifier.width(Sizes.Icon.Medium + Sizes.Icon.Large))
+        Spacer(modifier = Modifier.width(2 * Sizes.Icon.Large))
 
         // startDate
         Text(
@@ -95,7 +97,7 @@ private fun DateSelection(viewModel: AddTaskViewModel) {
                 Icon(
                     modifier = Modifier.size(Sizes.Icon.Small),
                     painter = painterResource(R.drawable.double_arrow_right),
-                    contentDescription = if (isEndDateVisible) "Hide end date" else "Show end date"
+                    contentDescription = if (isEndDateVisible) AddTaskStrings.HIDE_END_DATE else AddTaskStrings.SHOW_END_DATE
                 )
             }
         }
@@ -161,17 +163,18 @@ private fun TimeSelection(viewModel: AddTaskViewModel) {
     val isEndTimeVisible by viewModel.isEndTimeVisible.collectAsState()
     val keyboardDismissKey by viewModel.keyboardDismissKey.collectAsState()
 
-    val iconPaddingOffset = 8.dp
+    val inputPaddingOffset = 8.dp
 
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Spacer(modifier = Modifier.width(Sizes.Icon.Medium + Sizes.Icon.Large - iconPaddingOffset))
+        Spacer(modifier = Modifier.width(2 * Sizes.Icon.Large - inputPaddingOffset))
 
+        // startTime
         TimeSelectionInput(
-            modifier = Modifier.widthIn(min = AddTaskConstants.MIN_WIDTH.dp + iconPaddingOffset),
+            modifier = Modifier.widthIn(min = AddTaskConstants.MIN_WIDTH.dp + inputPaddingOffset),
             time = timeStartSelection,
             timeField = TimeField.START,
             activeTimeField = activeTimeField,
@@ -191,6 +194,7 @@ private fun TimeSelection(viewModel: AddTaskViewModel) {
 
         Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
 
+        // Double arrow
         WithRipple {
             Box(
                 modifier = Modifier
@@ -205,14 +209,18 @@ private fun TimeSelection(viewModel: AddTaskViewModel) {
                 Icon(
                     modifier = Modifier.size(Sizes.Icon.Small),
                     painter = painterResource(R.drawable.double_arrow_right),
-                    contentDescription = if (isEndTimeVisible) "Hide end time" else "Show end time"
+                    contentDescription = if (isEndTimeVisible) AddTaskStrings.HIDE_END_TIME else AddTaskStrings.SHOW_END_TIME
                 )
             }
         }
 
-        Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
+        Spacer(modifier = Modifier.width(Sizes.Icon.Medium - inputPaddingOffset))
 
+        // endTime
         TimeSelectionInput(
+            modifier = Modifier
+                .widthIn(min = AddTaskConstants.MIN_WIDTH.dp + inputPaddingOffset)
+                .alpha(if (isEndTimeVisible) 1f else 0f),
             time = timeEndSelection ?: timeStartSelection.plusHours(1),
             timeField = TimeField.END,
             activeTimeField = activeTimeField,
@@ -234,8 +242,7 @@ private fun TimeSelection(viewModel: AddTaskViewModel) {
                 }
             },
             keyboardDismissKey = keyboardDismissKey,
-            isError = isTimeRangeInvalid && isEndTimeVisible,
-            modifier = Modifier.alpha(if (isEndTimeVisible) 1f else 0f)
+            isError = isTimeRangeInvalid && isEndTimeVisible
         )
     }
 }
