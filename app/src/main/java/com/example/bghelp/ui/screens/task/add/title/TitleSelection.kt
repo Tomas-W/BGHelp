@@ -22,6 +22,7 @@ import com.example.bghelp.ui.screens.task.add.AddTaskSpacerMedium
 import com.example.bghelp.ui.screens.task.add.UserTitleSelection
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
+import com.example.bghelp.ui.components.OutlinedStringInput
 
 @Composable
 fun TitleSelection(
@@ -31,14 +32,13 @@ fun TitleSelection(
     val titleText by viewModel.titleText.collectAsState()
     val infoText by viewModel.infoText.collectAsState()
     val activeTitleInput by viewModel.activeTitleInput.collectAsState()
-    
     Column(
         modifier = Modifier
             .fillMaxWidth()
     ) {
         AddTaskSpacerSmall()
         // Title input
-        TitleInput(
+        OutlinedStringInput(
             modifier = Modifier,
             value = titleText,
             onValueChange = { viewModel.setTitleText(it) },
@@ -57,10 +57,10 @@ fun TitleSelection(
         )
 
         if (userTitleSelection == UserTitleSelection.TITLE_AND_INFO) {
-            AddTaskSpacerLarge()
-            
+            AddTaskSpacerSmall()
+
             // Info input (twice as high)
-            TitleInput(
+            OutlinedStringInput(
                 modifier = Modifier,
                 value = infoText,
                 onValueChange = { viewModel.setInfoText(it) },
@@ -79,5 +79,6 @@ fun TitleSelection(
             )
 
         }
+        AddTaskSpacerSmall()
     }
 }

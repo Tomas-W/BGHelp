@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -35,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import com.example.bghelp.constants.UiConstants as UI
 import com.example.bghelp.ui.components.DropdownItem
 import com.example.bghelp.ui.components.WithRipple
-import com.example.bghelp.ui.components.clickableWithUnboundedRipple
+import com.example.bghelp.ui.components.clickableRipple
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 import com.example.bghelp.ui.screens.task.add.TimeUnit
@@ -86,7 +87,13 @@ fun ReminderInput(
         modifier = Modifier
             .width(1.dp)
             .alpha(0f)
-            .focusRequester(focusRequester),
+            .focusRequester(focusRequester)
+            .onFocusChanged { focusState ->
+                // When focus is lost, clear selection (like text fields and time inputs)
+                if (!focusState.isFocused && isActive) {
+                    onActiveChange(false)
+                }
+            },
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number,
             imeAction = ImeAction.Done
@@ -98,14 +105,12 @@ fun ReminderInput(
 
     )
 
+    // Only show keyboard when active - don't hide (let focus system handle it)
     LaunchedEffect(isActive) {
         if (isActive) {
             focusRequester.requestFocus()
             keyboardController?.show()
             inputBuffer = ""
-        } else {
-            keyboardController?.hide()
-            focusManager.clearFocus()
         }
     }
 
@@ -125,7 +130,7 @@ fun ReminderInput(
     ) {
         Box(
             modifier = Modifier
-                .clickableWithUnboundedRipple(onClick = {
+                .clickableRipple(onClick = {
                     if (isActive) {
                         dismissKeyboard()
                     } else {

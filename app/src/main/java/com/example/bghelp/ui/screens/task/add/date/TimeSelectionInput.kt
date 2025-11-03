@@ -1,7 +1,6 @@
 package com.example.bghelp.ui.screens.task.add.date
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -25,6 +24,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -32,7 +32,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.ui.components.WithRipple
-import com.example.bghelp.ui.components.clickableWithUnboundedRipple
+import com.example.bghelp.ui.components.clickableRipple
 import com.example.bghelp.ui.screens.task.add.TimeField
 import com.example.bghelp.ui.screens.task.add.TimeSegment
 import com.example.bghelp.ui.theme.ErrorRed
@@ -62,10 +62,10 @@ fun TimeSelectionInput(
 
     val isThisFieldActive = activeTimeField == timeField
     val selectedSegment = if (isThisFieldActive) activeTimeSegment else null
+    val isActive = selectedSegment != null
 
     fun dismissKeyboard() {
         onSelectionCleared()
-        keyboardController?.hide()
         focusManager.clearFocus()
     }
 
@@ -122,16 +122,20 @@ fun TimeSelectionInput(
             .height(1.dp)
             .alpha(0f)
             .focusRequester(focusRequester)
+            .onFocusChanged { focusState ->
+                // When focus is lost, clear selection (like text fields do)
+                if (!focusState.isFocused && selectedSegment != null) {
+                    onSelectionCleared()
+                }
+            }
     )
 
-    LaunchedEffect(selectedSegment) {
-        if (selectedSegment != null) {
+    // Only show keyboard when active - don't hide (same pattern as text fields)
+    LaunchedEffect(isActive) {
+        if (isActive) {
             focusRequester.requestFocus()
             keyboardController?.show()
             inputBuffer = ""
-        } else {
-            keyboardController?.hide()
-            focusManager.clearFocus()
         }
     }
 
@@ -140,14 +144,8 @@ fun TimeSelectionInput(
     // Time select row
     Row(
         modifier = modifier
-            // Visuals for wrong endDate
             .clip(RoundedCornerShape(8.dp))
-            .background(if (isError) errorBackgroundColor else Color.Transparent)
-            .clickable {
-                if (selectedSegment != null) {
-                    dismissKeyboard()
-                }
-            },
+            .background(if (isError) errorBackgroundColor else Color.Transparent),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -157,8 +155,10 @@ fun TimeSelectionInput(
         fun select(segment: TimeSegment) {
             onTimeInputClicked()
             if (isThisFieldActive && selectedSegment == segment) {
+                // Clicking same segment - dismiss
                 dismissKeyboard()
             } else {
+                // Select new segment
                 onSegmentSelected(timeField, segment)
                 inputBuffer = ""
             }
@@ -166,11 +166,10 @@ fun TimeSelectionInput(
 
         Box(
             modifier = Modifier
-                .clickableWithUnboundedRipple(onClick = { select(TimeSegment.HOUR) })
+                .clickableRipple(onClick = { select(TimeSegment.HOUR) })
                 .padding(horizontal = 8.dp),
             contentAlignment = Alignment.Center
         ) {
-            // Hour
             Text(
                 text = hourText,
                 style = if (selectedSegment == TimeSegment.HOUR) TextStyles.MainBlue.Bold.Medium else TextStyles.Default.Medium,
@@ -185,11 +184,10 @@ fun TimeSelectionInput(
 
         Box(
             modifier = Modifier
-                .clickableWithUnboundedRipple(onClick = { select(TimeSegment.MINUTE) })
+                .clickableRipple(onClick = { select(TimeSegment.MINUTE) })
                 .padding(horizontal = 8.dp),
             contentAlignment = Alignment.Center
         ) {
-            // Minute
             Text(
                 text = minuteText,
                 style = if (selectedSegment == TimeSegment.MINUTE) TextStyles.MainBlue.Bold.Medium else TextStyles.Default.Medium,
@@ -197,4 +195,3 @@ fun TimeSelectionInput(
         }
     }
 }
-

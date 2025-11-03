@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
 import com.example.bghelp.ui.components.WithRipple
-import com.example.bghelp.ui.components.clickableWithUnboundedRipple
+import com.example.bghelp.ui.components.clickableRipple
 import com.example.bghelp.ui.theme.BGHelpTheme
 import com.example.bghelp.ui.theme.TextGrey
 import com.example.bghelp.ui.theme.TextStyles
@@ -45,7 +45,7 @@ private fun ClickableArrow(
         Image(
             modifier = Modifier
                 .size(48.dp)
-                .clickableWithUnboundedRipple(onClick = onClick),
+                .clickableRipple(onClick = onClick),
             painter = painterResource(painterResource),
             contentScale = ContentScale.Fit,
             contentDescription = contentDescription,

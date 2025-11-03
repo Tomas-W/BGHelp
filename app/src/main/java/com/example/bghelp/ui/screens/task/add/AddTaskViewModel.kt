@@ -37,12 +37,18 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
     private val _dateEndSelection = MutableStateFlow<LocalDate?>(null)
     val dateEndSelection: StateFlow<LocalDate?> = _dateEndSelection.asStateFlow()
 
+    // To save/load when toggling end date
+    private var hiddenDateEndValue: LocalDate? = null
+
     // Time selection (for AT_TIME mode)
     private val _timeStartSelection = MutableStateFlow(LocalTime.now().withSecond(0).withNano(0))
     val timeStartSelection: StateFlow<LocalTime> = _timeStartSelection.asStateFlow()
 
     private val _timeEndSelection = MutableStateFlow<LocalTime?>(null)
     val timeEndSelection: StateFlow<LocalTime?> = _timeEndSelection.asStateFlow()
+
+    // To save/load when toggling end time
+    private var hiddenTimeEndValue: LocalTime? = null
 
     // Reminder selection
     private val _userRemindSelection = MutableStateFlow(UserRemindSelection.OFF)
@@ -164,22 +170,22 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
     }
 
     fun toggleVibrateSelection() {
-        val soundMap = mapOf(
+        val vibrateMap = mapOf(
             UserVibrateSelection.OFF to UserVibrateSelection.ONCE,
             UserVibrateSelection.ONCE to UserVibrateSelection.CONTINUOUS,
             UserVibrateSelection.CONTINUOUS to UserVibrateSelection.OFF
         )
-        _userVibrateSelection.value = soundMap[_userVibrateSelection.value] ?: UserVibrateSelection.OFF
+        _userVibrateSelection.value = vibrateMap[_userVibrateSelection.value] ?: UserVibrateSelection.OFF
     }
 
     fun setDateStart(date: LocalDate) {
         _dateStartSelection.value = date
-        _dateEndSelection.value = _dateEndSelection.value?.let { maxOf(it, date) }
         updateTimeValidationState()
     }
 
     fun setDateEnd(date: LocalDate) {
         _dateEndSelection.value = date
+        hiddenDateEndValue = date
         _dateStartSelection.value = _dateStartSelection.value.coerceAtMost(date)
         updateTimeValidationState()
     }
@@ -191,11 +197,14 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
 
     fun setTimeEnd(time: LocalTime) {
         _timeEndSelection.value = time
+        hiddenTimeEndValue = time
         updateTimeValidationState()
     }
 
     fun toggleEndDateVisible() {
         if (_isEndDateVisible.value) {
+            // Store current value before hiding
+            hiddenDateEndValue = _dateEndSelection.value
             _isEndDateVisible.value = false
             _dateEndSelection.value = null
             if (_activeDateField.value == DateField.END) {
@@ -203,18 +212,26 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
             }
         } else {
             _isEndDateVisible.value = true
-            _dateEndSelection.value = _dateStartSelection.value
+            // Restore stored value or default to start date
+            _dateEndSelection.value = hiddenDateEndValue ?: _dateStartSelection.value
         }
         updateTimeValidationState()
     }
 
     fun toggleEndTimeVisible() {
         if (_isEndTimeVisible.value) {
+            // Store current value before hiding
+            hiddenTimeEndValue = _timeEndSelection.value
             _isEndTimeVisible.value = false
             _timeEndSelection.value = null
+            // Clear selection if end time input is active
+            if (_activeTimeField.value == TimeField.END) {
+                clearTimeInputSelection()
+            }
         } else {
             _isEndTimeVisible.value = true
-            _timeEndSelection.value = _timeStartSelection.value.plusHours(1)
+            // Restore stored value or default to start time + 1 hour
+            _timeEndSelection.value = hiddenTimeEndValue ?: _timeStartSelection.value.plusHours(1)
         }
         updateTimeValidationState()
     }
@@ -245,6 +262,7 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
     fun onTimeInputClicked() {
         setCalendarVisible(false)
         clearReminderInputSelection()
+        clearTitleInputSelection()
     }
 
     fun setActiveTimeInput(field: TimeField?, segment: TimeSegment?) {
@@ -252,6 +270,7 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
         _activeTimeSegment.value = segment
         if (field != null) {
             clearReminderInputSelection()
+            clearTitleInputSelection()
         }
     }
 
@@ -295,6 +314,11 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
     }
 
     fun removeReminder(type: RemindType, reminderId: Int) {
+        // Clear selection if this reminder was active
+        if (_activeReminderInput.value?.type == type && _activeReminderInput.value?.id == reminderId) {
+            clearReminderInputSelection()
+        }
+        
         when (type) {
             RemindType.START -> {
                 _startReminders.value = _startReminders.value.filter { it.id != reminderId }
@@ -340,6 +364,7 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
         _activeReminderInput.value = ActiveReminderInput(type, id)
         setCalendarVisible(false)
         clearTimeInputSelection()
+        clearTitleInputSelection()
         _keyboardDismissKey.value++
     }
 

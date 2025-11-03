@@ -1,6 +1,5 @@
 package com.example.bghelp.ui.screens.task.add
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +18,7 @@ import com.example.bghelp.ui.components.SelectionToggle
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
+import com.example.bghelp.ui.utils.clickableDismissFocus
 
 @Composable
 fun <T : Enum<T>> AddTaskHeader(
@@ -37,7 +37,7 @@ fun <T : Enum<T>> AddTaskHeader(
         Icon(
             modifier = Modifier
                 .size(Sizes.Icon.Large)
-                .clickable {
+                .clickableDismissFocus {
                     viewModel.clearAllInputSelections()
                     toggleSection()
                 },
@@ -50,7 +50,7 @@ fun <T : Enum<T>> AddTaskHeader(
         Text(
             modifier = Modifier
                 .weight(1f)
-                .clickable {
+                .clickableDismissFocus {
                     viewModel.clearAllInputSelections()
                     toggleSection()
                 },

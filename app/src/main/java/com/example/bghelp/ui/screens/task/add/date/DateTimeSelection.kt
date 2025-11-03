@@ -1,6 +1,5 @@
 package com.example.bghelp.ui.screens.task.add.date
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.example.bghelp.R
 import com.example.bghelp.ui.components.WithRipple
-import com.example.bghelp.ui.components.clickableWithUnboundedRipple
+import com.example.bghelp.ui.components.clickableRipple
+import com.example.bghelp.ui.components.clickableRippleDismiss
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
@@ -35,6 +35,7 @@ import com.example.bghelp.ui.screens.task.add.TimeField
 import com.example.bghelp.ui.screens.task.add.UserDateSelection
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
+import com.example.bghelp.ui.utils.clickableDismissFocus
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -73,9 +74,9 @@ private fun DateSelection(viewModel: AddTaskViewModel) {
         Text(
             modifier = Modifier
                 .widthIn(min = AddTaskConstants.MIN_WIDTH.dp)
-                .clickable {
-                viewModel.toggleCalendarFromDateField(DateField.START)
-            },
+                .clickableDismissFocus {
+                    viewModel.toggleCalendarFromDateField(DateField.START)
+                },
             text = dateStartSelection.format(fMonthYearDayShort),
             style = if (activeDateField == DateField.START) TextStyles.MainBlue.Bold.Medium else TextStyles.Default.Medium,
         )
@@ -86,7 +87,7 @@ private fun DateSelection(viewModel: AddTaskViewModel) {
         WithRipple {
             Box(
                 modifier = Modifier
-                    .clickableWithUnboundedRipple(
+                    .clickableRipple(
                         onClick = {
                             viewModel.toggleEndDateVisible()
                         },
@@ -111,7 +112,7 @@ private fun DateSelection(viewModel: AddTaskViewModel) {
                 .alpha(if (isEndDateVisible) 1f else 0f)
                 .then(
                     if (isEndDateVisible) {
-                        Modifier.clickable {
+                        Modifier.clickableDismissFocus {
                             viewModel.toggleCalendarFromDateField(DateField.END)
                         }
                     } else {
@@ -198,7 +199,7 @@ private fun TimeSelection(viewModel: AddTaskViewModel) {
         WithRipple {
             Box(
                 modifier = Modifier
-                    .clickableWithUnboundedRipple(
+                    .clickableRippleDismiss(
                         onClick = {
                             viewModel.toggleEndTimeVisible()
                         },

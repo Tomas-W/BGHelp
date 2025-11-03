@@ -1,6 +1,5 @@
 package com.example.bghelp.ui.screens.task.add.remind
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.example.bghelp.R
 import com.example.bghelp.ui.components.WithRipple
-import com.example.bghelp.ui.components.clickableWithUnboundedRipple
+import com.example.bghelp.ui.components.clickableRippleDismiss
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerMedium
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
@@ -55,13 +54,13 @@ fun RemindSelection (
             AddTaskSpacerSmall()
 
             // Before start items
-            startReminders.forEachIndexed { i,  reminder ->
+            startReminders.forEachIndexed { i, reminder ->
                 ReminderItem(
                     reminder = reminder,
                     remindType = RemindType.START,
                     viewModel = viewModel
                 )
-                 if (i != startReminders.size - 1) AddTaskSpacerSmall()
+                if (i != startReminders.size - 1) AddTaskSpacerSmall()
             }
             if (startReminders.isNotEmpty()) AddTaskSpacerMedium()
 
@@ -116,7 +115,7 @@ fun AddReminder(
         WithRipple {
             Box(
                 modifier = Modifier
-                    .clickableWithUnboundedRipple(
+                    .clickableRippleDismiss(
                         onClick = {
                             viewModel.clearReminderInputSelection()
                             onClick()
@@ -182,12 +181,21 @@ fun ReminderItem(
 
         Spacer(modifier = Modifier.width(Sizes.Size.Medium))
 
-        Icon(
-            modifier = Modifier
-                .size(Sizes.Icon.Medium)
-                .clickable{ viewModel.removeReminder(remindType, reminder.id) },
-            painter = painterResource(R.drawable.delete),
-            contentDescription = AddTaskStrings.REMOVE_REMINDER
-        )
+        WithRipple {
+            Box(
+                modifier = Modifier
+                    .clickableRippleDismiss(
+                        onClick = { viewModel.removeReminder(remindType, reminder.id) },
+                        radius = Sizes.Icon.Medium
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    modifier = Modifier.size(Sizes.Icon.Medium),
+                    painter = painterResource(R.drawable.delete),
+                    contentDescription = AddTaskStrings.REMOVE_REMINDER
+                )
+            }
+        }
     }
 }

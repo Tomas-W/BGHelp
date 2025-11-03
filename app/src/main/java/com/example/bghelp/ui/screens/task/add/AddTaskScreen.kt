@@ -79,7 +79,7 @@ fun AddTaskScreen(
 
 @Composable
 fun AddTaskSpacerLarge() {
-    Spacer(modifier = Modifier.height(Sizes.Size.Small))
+    Spacer(modifier = Modifier.height(Sizes.Size.Medium))
 }
 
 @Composable

@@ -15,7 +15,7 @@ import androidx.compose.ui.text.input.ImeAction
 import com.example.bghelp.ui.theme.TextStyles
 
 @Composable
-fun InputField(
+fun OldInputField(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
