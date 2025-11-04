@@ -20,6 +20,8 @@ object AddTaskStrings {
     const val ALARM_OFF = "Alarm off"
     const val ALARM_ONCE = "Alarm once"
     const val ALARM_CONTINUOUS = "Alarm continuous"
+    const val SELECT_ALARM = "Select alarm"
+    const val CREATE_ALARM = "Create alarm +"
     // vibrate
     const val VIBRATE_OFF = "Vibrate off"
     const val VIBRATE_ONCE = "Vibrate once"

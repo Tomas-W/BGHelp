@@ -4,10 +4,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.example.bghelp.ui.components.LazyColumnContainer
 import com.example.bghelp.ui.components.MainContentContainer
 import com.example.bghelp.ui.screens.task.add.title.TitleSection
 import com.example.bghelp.ui.screens.task.add.date.DateSection
@@ -23,8 +27,6 @@ object AddTaskConstants {
     const val TITLE_MAX_LINES = 2
     const val INFO_MIN_LINES = 2
     const val INFO_MAX_LINES = 30
-    const val MIN_TEXT_LEN = 2
-    const val MAX_TEXT_LEN = 40
 
     const val MIN_YEAR = 2025
     const val MAX_YEAR = 2100
@@ -52,6 +54,7 @@ data class Reminder(
 
 @Composable
 fun AddTaskScreen(
+    navController: NavController,
     viewModel: AddTaskViewModel = hiltViewModel()
 ) {
     Box(
@@ -61,7 +64,8 @@ fun AddTaskScreen(
                 viewModel.clearAllInputSelections()
             }
     ) {
-        MainContentContainer {
+        MainContentContainer(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            AddTaskSpacerLarge()
 
             TitleSection(viewModel = viewModel)
 
@@ -71,8 +75,10 @@ fun AddTaskScreen(
 
             AddTaskDivider()
 
-            RemindSection(viewModel = viewModel)
-
+            RemindSection(
+                viewModel = viewModel,
+                navController = navController
+            )
         }
     }
 }
@@ -94,7 +100,7 @@ fun AddTaskSpacerSmall() {
 
 @Composable
 fun AddTaskDivider() {
-    AddTaskSpacerMedium()
+    AddTaskSpacerLarge()
     HorizontalDivider()
     AddTaskSpacerLarge()
 }

@@ -21,6 +21,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
@@ -88,14 +89,18 @@ fun OutlinedStringInput(
             label = {
                 Text(
                     text = hint,
-                    style = TextStyles.Default.Small.copy(
-                        fontWeight = textStyle.fontWeight,
-                        fontStyle = textStyle.fontStyle
-                    )
+                    style = textStyle,
+                    color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary
                 )
             },
             placeholder = if (showPlaceholder) {
-                { Text(text = hint, style = TextStyles.Grey.Small) }
+                {
+                    Text(
+                        text = hint,
+                        style = textStyle,
+                        color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary
+                    )
+                }
             } else null,
             textStyle = textStyle,
             singleLine = !isMultiLine,

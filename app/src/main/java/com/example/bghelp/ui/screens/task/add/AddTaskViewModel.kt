@@ -1,6 +1,7 @@
 package com.example.bghelp.ui.screens.task.add
 
 import androidx.lifecycle.ViewModel
+import com.example.bghelp.utils.AudioManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +13,9 @@ import java.time.YearMonth
 import javax.inject.Inject
 
 @HiltViewModel
-class AddTaskViewModel @Inject constructor() : ViewModel() {
+class AddTaskViewModel @Inject constructor(
+    val audioManager: AudioManager
+) : ViewModel() {
     
     // Title selection
     private val _userTitleSelection = MutableStateFlow(UserTitleSelection.TITLE_ONLY)
@@ -61,6 +64,10 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
     // Vibrate selection
     private val _userVibrateSelection = MutableStateFlow(UserVibrateSelection.OFF)
     val userVibrateSelection: StateFlow<UserVibrateSelection> = _userVibrateSelection.asStateFlow()
+
+    // Selected audio file
+    private val _selectedAudioFile = MutableStateFlow<String>("")
+    val selectedAudioFile: StateFlow<String> = _selectedAudioFile.asStateFlow()
 
     // dateEnd & timeEnd visibility
     private val _isEndDateVisible = MutableStateFlow(false)
@@ -178,6 +185,10 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
         _userVibrateSelection.value = vibrateMap[_userVibrateSelection.value] ?: UserVibrateSelection.OFF
     }
 
+    fun setSelectedAudioFile(fileName: String) {
+        _selectedAudioFile.value = fileName
+    }
+
     fun setDateStart(date: LocalDate) {
         _dateStartSelection.value = date
         updateTimeValidationState()
@@ -203,7 +214,6 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
 
     fun toggleEndDateVisible() {
         if (_isEndDateVisible.value) {
-            // Store current value before hiding
             hiddenDateEndValue = _dateEndSelection.value
             _isEndDateVisible.value = false
             _dateEndSelection.value = null
@@ -212,7 +222,6 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
             }
         } else {
             _isEndDateVisible.value = true
-            // Restore stored value or default to start date
             _dateEndSelection.value = hiddenDateEndValue ?: _dateStartSelection.value
         }
         updateTimeValidationState()
@@ -220,7 +229,6 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
 
     fun toggleEndTimeVisible() {
         if (_isEndTimeVisible.value) {
-            // Store current value before hiding
             hiddenTimeEndValue = _timeEndSelection.value
             _isEndTimeVisible.value = false
             _timeEndSelection.value = null
@@ -230,7 +238,6 @@ class AddTaskViewModel @Inject constructor() : ViewModel() {
             }
         } else {
             _isEndTimeVisible.value = true
-            // Restore stored value or default to start time + 1 hour
             _timeEndSelection.value = hiddenTimeEndValue ?: _timeStartSelection.value.plusHours(1)
         }
         updateTimeValidationState()

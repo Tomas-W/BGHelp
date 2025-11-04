@@ -1,26 +1,16 @@
 package com.example.bghelp.ui.screens.task.add.title
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants
-import com.example.bghelp.ui.screens.task.add.AddTaskSpacerLarge
-import com.example.bghelp.ui.screens.task.add.AddTaskSpacerMedium
 import com.example.bghelp.ui.screens.task.add.UserTitleSelection
-import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.components.OutlinedStringInput
 
@@ -36,7 +26,6 @@ fun TitleSelection(
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        AddTaskSpacerSmall()
         // Title input
         OutlinedStringInput(
             modifier = Modifier,
@@ -77,8 +66,6 @@ fun TitleSelection(
                     }
                 }
             )
-
         }
-        AddTaskSpacerSmall()
     }
 }

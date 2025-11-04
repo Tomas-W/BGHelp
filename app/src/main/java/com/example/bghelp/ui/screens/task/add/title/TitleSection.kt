@@ -8,6 +8,7 @@ import com.example.bghelp.R
 import com.example.bghelp.ui.screens.task.add.AddTaskHeader
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerLarge
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerMedium
+import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 import com.example.bghelp.ui.screens.task.add.UserTitleSelection
