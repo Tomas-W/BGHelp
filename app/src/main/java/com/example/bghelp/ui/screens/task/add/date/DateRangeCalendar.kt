@@ -10,13 +10,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DropdownMenu
+import com.example.bghelp.ui.components.CustomDropdown
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,11 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
 import com.example.bghelp.ui.components.DropdownItem
-import com.example.bghelp.constants.UiConstants as UI
 import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableWithCalendarRipple
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants
@@ -68,7 +65,6 @@ fun DateRangeCalendar(
     var isYearMenuOpen by remember { mutableStateOf(false) }
     val months = remember { Month.entries }
     val years = remember { (AddTaskConstants.MIN_YEAR..AddTaskConstants.MAX_YEAR).toList() }
-    val dropdownHeight = (6 * UI.DROPDOWN_ITEM_HEIGHT).dp
 
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
@@ -100,13 +96,9 @@ fun DateRangeCalendar(
                     )
 
                     // Month dropdown
-                    DropdownMenu(
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.tertiary)
-                            .heightIn(max = dropdownHeight),
+                    CustomDropdown(
                         expanded = isMonthMenuOpen,
-                        onDismissRequest = { isMonthMenuOpen = false },
-                        offset = DpOffset(x = 0.dp, y = 4.dp)
+                        onDismissRequest = { isMonthMenuOpen = false }
                     ) {
                         months.forEach { m ->
                             val label = YearMonth.of(currentMonth.year, m).format(fMonthLong)
@@ -133,13 +125,9 @@ fun DateRangeCalendar(
                     )
 
                     // Year dropdown
-                    DropdownMenu(
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.tertiary)
-                            .heightIn(max = dropdownHeight),
+                    CustomDropdown(
                         expanded = isYearMenuOpen,
-                        onDismissRequest = { isYearMenuOpen = false },
-                        offset = DpOffset(x = 0.dp, y = 4.dp)
+                        onDismissRequest = { isYearMenuOpen = false }
                     ) {
                         years.forEach { y ->
                             val label = YearMonth.of(y, currentMonth.month).format(fYearLong)
@@ -268,4 +256,3 @@ private fun dayOfWeekOrder(first: DayOfWeek): List<DayOfWeek> {
     val startIndex = all.indexOf(first)
     return all.drop(startIndex) + all.take(startIndex)
 }
-

@@ -6,7 +6,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.example.bghelp.R
 import com.example.bghelp.ui.screens.task.add.AddTaskHeader
-import com.example.bghelp.ui.screens.task.add.AddTaskSpacerLarge
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerMedium
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
@@ -36,7 +35,14 @@ fun TitleSection(
     AddTaskSpacerMedium()
 
     TitleSelection(
-        viewModel = viewModel,
-        userTitleSelection = userTitleSelection
+        viewModel = viewModel
     )
+
+    if (userTitleSelection == UserTitleSelection.TITLE_AND_INFO) {
+        InfoSelection(
+            viewModel = viewModel
+        )
+    }
+
+    AddTaskSpacerSmall()
 }

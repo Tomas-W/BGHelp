@@ -1,7 +1,5 @@
 package com.example.bghelp.ui.screens.task.add
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,11 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.ui.components.SelectionToggle
-import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.utils.clickableDismissFocus
@@ -28,6 +24,7 @@ fun <T : Enum<T>> AddTaskHeader(
     userSectionSelection: T,
     stringChoices: Map<T, String>,
     iconChoices: Map<T, Int>,
+    hasToggle: Boolean = true,
     toggleSection: () -> Unit
 ) {
     Row(
@@ -60,14 +57,17 @@ fun <T : Enum<T>> AddTaskHeader(
             style = TextStyles.Grey.Bold.Medium
         )
 
-        SelectionToggle(
-            selectedIndex = userSectionSelection.ordinal,
-            numberOfStates = stringChoices.size,
-            enabled = true,
-            onClick = {
-                viewModel.clearAllInputSelections()
-                toggleSection()
-            }
-        )
+        if (hasToggle) {
+            SelectionToggle(
+                selectedIndex = userSectionSelection.ordinal,
+                numberOfStates = stringChoices.size,
+                enabled = true,
+                onClick = {
+                    viewModel.clearAllInputSelections()
+                    toggleSection()
+                }
+            )
+        }
+
     }
 }

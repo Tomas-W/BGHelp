@@ -36,7 +36,6 @@ import com.example.bghelp.ui.components.clickableRipple
 import com.example.bghelp.ui.screens.task.add.TimeField
 import com.example.bghelp.ui.screens.task.add.TimeSegment
 import com.example.bghelp.ui.theme.ErrorRed
-import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import java.time.LocalTime
 import java.util.Locale
@@ -130,7 +129,6 @@ fun TimeSelectionInput(
             }
     )
 
-    // Only show keyboard when active - don't hide (same pattern as text fields)
     LaunchedEffect(isActive) {
         if (isActive) {
             focusRequester.requestFocus()
@@ -164,6 +162,7 @@ fun TimeSelectionInput(
             }
         }
 
+        // Hour input
         Box(
             modifier = Modifier
                 .clickableRipple(onClick = { select(TimeSegment.HOUR) })
@@ -175,13 +174,13 @@ fun TimeSelectionInput(
                 style = if (selectedSegment == TimeSegment.HOUR) TextStyles.MainBlue.Bold.Medium else TextStyles.Default.Medium,
             )
         }
-
+        // Separator
         Text(
             text = ":",
             style = TextStyles.Default.Bold.Medium,
             modifier = Modifier.padding(horizontal = 2.dp),
         )
-
+        // Minute input
         Box(
             modifier = Modifier
                 .clickableRipple(onClick = { select(TimeSegment.MINUTE) })

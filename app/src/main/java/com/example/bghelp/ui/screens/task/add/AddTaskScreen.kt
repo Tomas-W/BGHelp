@@ -11,25 +11,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.bghelp.ui.components.LazyColumnContainer
 import com.example.bghelp.ui.components.MainContentContainer
 import com.example.bghelp.ui.screens.task.add.title.TitleSection
 import com.example.bghelp.ui.screens.task.add.date.DateSection
 import com.example.bghelp.ui.screens.task.add.remind.RemindSection
+import com.example.bghelp.ui.screens.task.add.color.ColorSection
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.utils.dismissKeyboardOnTap
 
 object AddTaskConstants {
+    // Misc
     const val END_PADDING = 24
     const val MIN_WIDTH = 115
-
+    const val DROPDOWN_ITEMS = 6
+    // Title
     const val TITLE_MIN_LINES = 1
     const val TITLE_MAX_LINES = 2
     const val INFO_MIN_LINES = 2
     const val INFO_MAX_LINES = 30
-
+    // When
     const val MIN_YEAR = 2025
     const val MAX_YEAR = 2100
+    // Remind
+    const val REMINDER_INPUT_WIDTH = 60
     const val REMINDER_START = 0
     const val MIN_REMINDER = 0
     const val MAX_REMINDER = 999
@@ -45,6 +49,8 @@ enum class RemindType { START, END }
 enum class TimeUnit { MINUTES, HOURS, DAYS, WEEKS, MONTHS }
 enum class UserSoundSelection { OFF, ONCE, CONTINUOUS }
 enum class UserVibrateSelection { OFF, ONCE, CONTINUOUS }
+enum class UserColorSelection { DEFAULT, CUSTOM }
+enum class UserColorChoices { DEFAULT, RED, GREEN, YELLOW, CYAN, MAGENTA }
 
 data class Reminder(
     val id: Int,
@@ -79,6 +85,10 @@ fun AddTaskScreen(
                 viewModel = viewModel,
                 navController = navController
             )
+
+            AddTaskDivider()
+
+            ColorSection(viewModel = viewModel)
         }
     }
 }

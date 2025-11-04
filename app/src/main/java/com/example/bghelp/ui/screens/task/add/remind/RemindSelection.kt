@@ -38,49 +38,47 @@ import com.example.bghelp.ui.theme.TextStyles
 @Composable
 fun RemindSelection (
     viewModel: AddTaskViewModel,
-    userRemindSelection: UserRemindSelection,
 ) {
     val startReminders by viewModel.startReminders.collectAsState()
     val endReminders by viewModel.endReminders.collectAsState()
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        if (userRemindSelection == UserRemindSelection.ON) {
-            // Before Start
-            AddReminder(
+        AddTaskSpacerMedium()
+        // Before Start
+        AddReminder(
+            remindType = RemindType.START,
+            onClick = { viewModel.addReminder(RemindType.START) },
+            viewModel = viewModel
+        )
+        AddTaskSpacerSmall()
+
+        // Before start items
+        startReminders.forEachIndexed { i, reminder ->
+            ReminderItem(
+                reminder = reminder,
                 remindType = RemindType.START,
-                onClick = { viewModel.addReminder(RemindType.START) },
                 viewModel = viewModel
             )
-            AddTaskSpacerSmall()
+            if (i != startReminders.size - 1) AddTaskSpacerSmall()
+        }
+        if (startReminders.isNotEmpty()) AddTaskSpacerMedium()
 
-            // Before start items
-            startReminders.forEachIndexed { i, reminder ->
-                ReminderItem(
-                    reminder = reminder,
-                    remindType = RemindType.START,
-                    viewModel = viewModel
-                )
-                if (i != startReminders.size - 1) AddTaskSpacerSmall()
-            }
-            if (startReminders.isNotEmpty()) AddTaskSpacerMedium()
+        // Before end
+        AddReminder(
+            remindType = RemindType.END,
+            onClick = { viewModel.addReminder(RemindType.END) },
+            viewModel = viewModel
+        )
+        AddTaskSpacerSmall()
 
-            // Before end
-            AddReminder(
+        // Before end items
+        endReminders.forEachIndexed { i, reminder ->
+            ReminderItem(
+                reminder = reminder,
                 remindType = RemindType.END,
-                onClick = { viewModel.addReminder(RemindType.END) },
                 viewModel = viewModel
             )
-            AddTaskSpacerSmall()
-
-            // Before end items
-            endReminders.forEachIndexed { i, reminder ->
-                ReminderItem(
-                    reminder = reminder,
-                    remindType = RemindType.END,
-                    viewModel = viewModel
-                )
-                if (i != endReminders.size - 1) AddTaskSpacerSmall()
-            }
+            if (i != endReminders.size - 1) AddTaskSpacerSmall()
         }
     }
 }
@@ -103,6 +101,7 @@ fun AddReminder(
     ) {
         Spacer(modifier = Modifier.width(2 * Sizes.Icon.Large))
 
+        // Before / after start
         Text(
             modifier = Modifier
                 .widthIn(min = AddTaskConstants.MIN_WIDTH.dp),
@@ -112,6 +111,7 @@ fun AddReminder(
 
         Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
 
+        // + Icon
         WithRipple {
             Box(
                 modifier = Modifier
@@ -152,6 +152,7 @@ fun ReminderItem(
     ) {
         Spacer(modifier = Modifier.width(Sizes.Icon.Medium + Sizes.Icon.Large))
 
+        // Input field
         ReminderInput(
             value = reminder.value,
             onValueChange = { newValue ->
@@ -169,6 +170,7 @@ fun ReminderItem(
 
         Spacer(modifier = Modifier.width(Sizes.Size.Small))
 
+        // Dropdown
         TimeUnitDropdown(
             selectedUnit = reminder.timeUnit,
             onUnitSelected = { newUnit ->
@@ -181,6 +183,7 @@ fun ReminderItem(
 
         Spacer(modifier = Modifier.width(Sizes.Size.Medium))
 
+        // Delete icon
         WithRipple {
             Box(
                 modifier = Modifier

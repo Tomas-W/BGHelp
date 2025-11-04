@@ -26,8 +26,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.bghelp.R
 import com.example.bghelp.constants.UiConstants as UI
 import com.example.bghelp.ui.navigation.Screen
-import com.example.bghelp.ui.theme.BottomNavSelected
-import com.example.bghelp.ui.theme.BottomNavUnselected
 import com.example.bghelp.ui.theme.Sizes
 
 @Composable

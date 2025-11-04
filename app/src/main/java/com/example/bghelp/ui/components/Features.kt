@@ -20,12 +20,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.bghelp.constants.UiConstants as UI
+import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 
 @SuppressLint("RememberInComposition")
 @Composable
@@ -132,6 +138,40 @@ fun SelectionToggle(
                 }
             }
         }
+    }
+}
+
+private fun Modifier.cropVertical(vertical: Dp): Modifier = this.layout { measurable, constraints ->
+    val placeable = measurable.measure(constraints)
+    val verticalPx = vertical.toPx().toInt()
+    
+    layout(placeable.width, placeable.height - (verticalPx * 2)) {
+        placeable.placeRelative(0, -verticalPx)
+    }
+}
+
+@Composable
+fun CustomDropdown(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
+    itemHeight: Int? = null,
+    content: @Composable () -> Unit
+) {
+    val maxHeight = remember(itemHeight) {
+        val items = itemHeight ?: AddTaskConstants.DROPDOWN_ITEMS
+        (items * UI.DROPDOWN_ITEM_HEIGHT).dp
+    }
+    
+    DropdownMenu(
+        modifier = modifier
+            .cropVertical(8.dp)
+            .heightIn(max = maxHeight)
+            .background(MaterialTheme.colorScheme.tertiary),
+        expanded = expanded,
+        onDismissRequest = onDismissRequest
+    ) {
+        content()
     }
 }
 

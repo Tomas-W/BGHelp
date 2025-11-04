@@ -5,14 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.MaterialTheme
+import com.example.bghelp.ui.components.CustomDropdown
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,7 +29,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.constants.UiConstants as UI
 import com.example.bghelp.ui.components.DropdownItem
@@ -89,7 +86,6 @@ fun ReminderInput(
             .alpha(0f)
             .focusRequester(focusRequester)
             .onFocusChanged { focusState ->
-                // When focus is lost, clear selection (like text fields and time inputs)
                 if (!focusState.isFocused && isActive) {
                     onActiveChange(false)
                 }
@@ -105,7 +101,6 @@ fun ReminderInput(
 
     )
 
-    // Only show keyboard when active - don't hide (let focus system handle it)
     LaunchedEffect(isActive) {
         if (isActive) {
             focusRequester.requestFocus()
@@ -116,7 +111,7 @@ fun ReminderInput(
 
     Row(
         modifier = modifier
-            .width(60.dp)
+            .width(AddTaskConstants.REMINDER_INPUT_WIDTH.dp)
             .clip(RoundedCornerShape(Sizes.Corner.Small))
             .clickable {
                 if (isActive) {
@@ -165,7 +160,7 @@ fun TimeUnitDropdown(
             TimeUnit.MONTHS to AddTaskStrings.MONTHS
         )
     }
-    val dropdownHeight = (units.size * UI.DROPDOWN_ITEM_HEIGHT).dp
+    val dropdownHeight = (AddTaskConstants.DROPDOWN_ITEMS * UI.DROPDOWN_ITEM_HEIGHT).dp
 
     Box(modifier = modifier) {
         Text(
@@ -179,13 +174,9 @@ fun TimeUnitDropdown(
                 }
         )
 
-        DropdownMenu(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.tertiary)
-                .heightIn(max = dropdownHeight),
+        CustomDropdown(
             expanded = isExpanded,
-            onDismissRequest = { isExpanded = false },
-            offset = DpOffset(x = 0.dp, y = 4.dp)
+            onDismissRequest = { isExpanded = false }
         ) {
             units.forEach { unit ->
                 DropdownItem(
@@ -200,4 +191,3 @@ fun TimeUnitDropdown(
         }
     }
 }
-

@@ -13,11 +13,12 @@ val BackgroundGrey = Color(237, 237, 237)
 val SecondaryGrey = Color(210, 210, 210)
 val TertiaryGrey = Color(155, 155, 155)
 
-
-val testBlue = Color(221, 232, 240)
-val BottomNavColor = BackgroundGrey
-val BottomNavSelected = TextBlack
-val BottomNavUnselected = TextGrey
+val TaskDefault = MainBlue.copy(alpha = 0.15f)
+val TaskRed = Color.Red.copy(alpha = 0.25f)
+val TaskGreen = Color.Green.copy(alpha = 0.25f)
+val TaskYellow = Color.Yellow.copy(alpha = 0.25f)
+val TaskCyan = Color.Cyan.copy(alpha = 0.25f)
+val TaskMagenta = Color.Magenta.copy(alpha = 0.25f)
 
 // Semantic colors for text
 val ErrorRed = Color(220, 53, 69)
