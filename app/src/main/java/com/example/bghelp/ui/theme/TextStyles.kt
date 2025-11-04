@@ -178,27 +178,27 @@ object TextStyles {
     }
 
     // Info (Blue)
-    object MainBlue {
-        val ExtraSmall = create(TextSizes.EXTRA_SMALL, color = InfoBlue)
-        val Small = create(TextSizes.SMALL, color = InfoBlue)
-        val Medium = create(TextSizes.MEDIUM, color = InfoBlue)
-        val Large = create(TextSizes.LARGE, color = InfoBlue)
-        val ExtraLarge = create(TextSizes.EXTRA_LARGE, color = InfoBlue)
+    object Main {
+        val ExtraSmall = create(TextSizes.EXTRA_SMALL, color = MainBlue)
+        val Small = create(TextSizes.SMALL, color = MainBlue)
+        val Medium = create(TextSizes.MEDIUM, color = MainBlue)
+        val Large = create(TextSizes.LARGE, color = MainBlue)
+        val ExtraLarge = create(TextSizes.EXTRA_LARGE, color = MainBlue)
 
         object Bold {
-            val ExtraSmall = create(TextSizes.EXTRA_SMALL, weight = FontWeight.Bold, color = InfoBlue)
-            val Small = create(TextSizes.SMALL, weight = FontWeight.Bold, color = InfoBlue)
-            val Medium = create(TextSizes.MEDIUM, weight = FontWeight.Bold, color = InfoBlue)
-            val Large = create(TextSizes.LARGE, weight = FontWeight.Bold, color = InfoBlue)
-            val ExtraLarge = create(TextSizes.EXTRA_LARGE, weight = FontWeight.Bold, color = InfoBlue)
+            val ExtraSmall = create(TextSizes.EXTRA_SMALL, weight = FontWeight.Bold, color = MainBlue)
+            val Small = create(TextSizes.SMALL, weight = FontWeight.Bold, color = MainBlue)
+            val Medium = create(TextSizes.MEDIUM, weight = FontWeight.Bold, color = MainBlue)
+            val Large = create(TextSizes.LARGE, weight = FontWeight.Bold, color = MainBlue)
+            val ExtraLarge = create(TextSizes.EXTRA_LARGE, weight = FontWeight.Bold, color = MainBlue)
         }
 
         object Italic {
-            val ExtraSmall = create(TextSizes.EXTRA_SMALL, style = FontStyle.Italic, color = InfoBlue)
-            val Small = create(TextSizes.SMALL, style = FontStyle.Italic, color = InfoBlue)
-            val Medium = create(TextSizes.MEDIUM, style = FontStyle.Italic, color = InfoBlue)
-            val Large = create(TextSizes.LARGE, style = FontStyle.Italic, color = InfoBlue)
-            val ExtraLarge = create(TextSizes.EXTRA_LARGE, style = FontStyle.Italic, color = InfoBlue)
+            val ExtraSmall = create(TextSizes.EXTRA_SMALL, style = FontStyle.Italic, color = MainBlue)
+            val Small = create(TextSizes.SMALL, style = FontStyle.Italic, color = MainBlue)
+            val Medium = create(TextSizes.MEDIUM, style = FontStyle.Italic, color = MainBlue)
+            val Large = create(TextSizes.LARGE, style = FontStyle.Italic, color = MainBlue)
+            val ExtraLarge = create(TextSizes.EXTRA_LARGE, style = FontStyle.Italic, color = MainBlue)
         }
     }
 

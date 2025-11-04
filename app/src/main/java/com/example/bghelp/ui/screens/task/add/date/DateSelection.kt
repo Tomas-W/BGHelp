@@ -57,7 +57,7 @@ fun DateSelection(
                     viewModel.toggleCalendarFromDateField(DateField.START)
                 },
             text = dateStartSelection.format(fMonthYearDayShort),
-            style = if (activeDateField == DateField.START) TextStyles.MainBlue.Bold.Medium else TextStyles.Default.Medium,
+            style = if (activeDateField == DateField.START) TextStyles.Main.Bold.Medium else TextStyles.Default.Medium,
         )
 
         Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
@@ -98,7 +98,7 @@ fun DateSelection(
                     }
                 ),
             text = dateEndSelection?.format(fMonthYearDayShort) ?: dateStartSelection.format(fMonthYearDayShort),
-            style = if (activeDateField == DateField.END) TextStyles.MainBlue.Bold.Medium else TextStyles.Default.Medium
+            style = if (activeDateField == DateField.END) TextStyles.Main.Bold.Medium else TextStyles.Default.Medium
         )
     }
 }

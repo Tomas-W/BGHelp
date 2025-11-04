@@ -1,6 +1,5 @@
 package com.example.bghelp.ui.screens.task.add.remind
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -136,7 +135,7 @@ fun ReminderInput(
         ) {
             Text(
                 text = value.toString(),
-                style = if (isActive) TextStyles.MainBlue.Bold.Small else TextStyles.Default.Small
+                style = if (isActive) TextStyles.Main.Bold.Small else TextStyles.Default.Small
             )
         }
     }

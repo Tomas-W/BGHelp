@@ -171,7 +171,7 @@ fun TimeSelectionInput(
         ) {
             Text(
                 text = hourText,
-                style = if (selectedSegment == TimeSegment.HOUR) TextStyles.MainBlue.Bold.Medium else TextStyles.Default.Medium,
+                style = if (selectedSegment == TimeSegment.HOUR) TextStyles.Main.Bold.Medium else TextStyles.Default.Medium,
             )
         }
         // Separator
@@ -189,7 +189,7 @@ fun TimeSelectionInput(
         ) {
             Text(
                 text = minuteText,
-                style = if (selectedSegment == TimeSegment.MINUTE) TextStyles.MainBlue.Bold.Medium else TextStyles.Default.Medium,
+                style = if (selectedSegment == TimeSegment.MINUTE) TextStyles.Main.Bold.Medium else TextStyles.Default.Medium,
             )
         }
     }

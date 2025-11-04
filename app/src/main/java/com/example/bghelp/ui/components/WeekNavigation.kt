@@ -23,8 +23,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
-import com.example.bghelp.ui.components.WithRipple
-import com.example.bghelp.ui.components.clickableRipple
 import com.example.bghelp.ui.theme.BGHelpTheme
 import com.example.bghelp.ui.theme.TextGrey
 import com.example.bghelp.ui.theme.TextStyles
@@ -109,7 +107,7 @@ fun WeekNavigationRow(
                     val isToday = day == today
                     val isSelected = day == selectedDate
                     val style = when {
-                        isToday -> TextStyles.MainBlue.Bold.Large
+                        isToday -> TextStyles.Main.Bold.Large
                         isSelected -> TextStyles.Default.Bold.Large
                         else -> TextStyles.Default.Medium
                     }
