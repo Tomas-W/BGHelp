@@ -1,11 +1,8 @@
 package com.example.bghelp.ui.screens.task.add.remind
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import com.example.bghelp.R
 import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableRippleDismiss
@@ -31,7 +27,6 @@ import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.Reminder
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 import com.example.bghelp.ui.screens.task.add.RemindType
-import com.example.bghelp.ui.screens.task.add.UserRemindSelection
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 
@@ -42,44 +37,39 @@ fun RemindSelection (
     val startReminders by viewModel.startReminders.collectAsState()
     val endReminders by viewModel.endReminders.collectAsState()
 
-    Column(modifier = Modifier.fillMaxWidth()) {
-        AddTaskSpacerMedium()
-        // Before Start
-        AddReminder(
+    // Before Start
+    AddReminder(
+        remindType = RemindType.START,
+        onClick = { viewModel.addReminder(RemindType.START) },
+        viewModel = viewModel
+    )
+    AddTaskSpacerSmall()
+
+    // Before start items
+    startReminders.forEach { reminder ->
+        ReminderItem(
+            reminder = reminder,
             remindType = RemindType.START,
-            onClick = { viewModel.addReminder(RemindType.START) },
             viewModel = viewModel
         )
-        AddTaskSpacerSmall()
+    }
+    if (startReminders.isNotEmpty()) AddTaskSpacerMedium()
 
-        // Before start items
-        startReminders.forEachIndexed { i, reminder ->
-            ReminderItem(
-                reminder = reminder,
-                remindType = RemindType.START,
-                viewModel = viewModel
-            )
-            if (i != startReminders.size - 1) AddTaskSpacerSmall()
-        }
-        if (startReminders.isNotEmpty()) AddTaskSpacerMedium()
+    // Before end
+    AddReminder(
+        remindType = RemindType.END,
+        onClick = { viewModel.addReminder(RemindType.END) },
+        viewModel = viewModel
+    )
+    AddTaskSpacerSmall()
 
-        // Before end
-        AddReminder(
+    // Before end items
+    endReminders.forEach { reminder ->
+        ReminderItem(
+            reminder = reminder,
             remindType = RemindType.END,
-            onClick = { viewModel.addReminder(RemindType.END) },
             viewModel = viewModel
         )
-        AddTaskSpacerSmall()
-
-        // Before end items
-        endReminders.forEachIndexed { i, reminder ->
-            ReminderItem(
-                reminder = reminder,
-                remindType = RemindType.END,
-                viewModel = viewModel
-            )
-            if (i != endReminders.size - 1) AddTaskSpacerSmall()
-        }
     }
 }
 
@@ -94,13 +84,8 @@ fun AddReminder(
         RemindType.END to AddTaskStrings.BEFORE_END) }
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Spacer(modifier = Modifier.width(2 * Sizes.Icon.Large))
-
         // Before / after start
         Text(
             modifier = Modifier
@@ -145,13 +130,9 @@ fun ReminderItem(
 
     Row(
         modifier = Modifier
-            .fillMaxWidth()
             .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Spacer(modifier = Modifier.width(Sizes.Icon.Medium + Sizes.Icon.Large))
-
         // Input field
         ReminderInput(
             value = reminder.value,

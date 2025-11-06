@@ -18,7 +18,7 @@ class AddTaskViewModel @Inject constructor(
 ) : ViewModel() {
     
     // Title selection
-    private val _userTitleSelection = MutableStateFlow(UserTitleSelection.TITLE_ONLY)
+    private val _userTitleSelection = MutableStateFlow(UserTitleSelection.OFF)
     val userTitleSelection: StateFlow<UserTitleSelection> = _userTitleSelection.asStateFlow()
     // Title
     private val _titleText = MutableStateFlow("")
@@ -32,7 +32,7 @@ class AddTaskViewModel @Inject constructor(
     val activeTitleInput: StateFlow<TitleInputType?> = _activeTitleInput.asStateFlow()
 
     // When selection
-    private val _userDateSelection = MutableStateFlow(UserDateSelection.AT_TIME)
+    private val _userDateSelection = MutableStateFlow(UserDateSelection.OFF)
     val userDateSelection: StateFlow<UserDateSelection> = _userDateSelection.asStateFlow()
     // Date
     private val _dateStartSelection = MutableStateFlow(LocalDate.now())
@@ -70,6 +70,16 @@ class AddTaskViewModel @Inject constructor(
     private val _isTimeRangeInvalid = MutableStateFlow(false)
     val isTimeRangeInvalid: StateFlow<Boolean> = _isTimeRangeInvalid.asStateFlow()
 
+    // Repeat selection
+    private val _userRepeatSelection = MutableStateFlow(UserRepeatSelection.OFF)
+    val userRepeatSelection: StateFlow<UserRepeatSelection> = _userRepeatSelection.asStateFlow()
+    // Selected days (1-7, Monday=1, Sunday=7)
+    private val _selectedDays = MutableStateFlow(setOf(1, 2, 3, 4, 5, 6, 7))
+    val selectedDays: StateFlow<Set<Int>> = _selectedDays.asStateFlow()
+    // Selected weeks (1-4)
+    private val _selectedWeeks = MutableStateFlow(setOf(1, 2, 3, 4))
+    val selectedWeeks: StateFlow<Set<Int>> = _selectedWeeks.asStateFlow()
+
     // Reminder selection
     private val _userRemindSelection = MutableStateFlow(UserRemindSelection.OFF)
     val userRemindSelection: StateFlow<UserRemindSelection> = _userRemindSelection.asStateFlow()
@@ -95,7 +105,7 @@ class AddTaskViewModel @Inject constructor(
     val userVibrateSelection: StateFlow<UserVibrateSelection> = _userVibrateSelection.asStateFlow()
 
     // Color
-    private val _userColorSelection = MutableStateFlow(UserColorSelection.DEFAULT)
+    private val _userColorSelection = MutableStateFlow(UserColorSelection.OFF)
     val userColorSelection: StateFlow<UserColorSelection> = _userColorSelection.asStateFlow()
     private val _selectedColor = MutableStateFlow(UserColorChoices.DEFAULT)
     val selectedColor: StateFlow<UserColorChoices> = _selectedColor.asStateFlow()
@@ -129,8 +139,7 @@ class AddTaskViewModel @Inject constructor(
 
     // Title
     fun toggleTitleSelection() {
-        _userTitleSelection.value = if (_userTitleSelection.value == UserTitleSelection.TITLE_ONLY)
-            UserTitleSelection.TITLE_AND_INFO else UserTitleSelection.TITLE_ONLY
+        _userTitleSelection.value = _userTitleSelection.value.toggle()
     }
     fun setTitleText(text: String) {
         _titleText.value = text
@@ -151,8 +160,7 @@ class AddTaskViewModel @Inject constructor(
 
     // When
     fun toggleDateSelection() {
-        _userDateSelection.value = if (_userDateSelection.value == UserDateSelection.AT_TIME)
-            UserDateSelection.ALL_DAY else UserDateSelection.AT_TIME
+        _userDateSelection.value = _userDateSelection.value.toggle()
     }
     fun setDateStart(date: LocalDate) {
         _dateStartSelection.value = date
@@ -258,9 +266,32 @@ class AddTaskViewModel @Inject constructor(
         }
     }
 
+    // Repeat
+    fun toggleRepeatSelection() {
+        _userRepeatSelection.value = _userRepeatSelection.value.toggle()
+    }
+    fun toggleDaySelection(day: Int) {
+        val currentDays = _selectedDays.value.toMutableSet()
+        if (currentDays.contains(day)) {
+            currentDays.remove(day)
+        } else {
+            currentDays.add(day)
+        }
+        _selectedDays.value = currentDays
+    }
+    fun toggleWeekSelection(week: Int) {
+        val currentWeeks = _selectedWeeks.value.toMutableSet()
+        if (currentWeeks.contains(week)) {
+            currentWeeks.remove(week)
+        } else {
+            currentWeeks.add(week)
+        }
+        _selectedWeeks.value = currentWeeks
+    }
+
     // Remind
     fun toggleRemindSelection() {
-        _userRemindSelection.value = if (_userRemindSelection.value == UserRemindSelection.OFF) UserRemindSelection.ON else UserRemindSelection.OFF
+        _userRemindSelection.value = _userRemindSelection.value.toggle()
     }
     fun addReminder(type: RemindType) {
         val newReminder = Reminder(
@@ -332,32 +363,18 @@ class AddTaskViewModel @Inject constructor(
         _activeReminderInput.value = null
     }
     fun toggleSoundSelection() {
-        val soundMap = mapOf(
-            UserSoundSelection.OFF to UserSoundSelection.ONCE,
-            UserSoundSelection.ONCE to UserSoundSelection.CONTINUOUS,
-            UserSoundSelection.CONTINUOUS to UserSoundSelection.OFF
-        )
-        _userSoundSelection.value = soundMap[_userSoundSelection.value] ?: UserSoundSelection.OFF
+        _userSoundSelection.value = _userSoundSelection.value.toggle()
     }
     fun setSelectedAudioFile(fileName: String) {
         _selectedAudioFile.value = fileName
     }
     fun toggleVibrateSelection() {
-        val vibrateMap = mapOf(
-            UserVibrateSelection.OFF to UserVibrateSelection.ONCE,
-            UserVibrateSelection.ONCE to UserVibrateSelection.CONTINUOUS,
-            UserVibrateSelection.CONTINUOUS to UserVibrateSelection.OFF
-        )
-        _userVibrateSelection.value = vibrateMap[_userVibrateSelection.value] ?: UserVibrateSelection.OFF
+        _userVibrateSelection.value = _userVibrateSelection.value.toggle()
     }
 
     // Color
     fun toggleColorSelection() {
-        val colorMap = mapOf(
-            UserColorSelection.DEFAULT to UserColorSelection.CUSTOM,
-            UserColorSelection.CUSTOM to UserColorSelection.DEFAULT
-        )
-        _userColorSelection.value = colorMap[_userColorSelection.value] ?: UserColorSelection.DEFAULT
+        _userColorSelection.value = _userColorSelection.value.toggle()
     }
     fun setSelectedColorChoice(color: UserColorChoices) {
         _selectedColor.value = color

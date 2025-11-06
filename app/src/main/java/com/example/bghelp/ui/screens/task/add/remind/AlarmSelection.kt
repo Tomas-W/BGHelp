@@ -1,12 +1,8 @@
 package com.example.bghelp.ui.screens.task.add.remind
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,18 +12,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import androidx.navigation.NavController
 import com.example.bghelp.utils.AudioManager
 import com.example.bghelp.ui.components.CustomDropdown
 import com.example.bghelp.ui.components.DropdownItem
 import com.example.bghelp.ui.navigation.Screen
-import com.example.bghelp.ui.screens.task.add.AddTaskConstants
-import com.example.bghelp.ui.screens.task.add.AddTaskSpacerMedium
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings
-import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 
 @Composable
@@ -36,11 +27,8 @@ fun AlarmSelection(
     navController: NavController,
     audioManager: AudioManager
 ) {
-    AddTaskSpacerMedium()
-    
     val selectedAudioFile by viewModel.selectedAudioFile.collectAsState()
     Row {
-        Spacer(modifier = Modifier.width(2 * Sizes.Icon.Large))
         AlarmDropdown(
             selectedAudioFile = selectedAudioFile,
             onAudioFileSelected = { fileName ->
@@ -89,7 +77,6 @@ fun AlarmDropdown(
     Box(
         modifier = modifier
             .wrapContentWidth()
-            .padding(end = AddTaskConstants.END_PADDING.dp)
     ) {
         Text(
             text = displayText,

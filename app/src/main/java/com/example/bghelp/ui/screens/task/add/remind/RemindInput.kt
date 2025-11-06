@@ -159,7 +159,6 @@ fun TimeUnitDropdown(
             TimeUnit.MONTHS to AddTaskStrings.MONTHS
         )
     }
-    val dropdownHeight = (AddTaskConstants.DROPDOWN_ITEMS * UI.DROPDOWN_ITEM_HEIGHT).dp
 
     Box(modifier = modifier) {
         Text(

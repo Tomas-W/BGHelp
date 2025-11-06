@@ -1,5 +1,6 @@
 package com.example.bghelp.ui.screens.task.add
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,39 +13,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import com.example.bghelp.ui.components.SelectionToggle
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.utils.clickableDismissFocus
 
 @Composable
-fun <T : Enum<T>> AddTaskHeader(
+fun <T> Header(
     viewModel: AddTaskViewModel,
     userSectionSelection: T,
-    stringChoices: Map<T, String>,
-    iconChoices: Map<T, Int>,
     hasToggle: Boolean = true,
     toggleSection: () -> Unit
-) {
+) where T : Enum<T>, T : SectionMeta {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(end = AddTaskConstants.END_PADDING.dp),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             modifier = Modifier
-                .size(Sizes.Icon.Large)
+                .size(Sizes.Icon.Medium)
                 .clickableDismissFocus {
                     viewModel.clearAllInputSelections()
                     toggleSection()
                 },
-            painter = painterResource(iconChoices[userSectionSelection]!!),
-            contentDescription = stringChoices[userSectionSelection]
+            painter = painterResource(userSectionSelection.iconRes),
+            contentDescription = userSectionSelection.headerText
         )
 
-        Spacer(modifier = Modifier.width(Sizes.Icon.Large))
+        Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
 
         Text(
             modifier = Modifier
@@ -53,21 +51,40 @@ fun <T : Enum<T>> AddTaskHeader(
                     viewModel.clearAllInputSelections()
                     toggleSection()
                 },
-            text = stringChoices[userSectionSelection]!!,
+            text = userSectionSelection.headerText,
             style = TextStyles.Grey.Bold.Medium
         )
 
-        if (hasToggle) {
-            SelectionToggle(
-                selectedIndex = userSectionSelection.ordinal,
-                numberOfStates = stringChoices.size,
-                enabled = true,
-                onClick = {
-                    viewModel.clearAllInputSelections()
-                    toggleSection()
-                }
-            )
-        }
+//        if (hasToggle) {
+//            SelectionToggle(
+//                selectedIndex = userSectionSelection.ordinal,
+//                numberOfStates = userSectionSelection.javaClass.enumConstants?.size ?: 2,
+//                enabled = true,
+//                onClick = {
+//                    viewModel.clearAllInputSelections()
+//                    toggleSection()
+//                }
+//            )
+//        }
 
+    }
+    
+    AddTaskSpacerSmall()
+}
+
+@Composable
+fun SubContainer(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                start = 2 * Sizes.Icon.Medium
+            ),
+//        horizontalAlignment = Alignment.Start
+    ) {
+        content()
     }
 }
