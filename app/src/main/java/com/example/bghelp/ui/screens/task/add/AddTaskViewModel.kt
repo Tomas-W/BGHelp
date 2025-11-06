@@ -73,12 +73,10 @@ class AddTaskViewModel @Inject constructor(
     // Repeat selection
     private val _userRepeatSelection = MutableStateFlow(UserRepeatSelection.OFF)
     val userRepeatSelection: StateFlow<UserRepeatSelection> = _userRepeatSelection.asStateFlow()
-    // Selected days (1-7, Monday=1, Sunday=7)
     private val _selectedDays = MutableStateFlow(setOf(1, 2, 3, 4, 5, 6, 7))
     val selectedDays: StateFlow<Set<Int>> = _selectedDays.asStateFlow()
-    // Selected weeks (1-4)
-    private val _selectedWeeks = MutableStateFlow(setOf(1, 2, 3, 4))
-    val selectedWeeks: StateFlow<Set<Int>> = _selectedWeeks.asStateFlow()
+    private val _selectedWeek = MutableStateFlow(1)
+    val selectedWeek: StateFlow<Int> = _selectedWeek.asStateFlow()
 
     // Reminder selection
     private val _userRemindSelection = MutableStateFlow(UserRemindSelection.OFF)
@@ -164,6 +162,13 @@ class AddTaskViewModel @Inject constructor(
     }
     fun setDateStart(date: LocalDate) {
         _dateStartSelection.value = date
+        if (_isEndDateVisible.value && _dateEndSelection.value != null) {
+            val endDate = _dateEndSelection.value!!
+            if (date.isAfter(endDate)) {
+                _dateEndSelection.value = date
+                hiddenDateEndValue = date
+            }
+        }
         updateTimeValidationState()
     }
     fun toggleEndDateVisible() {
@@ -176,7 +181,9 @@ class AddTaskViewModel @Inject constructor(
             }
         } else {
             _isEndDateVisible.value = true
-            _dateEndSelection.value = hiddenDateEndValue ?: _dateStartSelection.value
+            val initialEndDate = hiddenDateEndValue ?: _dateStartSelection.value
+            _dateEndSelection.value = initialEndDate.coerceAtLeast(_dateStartSelection.value)
+            hiddenDateEndValue = _dateEndSelection.value
         }
         updateTimeValidationState()
     }
@@ -279,14 +286,8 @@ class AddTaskViewModel @Inject constructor(
         }
         _selectedDays.value = currentDays
     }
-    fun toggleWeekSelection(week: Int) {
-        val currentWeeks = _selectedWeeks.value.toMutableSet()
-        if (currentWeeks.contains(week)) {
-            currentWeeks.remove(week)
-        } else {
-            currentWeeks.add(week)
-        }
-        _selectedWeeks.value = currentWeeks
+    fun setWeekSelection(week: Int) {
+        _selectedWeek.value = week
     }
 
     // Remind

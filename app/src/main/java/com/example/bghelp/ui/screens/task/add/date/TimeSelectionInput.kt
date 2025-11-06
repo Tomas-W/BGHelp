@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
@@ -142,8 +141,7 @@ fun TimeSelectionInput(
     // Time select row
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(if (isError) errorBackgroundColor else Color.Transparent),
+            .background(if (isError) errorBackgroundColor else Color.Transparent, RoundedCornerShape(8.dp)),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {

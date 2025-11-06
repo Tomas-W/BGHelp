@@ -3,6 +3,7 @@ package com.example.bghelp.ui.screens.task.add.date
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import com.example.bghelp.R
 import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableRippleDismiss
@@ -39,16 +41,16 @@ fun TimeSelection(
 
     AddTaskSpacerSmall()
 
-    val inputPaddingOffset = 8.dp
+    val inputPaddingOffset = 6.dp
 
     Row(
-//        modifier = Modifier.fillMaxWidth(),
-//        horizontalArrangement = Arrangement.Start,
+        modifier = Modifier
+        .padding(start = 2 * Sizes.Icon.Medium - inputPaddingOffset),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // startTime
         TimeSelectionInput(
-            modifier = Modifier.widthIn(min = AddTaskConstants.MIN_WIDTH.dp),
+            modifier = Modifier.widthIn(min = AddTaskConstants.MIN_WIDTH.dp + inputPaddingOffset),
             time = timeStartSelection,
             timeField = TimeField.START,
             activeTimeField = activeTimeField,
