@@ -27,7 +27,6 @@ class AddTaskViewModel @Inject constructor(
     private val _infoText = MutableStateFlow("")
     val infoText: StateFlow<String> = _infoText.asStateFlow()
     // Title Info tracking
-    enum class TitleInputType { TITLE, INFO }
     private val _activeTitleInput = MutableStateFlow<TitleInputType?>(null)
     val activeTitleInput: StateFlow<TitleInputType?> = _activeTitleInput.asStateFlow()
 
@@ -73,10 +72,31 @@ class AddTaskViewModel @Inject constructor(
     // Repeat selection
     private val _userRepeatSelection = MutableStateFlow(UserRepeatSelection.OFF)
     val userRepeatSelection: StateFlow<UserRepeatSelection> = _userRepeatSelection.asStateFlow()
-    private val _selectedDays = MutableStateFlow(setOf(1, 2, 3, 4, 5, 6, 7))
-    val selectedDays: StateFlow<Set<Int>> = _selectedDays.asStateFlow()
-    private val _selectedWeek = MutableStateFlow(1)
-    val selectedWeek: StateFlow<Int> = _selectedWeek.asStateFlow()
+    // Weekly
+    private val _weeklySelectedDays = MutableStateFlow(setOf(1, 2, 3, 4, 5, 6, 7))
+    val weeklySelectedDays: StateFlow<Set<Int>> = _weeklySelectedDays.asStateFlow()
+    private val _weeklyIntervalWeeks = MutableStateFlow(1)
+    val weeklyIntervalWeeks: StateFlow<Int> = _weeklyIntervalWeeks.asStateFlow()
+    private val _weeklyUntilSelection = MutableStateFlow(RepeatUntilSelection.FOREVER)
+    val weeklyUntilSelection: StateFlow<RepeatUntilSelection> = _weeklyUntilSelection.asStateFlow()
+    private val _weeklyUntilDate = MutableStateFlow<LocalDate>(LocalDate.now())
+    val weeklyUntilDate: StateFlow<LocalDate> = _weeklyUntilDate.asStateFlow()
+    // Monthly
+    private val _monthlySelectedMonths = MutableStateFlow((1..12).toSet())
+    val monthlySelectedMonths: StateFlow<Set<Int>> = _monthlySelectedMonths.asStateFlow()
+    private val _monthlySelectedDays = MutableStateFlow((1..31).toSet())
+    val monthlySelectedDays: StateFlow<Set<Int>> = _monthlySelectedDays.asStateFlow()
+    private val _monthlyUntilSelection = MutableStateFlow(RepeatUntilSelection.FOREVER)
+    val monthlyUntilSelection: StateFlow<RepeatUntilSelection> = _monthlyUntilSelection.asStateFlow()
+    private val _monthlyUntilDate = MutableStateFlow<LocalDate>(LocalDate.now())
+    val monthlyUntilDate: StateFlow<LocalDate> = _monthlyUntilDate.asStateFlow()
+    // Calendar
+    private val _isUntilCalendarVisible = MutableStateFlow(false)
+    val isUntilCalendarVisible: StateFlow<Boolean> = _isUntilCalendarVisible.asStateFlow()
+    private val _untilCalendarMonth = MutableStateFlow(YearMonth.now())
+    val untilCalendarMonth: StateFlow<YearMonth> = _untilCalendarMonth.asStateFlow()
+    private val _activeUntilCalendarContext = MutableStateFlow<RepeatUntilContext?>(null)
+    val activeUntilCalendarContext: StateFlow<RepeatUntilContext?> = _activeUntilCalendarContext.asStateFlow()
 
     // Reminder selection
     private val _userRemindSelection = MutableStateFlow(UserRemindSelection.OFF)
@@ -278,16 +298,102 @@ class AddTaskViewModel @Inject constructor(
         _userRepeatSelection.value = _userRepeatSelection.value.toggle()
     }
     fun toggleDaySelection(day: Int) {
-        val currentDays = _selectedDays.value.toMutableSet()
+        val currentDays = _weeklySelectedDays.value.toMutableSet()
         if (currentDays.contains(day)) {
             currentDays.remove(day)
         } else {
             currentDays.add(day)
         }
-        _selectedDays.value = currentDays
+        _weeklySelectedDays.value = currentDays
     }
-    fun setWeekSelection(week: Int) {
-        _selectedWeek.value = week
+    fun setWeeklyIntervalWeeks(weeks: Int) {
+        _weeklyIntervalWeeks.value = weeks
+    }
+    fun toggleMonthSelection(month: Int) {
+        val currentMonths = _monthlySelectedMonths.value.toMutableSet()
+        if (currentMonths.contains(month)) {
+            currentMonths.remove(month)
+        } else {
+            currentMonths.add(month)
+        }
+        _monthlySelectedMonths.value = currentMonths
+    }
+    fun toggleMonthDaySelection(day: Int) {
+        val currentDays = _monthlySelectedDays.value.toMutableSet()
+        if (currentDays.contains(day)) {
+            currentDays.remove(day)
+        } else {
+            currentDays.add(day)
+        }
+        _monthlySelectedDays.value = currentDays
+    }
+    fun setWeeklyUntilSelection(selection: RepeatUntilSelection) {
+        _weeklyUntilSelection.value = selection
+        if (selection == RepeatUntilSelection.FOREVER && _activeUntilCalendarContext.value == RepeatUntilContext.WEEKLY) {
+            setUntilCalendarVisible(false)
+        }
+    }
+    fun setMonthlyUntilSelection(selection: RepeatUntilSelection) {
+        _monthlyUntilSelection.value = selection
+        if (selection == RepeatUntilSelection.FOREVER && _activeUntilCalendarContext.value == RepeatUntilContext.MONTHLY) {
+            setUntilCalendarVisible(false)
+        }
+    }
+    fun toggleWeeklyUntilCalendar() {
+        toggleUntilCalendar(RepeatUntilContext.WEEKLY)
+    }
+    fun toggleMonthlyUntilCalendar() {
+        toggleUntilCalendar(RepeatUntilContext.MONTHLY)
+    }
+    private fun toggleUntilCalendar(context: RepeatUntilContext) {
+        if (_isUntilCalendarVisible.value && _activeUntilCalendarContext.value == context) {
+            setUntilCalendarVisible(false)
+            return
+        }
+
+        val initialDate = when (context) {
+            RepeatUntilContext.WEEKLY -> _weeklyUntilDate.value
+            RepeatUntilContext.MONTHLY -> _monthlyUntilDate.value
+        }
+        _activeUntilCalendarContext.value = context
+        YearMonth.from(initialDate).takeIf { it != _untilCalendarMonth.value }?.let {
+            setUntilCalendarMonth(it)
+        }
+        setUntilCalendarVisible(true)
+        setCalendarVisible(false)
+        clearReminderInputSelection()
+        clearTimeInputSelection()
+        clearTitleInputSelection()
+        _keyboardDismissKey.value++
+    }
+    private fun setUntilCalendarVisible(visible: Boolean) {
+        _isUntilCalendarVisible.value = visible
+        if (!visible) {
+            _activeUntilCalendarContext.value = null
+        }
+    }
+    fun setUntilCalendarMonth(month: YearMonth) {
+        _untilCalendarMonth.value = month
+    }
+    fun onUntilDayClicked(clickedDate: LocalDate) {
+        applyUntilCalendarDate(clickedDate)
+    }
+    private fun applyUntilCalendarDate(date: LocalDate) {
+        when (_activeUntilCalendarContext.value) {
+            RepeatUntilContext.WEEKLY -> {
+                _weeklyUntilDate.value = date
+                _weeklyUntilSelection.value = RepeatUntilSelection.DATE
+            }
+            RepeatUntilContext.MONTHLY -> {
+                _monthlyUntilDate.value = date
+                _monthlyUntilSelection.value = RepeatUntilSelection.DATE
+            }
+            null -> return
+        }
+        YearMonth.from(date).takeIf { it != _untilCalendarMonth.value }?.let {
+            setUntilCalendarMonth(it)
+        }
+        setUntilCalendarVisible(false)
     }
 
     // Remind

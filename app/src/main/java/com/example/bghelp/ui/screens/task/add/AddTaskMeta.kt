@@ -1,8 +1,6 @@
 package com.example.bghelp.ui.screens.task.add
 
-import androidx.compose.ui.unit.times
 import com.example.bghelp.R
-import com.example.bghelp.ui.theme.Sizes
 
 object AddTaskConstants {
     // Misc
@@ -87,6 +85,7 @@ enum class UserTitleSelection(
         ON -> OFF
     }
 }
+enum class TitleInputType { TITLE, INFO }
 
 // Date
 enum class UserDateSelection(
@@ -120,6 +119,8 @@ enum class UserRepeatSelection(
         MONTHLY -> OFF
     }
 }
+enum class RepeatUntilSelection { FOREVER, DATE }
+enum class RepeatUntilContext { WEEKLY, MONTHLY }
 
 // Remind
 enum class UserRemindSelection(

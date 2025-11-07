@@ -25,15 +25,17 @@ import com.example.bghelp.ui.components.DropdownItem
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
+import com.example.bghelp.ui.screens.task.add.RepeatUntilSelection
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun RepeatSelection(
     viewModel: AddTaskViewModel
 ) {
-    val selectedDays by viewModel.selectedDays.collectAsState()
-    val selectedWeek by viewModel.selectedWeek.collectAsState()
+    val selectedDays by viewModel.weeklySelectedDays.collectAsState()
+    val selectedWeek by viewModel.weeklyIntervalWeeks.collectAsState()
 
     DaySelection(
         selectedDays = selectedDays,
@@ -44,7 +46,13 @@ fun RepeatSelection(
 
     WeekSelection(
         selectedWeek = selectedWeek,
-        onWeekSelected = { week -> viewModel.setWeekSelection(week) }
+        onWeekSelected = { week -> viewModel.setWeeklyIntervalWeeks(week) }
+    )
+
+    AddTaskSpacerSmall()
+
+    WeeklyUntilSelectionRow(
+        viewModel = viewModel
     )
 }
 
@@ -148,6 +156,43 @@ fun WeekSelection(
 }
 
 @Composable
-fun UntilSelection() {
+fun WeeklyUntilSelectionRow(
+    viewModel: AddTaskViewModel
+) {
+    val selectedUntil by viewModel.weeklyUntilSelection.collectAsState()
+    val selectedUntilDate by viewModel.weeklyUntilDate.collectAsState()
+    
+    val fMonthYearDayShort = remember { DateTimeFormatter.ofPattern("EEE, MMM d") }
+    
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(end = AddTaskConstants.START_PADDING.dp)
+    ) {
+        Text(
+            text = "Until",
+            style = TextStyles.Default.Medium
+        )
 
+        Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
+
+        Text(
+            modifier = Modifier.clickable { 
+                viewModel.setWeeklyUntilSelection(RepeatUntilSelection.FOREVER)
+            },
+            text = "Forever",
+            style = if (selectedUntil == RepeatUntilSelection.FOREVER) TextStyles.Default.Bold.Medium else TextStyles.Default.Medium
+        )
+
+        Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
+
+        Text(
+            modifier = Modifier.clickable { 
+                viewModel.setWeeklyUntilSelection(RepeatUntilSelection.DATE)
+                viewModel.toggleWeeklyUntilCalendar()
+            },
+            text = selectedUntilDate.format(fMonthYearDayShort),
+            style = if (selectedUntil == RepeatUntilSelection.DATE) TextStyles.Default.Bold.Medium else TextStyles.Default.Medium
+        )
+    }
 }
