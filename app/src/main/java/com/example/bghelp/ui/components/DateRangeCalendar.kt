@@ -50,7 +50,8 @@ fun DateRangeCalendar(
     endDate: LocalDate,
     onDayClicked: (LocalDate) -> Unit,
     onMonthChanged: (YearMonth) -> Unit,
-    isRangeMode: Boolean = true
+    isRangeMode: Boolean = true,
+    minDate: LocalDate? = null
 ) = WithRipple {
     val fMonthLong = remember { DateTimeFormatter.ofPattern("MMMM") }
     val fYearLong = remember { DateTimeFormatter.ofPattern("yyyy") }
@@ -189,7 +190,9 @@ fun DateRangeCalendar(
                         val inCurrentMonth = day.month == currentMonth.month
                         val isStart = day == startDate
                         val isEnd = isRangeMode && day == endDate
-                        val inRange = isRangeMode && !day.isBefore(rangeStart) && !day.isAfter(rangeEnd)
+                        val isBeforeMin = minDate?.let { day.isBefore(it) } ?: false
+                        val isSelectable = !isBeforeMin
+                        val inRange = isRangeMode && isSelectable && !day.isBefore(rangeStart) && !day.isAfter(rangeEnd)
 
                         val rangeBgColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
                         val startEndBgColor = MaterialTheme.colorScheme.primary
@@ -205,11 +208,14 @@ fun DateRangeCalendar(
                                     // Highlight if in selection range
                                     color = if (inRange && !isStart && !isEnd) rangeBgColor else Color.Transparent
                                 )
-                                .clickableWithCalendarRipple(onClick = { onDayClicked(day) }),
+                                .clickableWithCalendarRipple(
+                                    onClick = { onDayClicked(day) },
+                                    enabled = isSelectable
+                                ),
                             contentAlignment = Alignment.Center
                         ) {
                             // Start & End highlight
-                            if (isStart || isEnd) {
+                            if ((isStart || isEnd) && isSelectable) {
                                 Box(
                                     modifier = Modifier
                                         .size(38.dp)
@@ -227,7 +233,11 @@ fun DateRangeCalendar(
                                 Text(
                                     text = day.dayOfMonth.toString(),
                                     style = TextStyles.Default.Medium,
-                                    color = if (inCurrentMonth) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                                    color = when {
+                                        !isSelectable -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                                        inCurrentMonth -> MaterialTheme.colorScheme.onSurface
+                                        else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                                    }
                                 )
                             }
                         }

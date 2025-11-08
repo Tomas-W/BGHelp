@@ -6,9 +6,10 @@ import androidx.compose.runtime.getValue
 import com.example.bghelp.ui.components.DateRangeCalendar
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.RepeatUntilContext
+import java.time.LocalDate
 
 @Composable
-fun UntilCalendarSelection(
+fun UntilCalendar(
     viewModel: AddTaskViewModel
 ) {
     val weeklyUntilDate by viewModel.weeklyUntilDate.collectAsState()
@@ -30,7 +31,8 @@ fun UntilCalendarSelection(
             viewModel.onUntilDayClicked(clickedDate)
         },
         onMonthChanged = { ym -> viewModel.setUntilCalendarMonth(ym) },
-        isRangeMode = false
+        isRangeMode = false,
+        minDate = LocalDate.now()
     )
 }
 

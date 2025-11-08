@@ -11,6 +11,7 @@ import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.components.OutlinedStringInput
+import com.example.bghelp.ui.screens.task.add.TitleInputType
 
 @Composable
 fun InfoSelection(
@@ -29,10 +30,10 @@ fun InfoSelection(
         textStyle = TextStyles.Default.Italic.Small,
         minLines = AddTaskConstants.INFO_MIN_LINES,
         maxLines = AddTaskConstants.INFO_MAX_LINES,
-        isActive = activeTitleInput == AddTaskViewModel.TitleInputType.INFO,
+        isActive = activeTitleInput == TitleInputType.INFO,
         onActiveChange = { active ->
             if (active) {
-                viewModel.setActiveTitleInput(AddTaskViewModel.TitleInputType.INFO)
+                viewModel.setActiveTitleInput(TitleInputType.INFO)
             } else {
                 viewModel.clearTitleInputSelection()
             }

@@ -5,6 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.example.bghelp.ui.components.DateRangeCalendar
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
+import java.time.LocalDate
 
 @Composable
 fun CalendarSelection(
@@ -23,6 +24,7 @@ fun CalendarSelection(
             viewModel.onDayClicked(clickedDate)
         },
         onMonthChanged = { ym -> viewModel.setCurrentMonth(ym) },
-        isRangeMode = isEndDateVisible
+        isRangeMode = isEndDateVisible,
+        minDate = LocalDate.now()
     )
 }

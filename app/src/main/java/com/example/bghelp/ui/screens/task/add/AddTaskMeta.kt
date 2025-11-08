@@ -5,7 +5,7 @@ import com.example.bghelp.R
 object AddTaskConstants {
     // Misc
     const val START_PADDING = 2 * 22 // Sizes.Icon.Medium
-    const val END_PADDING = 24
+    const val END_PADDING = 2 * 22 // Sizes.Icon.Medium
     const val MIN_WIDTH = 115
     const val DROPDOWN_ITEMS = 6
     // Title
@@ -16,6 +16,8 @@ object AddTaskConstants {
     // When
     const val MIN_YEAR = 2025
     const val MAX_YEAR = 2100
+    // Repeat
+    const val REPEAT_LABEL_WIDTH = 60
     // Remind
     const val REMINDER_INPUT_WIDTH = 60
     const val REMINDER_START = 0

@@ -13,8 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
-import com.example.bghelp.ui.components.SelectionToggle
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.utils.clickableDismissFocus
@@ -75,15 +75,21 @@ fun <T> Header(
 @Composable
 fun SubContainer(
     modifier: Modifier = Modifier,
+    hasInputStart: Boolean = false,
     content: @Composable () -> Unit
 ) {
+    var inputPaddingOffset =
+        if (hasInputStart) {
+            2 * Sizes.Icon.Medium - 6.dp
+        } else {
+            2 * Sizes.Icon.Medium
+        }
     Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(
-                start = 2 * Sizes.Icon.Medium
-            ),
-//        horizontalAlignment = Alignment.Start
+                start = inputPaddingOffset
+            )
     ) {
         content()
     }

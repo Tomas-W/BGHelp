@@ -1,5 +1,6 @@
 package com.example.bghelp.ui.screens.task.add.date
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
@@ -44,8 +46,7 @@ fun TimeSelection(
     val inputPaddingOffset = 6.dp
 
     Row(
-        modifier = Modifier
-        .padding(start = 2 * Sizes.Icon.Medium - inputPaddingOffset),
+        modifier = Modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         // startTime

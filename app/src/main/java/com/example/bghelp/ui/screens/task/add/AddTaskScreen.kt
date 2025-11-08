@@ -17,7 +17,7 @@ import com.example.bghelp.ui.screens.task.add.title.TitleSection
 import com.example.bghelp.ui.screens.task.add.date.DateSection
 import com.example.bghelp.ui.screens.task.add.remind.Remind
 import com.example.bghelp.ui.screens.task.add.color.ColorSection
-import com.example.bghelp.ui.screens.task.add.repeat.RepeatSection
+import com.example.bghelp.ui.screens.task.add.repeat.Repeat
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.utils.dismissKeyboardOnTap
 
@@ -46,7 +46,7 @@ fun AddTaskScreen(
 
             AddTaskDivider()
 
-            RepeatSection(viewModel = viewModel)
+            Repeat(viewModel = viewModel)
 
             AddTaskDivider()
 
@@ -75,13 +75,6 @@ fun AddTaskSpacerMedium() {
 @Composable
 fun AddTaskSpacerSmall() {
     Spacer(modifier = Modifier.height(Sizes.Size.ExtraSmall))
-}
-
-@Composable
-fun AddTaskSubSpacer(hasInput: Boolean = false) {
-    val paddingOffset = if (hasInput) 8.dp else 0.dp
-    Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
-    Spacer(modifier = Modifier.width(Sizes.Icon.Large - paddingOffset))
 }
 
 @Composable

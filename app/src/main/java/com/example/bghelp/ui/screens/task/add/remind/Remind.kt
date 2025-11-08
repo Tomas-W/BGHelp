@@ -29,7 +29,7 @@ fun Remind(
     // Before after start
     if (userRemindSelection == UserRemindSelection.ON) {
         SubContainer {
-            RemindSelection(
+            BeforeSelection(
                 viewModel = viewModel
             )
         }

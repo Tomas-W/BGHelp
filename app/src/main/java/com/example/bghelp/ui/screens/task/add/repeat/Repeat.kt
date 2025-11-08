@@ -11,7 +11,7 @@ import com.example.bghelp.ui.screens.task.add.RepeatUntilContext
 import com.example.bghelp.ui.screens.task.add.RepeatUntilSelection
 
 @Composable
-fun RepeatSection(
+fun Repeat(
     viewModel: AddTaskViewModel
 ) {
     val userRepeatSelection by viewModel.userRepeatSelection.collectAsState()
@@ -29,7 +29,7 @@ fun RepeatSection(
     when (userRepeatSelection) {
         UserRepeatSelection.WEEKLY -> {
             SubContainer {
-                RepeatSelection(
+                WeeklySelection(
                     viewModel = viewModel
                 )
             }
@@ -38,23 +38,23 @@ fun RepeatSection(
                 activeUntilCalendarContext == RepeatUntilContext.WEEKLY &&
                 selectedWeeklyUntil == RepeatUntilSelection.DATE
             if (shouldShowUntilCalendar) {
-                UntilCalendarSelection(
+                UntilCalendar(
                     viewModel = viewModel
                 )
             }
         }
         UserRepeatSelection.MONTHLY -> {
-            SubContainer {
-                RepeatMonthlySelection(
+//            SubContainer {
+                MonthlySelection(
                     viewModel = viewModel
                 )
-            }
+//            }
 
             val shouldShowUntilCalendar = isUntilCalendarVisible &&
                 activeUntilCalendarContext == RepeatUntilContext.MONTHLY &&
                 selectedMonthlyUntil == RepeatUntilSelection.DATE
             if (shouldShowUntilCalendar) {
-                UntilCalendarSelection(
+                UntilCalendar(
                     viewModel = viewModel
                 )
             }

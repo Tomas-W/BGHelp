@@ -10,6 +10,7 @@ import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.components.OutlinedStringInput
+import com.example.bghelp.ui.screens.task.add.TitleInputType
 
 @Composable
 fun TitleSelection(
@@ -26,10 +27,10 @@ fun TitleSelection(
         textStyle = TextStyles.Default.Bold.Small,
         minLines = AddTaskConstants.TITLE_MIN_LINES,
         maxLines = AddTaskConstants.TITLE_MAX_LINES,
-        isActive = activeTitleInput == AddTaskViewModel.TitleInputType.TITLE,
+        isActive = activeTitleInput == TitleInputType.TITLE,
         onActiveChange = { active ->
             if (active) {
-                viewModel.setActiveTitleInput(AddTaskViewModel.TitleInputType.TITLE)
+                viewModel.setActiveTitleInput(TitleInputType.TITLE)
             } else {
                 viewModel.clearTitleInputSelection()
             }

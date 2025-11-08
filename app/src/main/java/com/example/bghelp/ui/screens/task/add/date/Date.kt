@@ -10,14 +10,12 @@ import com.example.bghelp.ui.screens.task.add.SubContainer
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.UserDateSelection
 import com.example.bghelp.ui.screens.task.add.DateField
-import com.example.bghelp.ui.screens.task.add.UserRepeatSelection
 
 @Composable
 fun DateSection(
     viewModel: AddTaskViewModel
 ) {
     val userDateSelection by viewModel.userDateSelection.collectAsState()
-    val userRepeatSelection by viewModel.userRepeatSelection.collectAsState()
 
     val activeDateField by viewModel.activeDateField.collectAsState()
     val isCalendarVisible by viewModel.isCalendarVisible.collectAsState()
@@ -35,14 +33,11 @@ fun DateSection(
         toggleSection = { viewModel.toggleDateSelection() }
     )
 
-    if (userRepeatSelection == UserRepeatSelection.OFF) {
-        SubContainer {
-            DateSelection(
-                viewModel = viewModel
-            )
-        }
+    SubContainer {
+        DateSelection(
+            viewModel = viewModel
+        )
     }
-
 
     if (shouldShowCalendar) {
         CalendarSelection(
@@ -51,8 +46,10 @@ fun DateSection(
     }
 
     if (userDateSelection == UserDateSelection.OFF) {
-        TimeSelection(
-            viewModel = viewModel
-        )
+        SubContainer(hasInputStart = true) {
+            TimeSelection(
+                viewModel = viewModel
+            )
+        }
     }
 }

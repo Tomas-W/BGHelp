@@ -1,5 +1,6 @@
 package com.example.bghelp.ui.screens.task.add.repeat
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
@@ -22,6 +22,7 @@ import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.RepeatUntilSelection
+import com.example.bghelp.ui.theme.SecondaryBlue
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import java.time.Month
@@ -30,41 +31,39 @@ import java.util.Locale
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun RepeatMonthlySelection(
+fun MonthlySelection(
     viewModel: AddTaskViewModel
 ) {
     val selectedMonths by viewModel.monthlySelectedMonths.collectAsState()
     val selectedMonthDays by viewModel.monthlySelectedDays.collectAsState()
-    val selectedMonthlyUntil by viewModel.monthlyUntilSelection.collectAsState()
-    val selectedMonthlyDate by viewModel.monthlyUntilDate.collectAsState()
 
-    MonthPicker(
+    MonthSelection(
         selectedMonths = selectedMonths,
         onToggle = { month -> viewModel.toggleMonthSelection(month) }
     )
 
     AddTaskSpacerSmall()
 
-    DayNumberPicker(
+    DaySelection(
         selectedDays = selectedMonthDays,
         onToggle = { day -> viewModel.toggleMonthDaySelection(day) }
     )
 
-    AddTaskSpacerSmall()
-
-    MonthlyUntilSelectionRow(
-        selectedUntil = selectedMonthlyUntil,
-        selectedDate = selectedMonthlyDate,
-        onForever = { viewModel.setMonthlyUntilSelection(RepeatUntilSelection.FOREVER) },
-        onDateClick = {
-            viewModel.setMonthlyUntilSelection(RepeatUntilSelection.DATE)
-            viewModel.toggleMonthlyUntilCalendar()
-        }
-    )
+//    AddTaskSpacerSmall()
+//
+//    UntilSelection(
+//        selectedUntil = selectedMonthlyUntil,
+//        selectedDate = selectedMonthlyDate,
+//        onForever = { viewModel.setMonthlyUntilSelection(RepeatUntilSelection.FOREVER) },
+//        onDateClick = {
+//            viewModel.setMonthlyUntilSelection(RepeatUntilSelection.DATE)
+//            viewModel.toggleMonthlyUntilCalendar()
+//        }
+//    )
 }
 
 @Composable
-private fun MonthPicker(
+private fun MonthSelection(
     selectedMonths: Set<Int>,
     onToggle: (Int) -> Unit
 ) {
@@ -73,14 +72,13 @@ private fun MonthPicker(
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(end = AddTaskConstants.START_PADDING.dp),
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(Sizes.Size.ExtraSmall)
     ) {
         monthChunks.forEach { chunk ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(Sizes.Size.Small)
+                horizontalArrangement = Arrangement.SpaceAround
             ) {
                 chunk.forEach { month ->
                     val monthNumber = month.value
@@ -103,7 +101,7 @@ private fun MonthPicker(
 }
 
 @Composable
-private fun DayNumberPicker(
+private fun DaySelection(
     selectedDays: Set<Int>,
     onToggle: (Int) -> Unit
 ) {
@@ -112,8 +110,7 @@ private fun DayNumberPicker(
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(end = AddTaskConstants.START_PADDING.dp),
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(Sizes.Size.ExtraSmall)
     ) {
         dayChunks.forEach { chunk ->
@@ -121,7 +118,7 @@ private fun DayNumberPicker(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(Sizes.Size.Small)
             ) {
-                chunk.forEach { day ->
+                chunk.forEach {day ->
                     Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
                         Text(
                             modifier = Modifier.clickable { onToggle(day) },
@@ -133,6 +130,13 @@ private fun DayNumberPicker(
                             }
                         )
                     }
+                    if (day == 31) {
+                        Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                            Text(
+                                text = ""
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -140,7 +144,7 @@ private fun DayNumberPicker(
 }
 
 @Composable
-private fun MonthlyUntilSelectionRow(
+private fun UntilSelection(
     selectedUntil: RepeatUntilSelection,
     selectedDate: java.time.LocalDate,
     onForever: () -> Unit,

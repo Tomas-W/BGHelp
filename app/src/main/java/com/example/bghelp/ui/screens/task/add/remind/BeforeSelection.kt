@@ -4,15 +4,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import com.example.bghelp.ui.components.CustomDropdown
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,21 +31,183 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.example.bghelp.constants.UiConstants as UI
+import com.example.bghelp.R
+import com.example.bghelp.ui.components.CustomDropdown
 import com.example.bghelp.ui.components.DropdownItem
 import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableRipple
+import com.example.bghelp.ui.components.clickableRippleDismiss
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants
+import com.example.bghelp.ui.screens.task.add.AddTaskSpacerMedium
+import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
+import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
+import com.example.bghelp.ui.screens.task.add.Reminder
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings
+import com.example.bghelp.ui.screens.task.add.RemindType
 import com.example.bghelp.ui.screens.task.add.TimeUnit
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 
 @Composable
-fun ReminderInput(
+fun BeforeSelection (
+    viewModel: AddTaskViewModel,
+) {
+    val startReminders by viewModel.startReminders.collectAsState()
+    val endReminders by viewModel.endReminders.collectAsState()
+
+    // Before Start
+    AddReminder(
+        remindType = RemindType.START,
+        onClick = { viewModel.addReminder(RemindType.START) },
+        viewModel = viewModel
+    )
+    AddTaskSpacerSmall()
+
+    // Before start items
+    startReminders.forEach { reminder ->
+        ReminderItem(
+            reminder = reminder,
+            remindType = RemindType.START,
+            viewModel = viewModel
+        )
+    }
+    if (startReminders.isNotEmpty()) AddTaskSpacerMedium()
+
+    // Before end
+    AddReminder(
+        remindType = RemindType.END,
+        onClick = { viewModel.addReminder(RemindType.END) },
+        viewModel = viewModel
+    )
+    AddTaskSpacerSmall()
+
+    // Before end items
+    endReminders.forEach { reminder ->
+        ReminderItem(
+            reminder = reminder,
+            remindType = RemindType.END,
+            viewModel = viewModel
+        )
+    }
+}
+
+@Composable
+private fun AddReminder(
+    remindType: RemindType,
+    onClick: () -> Unit,
+    viewModel: AddTaskViewModel
+) {
+    val remindTypeChoices = remember { mapOf(
+        RemindType.START to AddTaskStrings.BEFORE_START,
+        RemindType.END to AddTaskStrings.BEFORE_END) }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Before / after start
+        Text(
+            modifier = Modifier
+                .widthIn(min = AddTaskConstants.MIN_WIDTH.dp),
+            text = remindTypeChoices[remindType]!!,
+            style = TextStyles.Default.Medium,
+        )
+
+        Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
+
+        // + Icon
+        WithRipple {
+            Box(
+                modifier = Modifier
+                    .clickableRippleDismiss(
+                        onClick = {
+                            viewModel.clearReminderInputSelection()
+                            onClick()
+                        },
+                        radius = Sizes.Icon.Small
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    modifier = Modifier.size(Sizes.Icon.Small),
+                    painter = painterResource(R.drawable.add),
+                    contentDescription = AddTaskStrings.ADD_REMINDER
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReminderItem(
+    reminder: Reminder,
+    remindType: RemindType,
+    viewModel: AddTaskViewModel
+) {
+    val activeReminderInput by viewModel.activeReminderInput.collectAsState()
+    val isNumberActive = activeReminderInput?.type == remindType && activeReminderInput?.id == reminder.id
+
+    Row(
+        modifier = Modifier
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Input field
+        TimeInput(
+            value = reminder.value,
+            onValueChange = { newValue: Int ->
+                viewModel.updateReminder(remindType, reminder.id, value = newValue)
+            },
+            isActive = isNumberActive,
+            onActiveChange = { active: Boolean ->
+                if (active) {
+                    viewModel.setActiveReminderInput(remindType, reminder.id)
+                } else {
+                    viewModel.clearReminderInputSelection()
+                }
+            }
+        )
+
+        Spacer(modifier = Modifier.width(Sizes.Size.Small))
+
+        // Dropdown
+        TimeDropdown(
+            selectedUnit = reminder.timeUnit,
+            onUnitSelected = { newUnit: TimeUnit ->
+                viewModel.updateReminder(remindType, reminder.id, timeUnit = newUnit)
+            },
+            onDropdownClick = {
+                viewModel.clearReminderInputSelection()
+            }
+        )
+
+        Spacer(modifier = Modifier.width(Sizes.Size.Medium))
+
+        // Delete icon
+        WithRipple {
+            Box(
+                modifier = Modifier
+                    .clickableRippleDismiss(
+                        onClick = { viewModel.removeReminder(remindType, reminder.id) },
+                        radius = Sizes.Icon.Medium
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    modifier = Modifier.size(Sizes.Icon.Medium),
+                    painter = painterResource(R.drawable.delete),
+                    contentDescription = AddTaskStrings.REMOVE_REMINDER
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TimeInput(
     modifier: Modifier = Modifier,
     value: Int,
     onValueChange: (Int) -> Unit,
@@ -119,7 +286,7 @@ fun ReminderInput(
                     onActiveChange(true)
                 }
             },
-        horizontalArrangement = Arrangement.Center,
+        horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -142,7 +309,7 @@ fun ReminderInput(
 }
 
 @Composable
-fun TimeUnitDropdown(
+private fun TimeDropdown(
     selectedUnit: TimeUnit,
     onUnitSelected: (TimeUnit) -> Unit,
     modifier: Modifier = Modifier,
