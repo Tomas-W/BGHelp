@@ -22,8 +22,9 @@ import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableRipple
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
-import com.example.bghelp.ui.screens.task.add.DateField
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings
+import com.example.bghelp.ui.screens.task.add.DateField
+import com.example.bghelp.ui.screens.task.add.deselectedStyle
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.utils.clickableDismissFocus
@@ -52,7 +53,7 @@ fun DateSelection(
                     viewModel.toggleCalendarFromDateField(DateField.START)
                 },
             text = dateStartSelection.format(fMonthYearDayShort),
-            style = if (activeDateField == DateField.START) TextStyles.Main.Bold.Medium else TextStyles.Default.Medium,
+            style = if (activeDateField == DateField.START) TextStyles.Main.Bold.Medium else deselectedStyle,
         )
 
         Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
@@ -93,7 +94,7 @@ fun DateSelection(
                     }
                 ),
             text = dateEndSelection?.format(fMonthYearDayShort) ?: dateStartSelection.format(fMonthYearDayShort),
-            style = if (activeDateField == DateField.END) TextStyles.Main.Bold.Medium else TextStyles.Default.Medium
+            style = if (activeDateField == DateField.END) TextStyles.Main.Bold.Medium else deselectedStyle
         )
     }
 }

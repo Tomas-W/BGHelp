@@ -17,8 +17,9 @@ import com.example.bghelp.utils.AudioManager
 import com.example.bghelp.ui.components.CustomDropdown
 import com.example.bghelp.ui.components.DropdownItem
 import com.example.bghelp.ui.navigation.Screen
-import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings
+import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
+import com.example.bghelp.ui.screens.task.add.deselectedStyle
 import com.example.bghelp.ui.theme.TextStyles
 
 @Composable
@@ -80,7 +81,7 @@ fun AlarmDropdown(
     ) {
         Text(
             text = displayText,
-            style = TextStyles.Default.Medium,
+            style = deselectedStyle,
             modifier = Modifier
                 .wrapContentWidth()
                 .clickable {

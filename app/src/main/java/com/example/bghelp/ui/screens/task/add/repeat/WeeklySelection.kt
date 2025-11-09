@@ -26,10 +26,9 @@ import com.example.bghelp.ui.components.DropdownItem
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
-import com.example.bghelp.ui.screens.task.add.RepeatUntilSelection
+import com.example.bghelp.ui.screens.task.add.deselectedStyle
+import com.example.bghelp.ui.screens.task.add.selectedStyle
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun WeeklySelection(
@@ -40,7 +39,7 @@ fun WeeklySelection(
 
     DaySelection(
         selectedDays = selectedDays,
-        onDayToggle = { day -> viewModel.toggleDaySelection(day) }
+        onDayToggle = { day -> viewModel.toggleWeeklySelectedDays(day) }
     )
 
     AddTaskSpacerSmall()
@@ -49,12 +48,6 @@ fun WeeklySelection(
         selectedWeek = selectedWeek,
         onWeekSelected = { week -> viewModel.setWeeklyIntervalWeeks(week) }
     )
-
-//    AddTaskSpacerSmall()
-//
-//    UntilSelection(
-//        viewModel = viewModel
-//    )
 }
 
 @Composable
@@ -77,7 +70,7 @@ private fun DaySelection(
                 modifier = Modifier
                     .clickable { onDayToggle(dayNumbers[i]) },
                 text = day,
-                style = if (isSelected) TextStyles.Default.Bold.Medium else TextStyles.Default.Medium,
+                style = if (isSelected) selectedStyle else deselectedStyle,
             )
         }
     }
@@ -102,7 +95,7 @@ private fun WeekSelection(
             modifier = Modifier
                 .widthIn(min = AddTaskConstants.REPEAT_LABEL_WIDTH.dp),
             text = "Every",
-            style = TextStyles.Default.Medium
+            style = deselectedStyle
         )
 
         Spacer(modifier = Modifier.width(Sizes.Icon.Small))
@@ -119,7 +112,7 @@ private fun WeekSelection(
             ) {
                 Text(
                     text = displayText,
-                    style = TextStyles.Default.Bold.Medium.copy(
+                    style = selectedStyle.copy(
                         textDecoration = TextDecoration.Underline
                     )
                 )
@@ -138,9 +131,9 @@ private fun WeekSelection(
                             isExpanded = false
                         },
                         textStyle = (if (isSelected) {
-                            TextStyles.Default.Bold.Medium
+                            selectedStyle
                         } else {
-                            TextStyles.Default.Medium
+                            deselectedStyle
                         }).copy(
                             textDecoration = TextDecoration.Underline
                         )
@@ -153,51 +146,7 @@ private fun WeekSelection(
 
         Text(
             text = "weeks",
-            style = TextStyles.Default.Medium
-        )
-    }
-}
-
-@Composable
-private fun UntilSelection(
-    viewModel: AddTaskViewModel
-) {
-    val selectedUntil by viewModel.weeklyUntilSelection.collectAsState()
-    val selectedUntilDate by viewModel.weeklyUntilDate.collectAsState()
-    
-    val fMonthYearDayShort = remember { DateTimeFormatter.ofPattern("EEE, MMM d") }
-    
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(end = AddTaskConstants.START_PADDING.dp)
-    ) {
-        Text(
-            modifier = Modifier
-                .widthIn(min = AddTaskConstants.REPEAT_LABEL_WIDTH.dp),
-            text = "Until",
-            style = TextStyles.Default.Medium
-        )
-
-        Spacer(modifier = Modifier.width(Sizes.Icon.Small))
-
-        Text(
-            modifier = Modifier.clickable { 
-                viewModel.setWeeklyUntilSelection(RepeatUntilSelection.FOREVER)
-            },
-            text = "Forever",
-            style = if (selectedUntil == RepeatUntilSelection.FOREVER) TextStyles.Default.Bold.Medium else TextStyles.Default.Medium
-        )
-
-        Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
-
-        Text(
-            modifier = Modifier.clickable { 
-                viewModel.setWeeklyUntilSelection(RepeatUntilSelection.DATE)
-                viewModel.toggleWeeklyUntilCalendar()
-            },
-            text = selectedUntilDate.format(fMonthYearDayShort),
-            style = if (selectedUntil == RepeatUntilSelection.DATE) TextStyles.Default.Bold.Medium else TextStyles.Default.Medium
+            style = deselectedStyle
         )
     }
 }

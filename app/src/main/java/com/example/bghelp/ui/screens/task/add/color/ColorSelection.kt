@@ -35,6 +35,7 @@ import com.example.bghelp.ui.theme.TaskMagenta
 import com.example.bghelp.ui.theme.TaskRed
 import com.example.bghelp.ui.theme.TaskYellow
 import com.example.bghelp.ui.theme.TextStyles
+import com.example.bghelp.ui.screens.task.add.deselectedStyle
 
 @Composable
 fun ColorSelection(
@@ -110,7 +111,7 @@ fun ColorDropdown(
             Spacer(modifier = Modifier.width(Sizes.Icon.ExtraSmall))
             Text(
                 text = displayText,
-                style = TextStyles.Default.Medium
+                style = deselectedStyle
             )
         }
 

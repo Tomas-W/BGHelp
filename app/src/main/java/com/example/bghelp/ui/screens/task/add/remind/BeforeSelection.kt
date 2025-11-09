@@ -45,9 +45,10 @@ import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerMedium
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
-import com.example.bghelp.ui.screens.task.add.Reminder
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings
+import com.example.bghelp.ui.screens.task.add.Reminder
 import com.example.bghelp.ui.screens.task.add.RemindType
+import com.example.bghelp.ui.screens.task.add.deselectedStyle
 import com.example.bghelp.ui.screens.task.add.TimeUnit
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
@@ -113,7 +114,7 @@ private fun AddReminder(
             modifier = Modifier
                 .widthIn(min = AddTaskConstants.MIN_WIDTH.dp),
             text = remindTypeChoices[remindType]!!,
-            style = TextStyles.Default.Medium,
+            style = deselectedStyle,
         )
 
         Spacer(modifier = Modifier.width(Sizes.Icon.Medium))

@@ -1,6 +1,8 @@
 package com.example.bghelp.ui.screens.task.add
 
+import androidx.compose.runtime.remember
 import com.example.bghelp.R
+import com.example.bghelp.ui.theme.TextStyles
 
 object AddTaskConstants {
     // Misc
@@ -69,6 +71,9 @@ object AddTaskStrings {
     const val REMOVE_REMINDER = "Remove reminder"
 }
 
+val selectedStyle = TextStyles.Default.Bold.Medium
+val deselectedStyle = TextStyles.Default.Medium
+
 interface SectionMeta {
     val headerText: String
     val iconRes: Int
@@ -121,8 +126,7 @@ enum class UserRepeatSelection(
         MONTHLY -> OFF
     }
 }
-enum class RepeatUntilSelection { FOREVER, DATE }
-enum class RepeatUntilContext { WEEKLY, MONTHLY }
+enum class RepeatMonthlyDaySelection { ALL, SELECT, LAST }
 
 // Remind
 enum class UserRemindSelection(

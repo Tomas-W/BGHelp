@@ -1,6 +1,5 @@
 package com.example.bghelp.ui.screens.task.add.repeat
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,18 +15,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.example.bghelp.ui.screens.task.add.AddTaskConstants
+import com.example.bghelp.ui.screens.task.add.AddTaskSpacerMedium
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
-import com.example.bghelp.ui.screens.task.add.RepeatUntilSelection
-import com.example.bghelp.ui.theme.SecondaryBlue
+import com.example.bghelp.ui.screens.task.add.RepeatMonthlyDaySelection
+import com.example.bghelp.ui.screens.task.add.deselectedStyle
+import com.example.bghelp.ui.screens.task.add.selectedStyle
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
 import java.time.Month
 import java.time.format.TextStyle
 import java.util.Locale
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun MonthlySelection(
@@ -38,32 +34,23 @@ fun MonthlySelection(
     val selectedMonthDays by viewModel.monthlySelectedDays.collectAsState()
 
     MonthSelection(
+        viewModel = viewModel,
         selectedMonths = selectedMonths,
-        onToggle = { month -> viewModel.toggleMonthSelection(month) }
+        onToggle = { month -> viewModel.toggleMonthlySelectedMonths(month) }
     )
 
-    AddTaskSpacerSmall()
+    AddTaskSpacerMedium()
 
     DaySelection(
+        viewModel = viewModel,
         selectedDays = selectedMonthDays,
-        onToggle = { day -> viewModel.toggleMonthDaySelection(day) }
+        onToggle = { day -> viewModel.toggleMonthSelectedDays(day) }
     )
-
-//    AddTaskSpacerSmall()
-//
-//    UntilSelection(
-//        selectedUntil = selectedMonthlyUntil,
-//        selectedDate = selectedMonthlyDate,
-//        onForever = { viewModel.setMonthlyUntilSelection(RepeatUntilSelection.FOREVER) },
-//        onDateClick = {
-//            viewModel.setMonthlyUntilSelection(RepeatUntilSelection.DATE)
-//            viewModel.toggleMonthlyUntilCalendar()
-//        }
-//    )
 }
 
 @Composable
 private fun MonthSelection(
+    viewModel: AddTaskViewModel,
     selectedMonths: Set<Int>,
     onToggle: (Int) -> Unit
 ) {
@@ -75,6 +62,26 @@ private fun MonthSelection(
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(Sizes.Size.ExtraSmall)
     ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
+            Text(
+                modifier = Modifier
+                    .clickable { viewModel.selectAllMonthlySelectedMonths() },
+                text = "Select all",
+                style = deselectedStyle
+            )
+
+            Text(
+                modifier = Modifier
+                    .clickable { viewModel.deselectAllMonthlySelectedMonths() },
+                text = "Deselect all",
+                style = deselectedStyle
+            )
+        }
+
         monthChunks.forEach { chunk ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -88,9 +95,9 @@ private fun MonthSelection(
                             modifier = Modifier.clickable { onToggle(monthNumber) },
                             text = label,
                             style = if (selectedMonths.contains(monthNumber)) {
-                                TextStyles.Default.Bold.Medium
+                                selectedStyle
                             } else {
-                                TextStyles.Default.Medium
+                                deselectedStyle
                             }
                         )
                     }
@@ -102,9 +109,13 @@ private fun MonthSelection(
 
 @Composable
 private fun DaySelection(
+    viewModel: AddTaskViewModel,
     selectedDays: Set<Int>,
     onToggle: (Int) -> Unit
 ) {
+    val monthlyDaySelection by viewModel.userMonthlyDaySelection.collectAsState()
+    val allMonthDaysSelected by viewModel.allMonthDaysSelected.collectAsState()
+
     val dayNumbers = remember { (1..31).toList() }
     val dayChunks = remember(dayNumbers) { dayNumbers.chunked(8) }
 
@@ -113,82 +124,82 @@ private fun DaySelection(
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(Sizes.Size.ExtraSmall)
     ) {
-        dayChunks.forEach { chunk ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(Sizes.Size.Small)
-            ) {
-                chunk.forEach {day ->
-                    Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                        Text(
-                            modifier = Modifier.clickable { onToggle(day) },
-                            text = day.toString(),
-                            style = if (selectedDays.contains(day)) {
-                                TextStyles.Default.Bold.Medium
-                            } else {
-                                TextStyles.Default.Medium
-                            }
-                        )
-                    }
-                    if (day == 31) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
+            Text(
+                modifier = Modifier
+                    .clickable { viewModel.toggleMonthlyDaySelection(RepeatMonthlyDaySelection.ALL)},
+                text = "All days",
+                style = if (monthlyDaySelection == RepeatMonthlyDaySelection.ALL) selectedStyle else deselectedStyle
+            )
+
+            Text(
+                modifier = Modifier
+                    .clickable {
+                        viewModel.toggleMonthlyDaySelection(RepeatMonthlyDaySelection.SELECT)
+                               },
+                text = "Select days",
+                style = if (monthlyDaySelection == RepeatMonthlyDaySelection.SELECT) selectedStyle else deselectedStyle
+            )
+
+            Text(
+                modifier = Modifier
+                    .clickable { viewModel.toggleMonthlyDaySelection(RepeatMonthlyDaySelection.LAST)},
+                text = "Last of month",
+                style = if (monthlyDaySelection == RepeatMonthlyDaySelection.LAST) selectedStyle else deselectedStyle
+            )
+        }
+
+        if (monthlyDaySelection == RepeatMonthlyDaySelection.SELECT) {
+            dayChunks.forEach { chunk ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(Sizes.Size.Small)
+                ) {
+                    chunk.forEach {day ->
                         Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
                             Text(
-                                text = ""
+                                modifier = Modifier.clickable { onToggle(day) },
+                                text = day.toString(),
+                                style = if (selectedDays.contains(day)) selectedStyle else deselectedStyle
                             )
+                        }
+                        // Hack to align since 31/8 != Int
+                        if (day == 31) {
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = ""
+                                )
+                            }
                         }
                     }
                 }
             }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                Text(
+                    modifier = Modifier
+                        .clickable { viewModel.toggleAllMonthSelectedDays() },
+                    text = "Select all",
+                    style = deselectedStyle
+                )
+
+                Text(
+                    modifier = Modifier
+                        .clickable { viewModel.toggleAllMonthSelectedDays() },
+                    text = "Deselect all",
+                    style = deselectedStyle
+                )
+
+            }
         }
-    }
-}
 
-@Composable
-private fun UntilSelection(
-    selectedUntil: RepeatUntilSelection,
-    selectedDate: java.time.LocalDate,
-    onForever: () -> Unit,
-    onDateClick: () -> Unit
-) {
-    val fMonthYearDayShort = remember { DateTimeFormatter.ofPattern("EEE, MMM d") }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(end = AddTaskConstants.START_PADDING.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Until",
-            style = TextStyles.Default.Medium
-        )
-
-        Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
-
-        Text(
-            modifier = Modifier.clickable {
-                onForever()
-            },
-            text = "Forever",
-            style = if (selectedUntil == RepeatUntilSelection.FOREVER) {
-                TextStyles.Default.Bold.Medium
-            } else {
-                TextStyles.Default.Medium
-            }
-        )
-
-        Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
-
-        Text(
-            modifier = Modifier.clickable {
-                onDateClick()
-            },
-            text = selectedDate.format(fMonthYearDayShort),
-            style = if (selectedUntil == RepeatUntilSelection.DATE) {
-                TextStyles.Default.Bold.Medium
-            } else {
-                TextStyles.Default.Medium
-            }
-        )
     }
 }

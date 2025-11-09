@@ -34,6 +34,8 @@ import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableRipple
 import com.example.bghelp.ui.screens.task.add.TimeField
 import com.example.bghelp.ui.screens.task.add.TimeSegment
+import com.example.bghelp.ui.screens.task.add.deselectedStyle
+import com.example.bghelp.ui.screens.task.add.selectedStyle
 import com.example.bghelp.ui.theme.ErrorRed
 import com.example.bghelp.ui.theme.TextStyles
 import java.time.LocalTime
@@ -169,13 +171,13 @@ fun TimeSelectionInput(
         ) {
             Text(
                 text = hourText,
-                style = if (selectedSegment == TimeSegment.HOUR) TextStyles.Main.Bold.Medium else TextStyles.Default.Medium,
+                style = if (selectedSegment == TimeSegment.HOUR) TextStyles.Main.Bold.Medium else deselectedStyle,
             )
         }
         // Separator
         Text(
             text = ":",
-            style = TextStyles.Default.Bold.Medium,
+            style = selectedStyle,
             modifier = Modifier.padding(horizontal = 2.dp),
         )
         // Minute input
@@ -187,7 +189,7 @@ fun TimeSelectionInput(
         ) {
             Text(
                 text = minuteText,
-                style = if (selectedSegment == TimeSegment.MINUTE) TextStyles.Main.Bold.Medium else TextStyles.Default.Medium,
+                style = if (selectedSegment == TimeSegment.MINUTE) TextStyles.Main.Bold.Medium else deselectedStyle,
             )
         }
     }
