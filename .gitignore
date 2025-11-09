@@ -1,4 +1,5 @@
 error.txt
+.env
 
 # Built application files
 *.apk

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +8,18 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
+
+val envProperties = Properties().apply {
+    val envFile = rootProject.file(".env")
+    if (envFile.exists()) {
+        envFile.inputStream().use { load(it) }
+    }
+}
+
+val mapsApiKey: String = System.getenv("MAPS_API_KEY")
+    ?: envProperties.getProperty("MAPS_API_KEY")
+    ?: (project.findProperty("MAPS_API_KEY") as? String)
+    ?: ""
 
 android {
     namespace = "com.example.bghelp"
@@ -19,6 +33,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        if (mapsApiKey.isBlank()) {
+            logger.warn("MAPS_API_KEY is not set. Google Maps may not render correctly.")
+        }
+        resValue("string", "google_maps_key", mapsApiKey)
     }
 
     buildTypes {
@@ -70,7 +89,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
 
     // DateTimePicker
-    implementation("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")
+    implementation(libs.material.dialogs.datetime)
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
     // AndroidX core + lifecycle
@@ -80,6 +99,12 @@ dependencies {
     
     // Accompanist System UI Controller
     implementation(libs.accompanist.systemuicontroller)
+
+    // Maps & Places
+    implementation(libs.play.services.maps)
+    implementation(libs.google.maps.compose)
+    implementation(libs.places)
+    implementation(libs.coroutines.play.services)
 
     // Tests
     testImplementation(libs.junit)

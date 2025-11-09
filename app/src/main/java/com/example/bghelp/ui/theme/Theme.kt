@@ -46,7 +46,7 @@ private val LightColorScheme = lightColorScheme(
     // outlineVariant = Color(210, 210, 210).copy(alpha = 0.5f), // Alternative outline
     // inverseSurface = Color.Black, // Inverse surface backgrounds
     // inverseOnSurface = Color.White, // Text on inverse surface backgrounds
-    // inversePrimary = MainBlue.copy(alpha = 0.8f), // Primary color in inverse contexts
+     inversePrimary = TextWhite, // Primary color in inverse contexts
      scrim = TertiaryGrey // Overlay/backdrop color
 )
 

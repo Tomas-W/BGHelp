@@ -48,6 +48,14 @@ sealed class Screen(
         object CreateAlarm : Options("Create Alarm", "options/create_alarm")
     }
     
+    // Stand alone screens
+    object LocationPicker : Screen("Location Picker", "location_picker") {
+        const val ALLOW_MULTIPLE_ARG = "allowMultiple"
+        val ROUTE_WITH_ARGS = "$route?$ALLOW_MULTIPLE_ARG={$ALLOW_MULTIPLE_ARG}"
+        fun buildRoute(allowMultiple: Boolean) = "$route?$ALLOW_MULTIPLE_ARG=$allowMultiple"
+    }
+
+    
     companion object {
         fun getScreenByRoute(route: String?): Screen {
             return when (route) {
@@ -71,7 +79,11 @@ sealed class Screen(
                 Events.Wallpaper.route -> Events.Wallpaper
                 Options.Settings.route -> Options.Settings
                 Options.CreateAlarm.route -> Options.CreateAlarm
-                else -> Tasks.Main // Default to Tasks instead of Empty
+                LocationPicker.route -> LocationPicker
+                else -> when {
+                    route?.startsWith(LocationPicker.route) == true -> LocationPicker
+                    else -> Tasks.Main // Default to Tasks
+                }
             }
         }
 
@@ -108,6 +120,10 @@ sealed class Screen(
         val optionsScreens = listOf(
             Options.Settings,
             Options.CreateAlarm
+        )
+
+        val noBottomNavScreens = listOf(
+            LocationPicker
         )
 
         val featureMains = listOf(

@@ -36,6 +36,7 @@ fun MainScreen() {
         optionsRoute = optionsBackStackEntry?.destination?.route
     )
     val isOptionsActive = isOptionsScreenActive(optionsBackStackEntry?.destination?.route)
+    val shouldHideBottomNav = currentScreen in Screen.noBottomNavScreens
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -79,13 +80,15 @@ fun MainScreen() {
                 }
             },
             bottomBar = {
-                BottomNavigationBar(
-                    navController = bottomNavController,
-                    isOptionsActive = isOptionsActive,
-                    onRequestNavigateTo = { route ->
-                        resetAndNavigateToTab(navController, bottomNavController, route)
-                    }
-                )
+                if (!shouldHideBottomNav) {
+                    BottomNavigationBar(
+                        navController = bottomNavController,
+                        isOptionsActive = isOptionsActive,
+                        onRequestNavigateTo = { route ->
+                            resetAndNavigateToTab(navController, bottomNavController, route)
+                        }
+                    )
+                }
             }
         ) { innerPadding ->
             MainNavHost(

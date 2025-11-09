@@ -1,6 +1,5 @@
 package com.example.bghelp.ui.screens.task.add
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.bghelp.utils.AudioManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,6 +11,8 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.YearMonth
 import javax.inject.Inject
+import java.util.Locale
+import kotlin.random.Random
 
 @HiltViewModel
 class AddTaskViewModel @Inject constructor(
@@ -111,6 +112,12 @@ class AddTaskViewModel @Inject constructor(
     // Vibrate selection
     private val _userVibrateSelection = MutableStateFlow(UserVibrateSelection.OFF)
     val userVibrateSelection: StateFlow<UserVibrateSelection> = _userVibrateSelection.asStateFlow()
+
+    // Location
+    private val _userLocationSelection = MutableStateFlow(UserLocationSelection.OFF)
+    val userLocationSelection: StateFlow<UserLocationSelection> = _userLocationSelection.asStateFlow()
+    private val _selectedLocations = MutableStateFlow<List<TaskLocation>>(emptyList())
+    val selectedLocations: StateFlow<List<TaskLocation>> = _selectedLocations.asStateFlow()
 
     // Color
     private val _userColorSelection = MutableStateFlow(UserColorSelection.OFF)
@@ -424,6 +431,60 @@ class AddTaskViewModel @Inject constructor(
     }
     fun setSelectedColorChoice(color: UserColorChoices) {
         _selectedColor.value = color
+    }
+
+    // Location
+    fun toggleLocationSelection() {
+        _userLocationSelection.value = _userLocationSelection.value.toggle()
+        if (_userLocationSelection.value == UserLocationSelection.OFF) {
+            _selectedLocations.value = emptyList()
+        }
+    }
+    fun generateRandomLocation() {
+        val latitude = Random.nextDouble(from = -90.0, until = 90.0)
+        val longitude = Random.nextDouble(from = -180.0, until = 180.0)
+        val addressSuffix = Random.nextInt(1000, 9999)
+        val address = String.format(
+            Locale.getDefault(),
+            "Random Address %04d",
+            addressSuffix
+        )
+
+        setSelectedLocation(
+            TaskLocation(
+                latitude = latitude,
+                longitude = longitude,
+                address = address,
+                name = address
+            )
+        )
+    }
+
+    fun setSelectedLocation(location: TaskLocation) {
+        setSelectedLocations(listOf(location))
+    }
+
+    fun setSelectedLocations(locations: List<TaskLocation>) {
+        _selectedLocations.value = locations
+        _userLocationSelection.value =
+            if (locations.isEmpty()) UserLocationSelection.OFF else UserLocationSelection.ON
+    }
+
+    fun appendSelectedLocations(locations: List<TaskLocation>) {
+        if (locations.isEmpty()) return
+        val merged = (_selectedLocations.value + locations).distinctBy { location ->
+            location.latitude to location.longitude
+        }
+        _selectedLocations.value = merged
+        _userLocationSelection.value =
+            if (merged.isEmpty()) UserLocationSelection.OFF else UserLocationSelection.ON
+    }
+
+    fun removeSelectedLocation(location: TaskLocation) {
+        val updatedLocations = _selectedLocations.value.filterNot { it == location }
+        _selectedLocations.value = updatedLocations
+        _userLocationSelection.value =
+            if (updatedLocations.isEmpty()) UserLocationSelection.OFF else UserLocationSelection.ON
     }
 
     // Misc

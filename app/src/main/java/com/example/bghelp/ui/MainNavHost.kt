@@ -4,10 +4,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.bghelp.ui.screens.events.AddEventModal
 import com.example.bghelp.ui.screens.events.EventScreen
 import com.example.bghelp.ui.screens.events.EventWallpaperScreen
@@ -18,6 +19,7 @@ import com.example.bghelp.ui.screens.options.SettingsScreen
 import com.example.bghelp.ui.screens.task.add.AddTaskScreen
 import com.example.bghelp.ui.screens.task.main.TaskScreen
 import com.example.bghelp.ui.screens.task.TaskWallpaperScreen
+import com.example.bghelp.ui.screens.locationpicker.LocationPickerScreen
 import com.example.bghelp.ui.screens.target.AddTargetScreen
 import com.example.bghelp.ui.screens.target.TargetScreen
 import com.example.bghelp.ui.screens.target.TargetWallpaperScreen
@@ -87,6 +89,24 @@ fun OverlayNavHost(
 
         composable(Screen.Options.CreateAlarm.route) {
             CreateAlarmScreen()
+        }
+
+        composable(
+            route = Screen.LocationPicker.ROUTE_WITH_ARGS,
+            arguments = listOf(
+                navArgument(Screen.LocationPicker.ALLOW_MULTIPLE_ARG) {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
+            )
+        ) { backStackEntry ->
+            val allowMultiple = backStackEntry.arguments?.getBoolean(
+                Screen.LocationPicker.ALLOW_MULTIPLE_ARG
+            ) ?: false
+            LocationPickerScreen(
+                navController = navController,
+                allowMultiple = allowMultiple
+            )
         }
 
         // Wallpaper screens for each feature

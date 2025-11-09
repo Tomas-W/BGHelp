@@ -18,16 +18,6 @@ object Sizes {
         val ExtraLarge = 32.dp
         val MegaLarge = 54.dp
     }
-    
-    object Button {
-        object Width {
-            val ExtraSmall = 60.dp
-            val Small = 80.dp
-            val Medium = 120.dp
-            val Large = 160.dp
-            val ExtraLarge = 240.dp
-        }
-    }
 
     object Size {
         val ExtraSmall = 6.dp
@@ -37,24 +27,11 @@ object Sizes {
         val ExtraLarge = 36.dp
     }
     
-    object Padding {
-        val ExtraSmall = 4.dp
-        val Small = 8.dp
-        val Medium = 16.dp
-        val Large = 24.dp
-        val ExtraLarge = 32.dp
-    }
-    
     object Corner {
         val ExtraSmall = 6.dp
         val Small = 8.dp
         val Medium = 16.dp
         val Large = 24.dp
         val ExtraLarge = 64.dp
-    }
-    
-    object Divider {
-        val Height = 1.dp
-        val SeparatorHeight = 8.dp
     }
 }

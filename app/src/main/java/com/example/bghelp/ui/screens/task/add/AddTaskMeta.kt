@@ -1,8 +1,8 @@
 package com.example.bghelp.ui.screens.task.add
 
-import androidx.compose.runtime.remember
 import com.example.bghelp.R
 import com.example.bghelp.ui.theme.TextStyles
+import java.io.Serializable
 
 object AddTaskConstants {
     // Misc
@@ -69,6 +69,13 @@ object AddTaskStrings {
 
     const val ADD_REMINDER = "Add reminder"
     const val REMOVE_REMINDER = "Remove reminder"
+
+    // Location
+    const val ADD_LOCATION = "Add location"
+    const val LOCATION_PLACEHOLDER = "No location selected"
+    const val LOCATION_LAT_LABEL = "Latitude"
+    const val LOCATION_LONG_LABEL = "Longitude"
+    const val LOCATION_ADDRESS_LABEL = "Address"
 }
 
 val selectedStyle = TextStyles.Default.Bold.Medium
@@ -178,6 +185,28 @@ enum class UserVibrateSelection(
         CONTINUOUS -> OFF
     }
 }
+
+// Location
+// Location
+enum class UserLocationSelection(
+    override val headerText: String,
+    override val iconRes: Int
+) : SectionMeta {
+    OFF("No location", R.drawable.location_off),
+    ON("Custom Location", R.drawable.location_on);
+
+    fun toggle(): UserLocationSelection = when (this) {
+        OFF -> ON
+        ON -> OFF
+    }
+}
+
+data class TaskLocation(
+    val latitude: Double,
+    val longitude: Double,
+    val address: String,
+    val name: String = ""
+): Serializable
 
 // Color
 enum class UserColorSelection(
