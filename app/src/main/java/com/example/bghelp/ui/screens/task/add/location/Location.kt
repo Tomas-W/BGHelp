@@ -74,6 +74,13 @@ fun Location(
             LocationContent(
                 locations = selectedLocations,
                 onAddLocation = {
+                    // Send the current selected locations to the location picker
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set(
+                            LocationNavigationKeys.INITIAL_LOCATIONS,
+                            ArrayList(selectedLocations)
+                        )
                     navController.navigate(
                         Screen.LocationPicker.buildRoute(allowMultiple = allowMultiple)
                     ) {
