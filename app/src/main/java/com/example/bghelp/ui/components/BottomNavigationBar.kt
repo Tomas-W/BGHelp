@@ -14,8 +14,12 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
@@ -46,9 +50,9 @@ private fun getIconResource(screen: Screen, currentRoute: String?): Int {
 private fun RowScope.NavigationItem(
     screen: Screen,
     currentRoute: String?,
+    isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val isSelected = currentRoute == screen.route
     val iconRes = getIconResource(screen, currentRoute)
     
     NavigationBarItem(
@@ -90,11 +94,28 @@ fun BottomNavigationBar(
     modifier: Modifier = Modifier,
     navController: NavController,
     isOptionsActive: Boolean = false,
+    overlayRoute: String? = null,
     onRequestNavigateTo: ((String) -> Unit)? = null,
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = remember(isOptionsActive, navBackStackEntry?.destination?.route) {
-        if (isOptionsActive) null else navBackStackEntry?.destination?.route
+    // Track the last known bottom route for highlighting
+    val bottomRoute = navBackStackEntry?.destination?.route
+    var lastKnownBottomRoute by rememberSaveable {
+        mutableStateOf(bottomRoute)
+    }
+    LaunchedEffect(bottomRoute) {
+        if (bottomRoute != null) {
+            lastKnownBottomRoute = bottomRoute
+        }
+    }
+    val normalizedOverlayRoute = overlayRoute?.takeUnless { it == "empty" }
+    val isOptionsRoute = normalizedOverlayRoute != null &&
+        normalizedOverlayRoute in Screen.optionsScreens.map { it.route }
+
+    val currentRoute = when {
+        isOptionsRoute -> null
+        isOptionsActive -> lastKnownBottomRoute
+        else -> bottomRoute
     }
 
     fun navigateTo(route: String) {
@@ -125,6 +146,7 @@ fun BottomNavigationBar(
         NavigationItem(
             screen = Screen.Home.Main,
             currentRoute = currentRoute,
+            isSelected = currentRoute in Screen.homeScreens,
             onClick = { navigateTo(Screen.Home.Main.route) }
         )
 
@@ -132,6 +154,7 @@ fun BottomNavigationBar(
         NavigationItem(
             screen = Screen.Tasks.Main,
             currentRoute = currentRoute,
+            isSelected = currentRoute in Screen.taskScreens,
             onClick = { navigateTo(Screen.Tasks.Main.route) }
         )
 
@@ -139,6 +162,7 @@ fun BottomNavigationBar(
         NavigationItem(
             screen = Screen.Targets.Main,
             currentRoute = currentRoute,
+            isSelected = currentRoute in Screen.targetScreens,
             onClick = { navigateTo(Screen.Targets.Main.route) }
         )
 
@@ -146,6 +170,7 @@ fun BottomNavigationBar(
         NavigationItem(
             screen = Screen.Items.Main,
             currentRoute = currentRoute,
+            isSelected = currentRoute in Screen.itemScreens,
             onClick = { navigateTo(Screen.Items.Main.route) }
         )
 
@@ -153,6 +178,7 @@ fun BottomNavigationBar(
         NavigationItem(
             screen = Screen.Events.Main,
             currentRoute = currentRoute,
+            isSelected = currentRoute in Screen.eventScreens,
             onClick = { navigateTo(Screen.Events.Main.route) }
         )
     }

@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun AddTargetScreen(
+    viewModel: AddTargetViewModel,
     onTargetCreated: () -> Unit,
     modifier: Modifier = Modifier
 ) {

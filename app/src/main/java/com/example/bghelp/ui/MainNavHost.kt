@@ -3,12 +3,14 @@ package com.example.bghelp.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.bghelp.ui.screens.events.AddEventModal
 import com.example.bghelp.ui.screens.events.EventScreen
 import com.example.bghelp.ui.screens.events.EventWallpaperScreen
@@ -27,6 +29,12 @@ import com.example.bghelp.ui.navigation.Screen
 import com.example.bghelp.ui.screens.home.HomeScreen
 import com.example.bghelp.ui.screens.home.HomeWallpaperScreen
 import com.example.bghelp.ui.screens.items.AddItemScreen
+import com.example.bghelp.ui.screens.events.AddEventViewModel
+import com.example.bghelp.ui.screens.items.AddItemViewModel
+import com.example.bghelp.ui.screens.target.AddTargetViewModel
+import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
+
+private const val OVERLAY_GRAPH_ROUTE = "overlay_graph"
 
 @Composable
 fun BottomNavHost(
@@ -54,26 +62,54 @@ fun OverlayNavHost(
     NavHost(
         navController = navController,
         startDestination = "empty",
-        modifier = modifier
+        modifier = modifier,
+        route = OVERLAY_GRAPH_ROUTE
     ) {
         composable("empty") { /* Empty placeholder */ }
 
         // Add screens (full screens)
-        composable(Screen.Tasks.Add.route) {
-            AddTaskScreen(navController = navController)
+        composable(Screen.Tasks.Add.route) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(OVERLAY_GRAPH_ROUTE)
+            }
+            val viewModel: AddTaskViewModel = hiltViewModel(parentEntry)
+            AddTaskScreen(
+                navController = navController,
+                viewModel = viewModel
+            )
         }
 
-        composable(Screen.Targets.Add.route) {
-            AddTargetScreen(onTargetCreated = { navController.popBackStack() })
+        composable(Screen.Targets.Add.route) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(OVERLAY_GRAPH_ROUTE)
+            }
+            val viewModel: AddTargetViewModel = hiltViewModel(parentEntry)
+            AddTargetScreen(
+                viewModel = viewModel,
+                onTargetCreated = { navController.popBackStack() }
+            )
         }
 
-        // Modal screens
-        composable(Screen.Items.Add.route) {
-            AddItemScreen(onItemCreated = { navController.popBackStack() })
+        composable(Screen.Items.Add.route) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(OVERLAY_GRAPH_ROUTE)
+            }
+            val viewModel: AddItemViewModel = hiltViewModel(parentEntry)
+            AddItemScreen(
+                viewModel = viewModel,
+                onItemCreated = { navController.popBackStack() }
+            )
         }
 
-        composable(Screen.Events.Add.route) {
-            AddEventModal(onEventCreated = { navController.popBackStack() })
+        composable(Screen.Events.Add.route) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(OVERLAY_GRAPH_ROUTE)
+            }
+            val viewModel: AddEventViewModel = hiltViewModel(parentEntry)
+            AddEventModal(
+                viewModel = viewModel,
+                onEventCreated = { navController.popBackStack() }
+            )
         }
 
         // Options screens

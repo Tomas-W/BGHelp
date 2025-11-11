@@ -25,7 +25,8 @@ class MainActivity : ComponentActivity() {
                 // set NavigationBar color - StatusBar set by TopBar
                 systemUiController.setNavigationBarColor(
                     color = BackgroundGrey,
-                    darkIcons = true)
+                    darkIcons = true
+                )
             }
             
             BGHelpTheme {

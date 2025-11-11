@@ -84,6 +84,7 @@ fun MainScreen() {
                     BottomNavigationBar(
                         navController = bottomNavController,
                         isOptionsActive = isOptionsActive,
+                        overlayRoute = optionsBackStackEntry?.destination?.route,
                         onRequestNavigateTo = { route ->
                             resetAndNavigateToTab(navController, bottomNavController, route)
                         }

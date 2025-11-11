@@ -87,6 +87,39 @@ sealed class Screen(
             }
         }
 
+        val homeScreens = listOf(
+            Home.Main.route,
+            Home.Wallpaper.route
+        )
+
+        val taskScreens = listOf(
+            Tasks.Main.route,
+            Tasks.Add.route,
+            Tasks.Wallpaper.route,
+            Tasks.Calendar.route
+        )
+
+        val targetScreens = listOf(
+            Targets.Main.route,
+            Targets.Add.route,
+            Targets.Wallpaper.route,
+            Targets.Calendar.route
+        )
+
+        val itemScreens = listOf(
+            Items.Main.route,
+            Items.Add.route,
+            Items.Wallpaper.route,
+            Items.Calendar.route
+        )
+
+        val eventScreens = listOf(
+            Events.Main.route,
+            Events.Add.route,
+            Events.Wallpaper.route,
+            Events.Calendar.route
+        )
+
         val bottomNavScreens = listOf(
             Home.Main,
             Tasks.Main,

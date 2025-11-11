@@ -8,7 +8,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.bghelp.ui.components.MainContentContainer
 import com.example.bghelp.ui.screens.task.add.title.TitleSection
@@ -25,7 +24,7 @@ import com.example.bghelp.ui.utils.dismissKeyboardOnTap
 @Composable
 fun AddTaskScreen(
     navController: NavController,
-    viewModel: AddTaskViewModel = hiltViewModel()
+    viewModel: AddTaskViewModel
 ) {
     Box(
         modifier = Modifier

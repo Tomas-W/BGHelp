@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun AddEventModal(
+    viewModel: AddEventViewModel,
     onEventCreated: () -> Unit,
     modifier: Modifier = Modifier
 ) {

@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun AddItemScreen(
+    viewModel: AddItemViewModel,
     onItemCreated: () -> Unit,
     modifier: Modifier = Modifier
 ) {
