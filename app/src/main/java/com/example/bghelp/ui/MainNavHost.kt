@@ -11,9 +11,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.bghelp.ui.screens.events.AddEventModal
-import com.example.bghelp.ui.screens.events.EventScreen
-import com.example.bghelp.ui.screens.events.EventWallpaperScreen
+import com.example.bghelp.ui.screens.note.AddNoteModal
+import com.example.bghelp.ui.screens.note.AddNoteViewModel
+import com.example.bghelp.ui.screens.note.NoteScreen
+import com.example.bghelp.ui.screens.note.NoteWallpaperScreen
 import com.example.bghelp.ui.screens.items.ItemScreen
 import com.example.bghelp.ui.screens.items.ItemWallpaperScreen
 import com.example.bghelp.ui.screens.options.CreateAlarmScreen
@@ -29,7 +30,6 @@ import com.example.bghelp.ui.navigation.Screen
 import com.example.bghelp.ui.screens.home.HomeScreen
 import com.example.bghelp.ui.screens.home.HomeWallpaperScreen
 import com.example.bghelp.ui.screens.items.AddItemScreen
-import com.example.bghelp.ui.screens.events.AddEventViewModel
 import com.example.bghelp.ui.screens.items.AddItemViewModel
 import com.example.bghelp.ui.screens.target.AddTargetViewModel
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
@@ -50,7 +50,7 @@ fun BottomNavHost(
         composable(Screen.Tasks.Main.route) { TaskScreen() }
         composable(Screen.Targets.Main.route) { TargetScreen() }
         composable(Screen.Items.Main.route) { ItemScreen() }
-        composable(Screen.Events.Main.route) { EventScreen() }
+        composable(Screen.Notes.Main.route) { NoteScreen() }
     }
 }
 
@@ -101,14 +101,14 @@ fun OverlayNavHost(
             )
         }
 
-        composable(Screen.Events.Add.route) { backStackEntry ->
+        composable(Screen.Notes.Add.route) { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(OVERLAY_GRAPH_ROUTE)
             }
-            val viewModel: AddEventViewModel = hiltViewModel(parentEntry)
-            AddEventModal(
+            val viewModel: AddNoteViewModel = hiltViewModel(parentEntry)
+            AddNoteModal(
                 viewModel = viewModel,
-                onEventCreated = { navController.popBackStack() }
+                onNoteCreated = { navController.popBackStack() }
             )
         }
 
@@ -150,7 +150,7 @@ fun OverlayNavHost(
         composable(Screen.Tasks.Wallpaper.route) { TaskWallpaperScreen() }
         composable(Screen.Targets.Wallpaper.route) { TargetWallpaperScreen() }
         composable(Screen.Items.Wallpaper.route) { ItemWallpaperScreen() }
-        composable(Screen.Events.Wallpaper.route) { EventWallpaperScreen() }
+        composable(Screen.Notes.Wallpaper.route) { NoteWallpaperScreen() }
     }
 }
 

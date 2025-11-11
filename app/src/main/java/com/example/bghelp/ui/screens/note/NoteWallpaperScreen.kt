@@ -1,4 +1,4 @@
-package com.example.bghelp.ui.screens.events
+package com.example.bghelp.ui.screens.note
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,9 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun AddEventModal(
-    viewModel: AddEventViewModel,
-    onEventCreated: () -> Unit,
+fun NoteWallpaperScreen(
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -27,7 +25,8 @@ fun AddEventModal(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("Add Event Modal")
+            Text("Notes Wallpaper Screen")
         }
     }
 }
+

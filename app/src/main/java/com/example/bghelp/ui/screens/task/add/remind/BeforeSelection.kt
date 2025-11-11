@@ -41,11 +41,11 @@ import com.example.bghelp.ui.components.DropdownItem
 import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableRipple
 import com.example.bghelp.ui.components.clickableRippleDismiss
-import com.example.bghelp.ui.screens.task.add.AddTaskConstants
+import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerMedium
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 import com.example.bghelp.ui.screens.task.add.Reminder
 import com.example.bghelp.ui.screens.task.add.RemindType
 import com.example.bghelp.ui.screens.task.add.deselectedStyle
@@ -103,8 +103,8 @@ private fun AddReminder(
     viewModel: AddTaskViewModel
 ) {
     val remindTypeChoices = remember { mapOf(
-        RemindType.START to AddTaskStrings.BEFORE_START,
-        RemindType.END to AddTaskStrings.BEFORE_END) }
+        RemindType.START to STR.BEFORE_START,
+        RemindType.END to STR.BEFORE_END) }
 
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -112,7 +112,7 @@ private fun AddReminder(
         // Before / after start
         Text(
             modifier = Modifier
-                .widthIn(min = AddTaskConstants.MIN_WIDTH.dp),
+                .widthIn(min = CONST.MIN_WIDTH.dp),
             text = remindTypeChoices[remindType]!!,
             style = deselectedStyle,
         )
@@ -135,7 +135,7 @@ private fun AddReminder(
                 Icon(
                     modifier = Modifier.size(Sizes.Icon.Small),
                     painter = painterResource(R.drawable.add),
-                    contentDescription = AddTaskStrings.ADD_REMINDER
+                    contentDescription = STR.ADD_REMINDER
                 )
             }
         }
@@ -200,7 +200,7 @@ private fun ReminderItem(
                 Icon(
                     modifier = Modifier.size(Sizes.Icon.Medium),
                     painter = painterResource(R.drawable.delete),
-                    contentDescription = AddTaskStrings.REMOVE_REMINDER
+                    contentDescription = STR.REMOVE_REMINDER
                 )
             }
         }
@@ -212,8 +212,8 @@ private fun TimeInput(
     modifier: Modifier = Modifier,
     value: Int,
     onValueChange: (Int) -> Unit,
-    minValue: Int = AddTaskConstants.MIN_REMINDER,
-    maxValue: Int = AddTaskConstants.MAX_REMINDER,
+    minValue: Int = CONST.MIN_REMINDER,
+    maxValue: Int = CONST.MAX_REMINDER,
     isActive: Boolean = false,
     onActiveChange: (Boolean) -> Unit = {}
 ) = WithRipple {
@@ -278,7 +278,7 @@ private fun TimeInput(
 
     Row(
         modifier = modifier
-            .width(AddTaskConstants.REMINDER_INPUT_WIDTH.dp)
+            .width(CONST.REMINDER_INPUT_WIDTH.dp)
             .clip(RoundedCornerShape(Sizes.Corner.Small))
             .clickable {
                 if (isActive) {
@@ -320,11 +320,11 @@ private fun TimeDropdown(
     val units = remember { TimeUnit.entries }
     val unitLabels = remember {
         mapOf(
-            TimeUnit.MINUTES to AddTaskStrings.MINUTES,
-            TimeUnit.HOURS to AddTaskStrings.HOURS,
-            TimeUnit.DAYS to AddTaskStrings.DAYS,
-            TimeUnit.WEEKS to AddTaskStrings.WEEKS,
-            TimeUnit.MONTHS to AddTaskStrings.MONTHS
+            TimeUnit.MINUTES to STR.MINUTES,
+            TimeUnit.HOURS to STR.HOURS,
+            TimeUnit.DAYS to STR.DAYS,
+            TimeUnit.WEEKS to STR.WEEKS,
+            TimeUnit.MONTHS to STR.MONTHS
         )
     }
 

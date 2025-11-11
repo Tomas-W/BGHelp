@@ -1,5 +1,7 @@
 package com.example.bghelp.ui.screens.task.add
 
+import android.graphics.Bitmap
+import android.net.Uri
 import com.example.bghelp.R
 import com.example.bghelp.ui.theme.TextStyles
 import java.io.Serializable
@@ -25,23 +27,34 @@ object AddTaskConstants {
     const val REMINDER_START = 0
     const val MIN_REMINDER = 0
     const val MAX_REMINDER = 999
+    // Image
+    const val IMAGE_SIZE = 120
 }
 
 object AddTaskStrings {
     // Title
     const val TITLE_HINT = "Title"
     const val INFO_HINT = "Info"
-
     // When
-
     // Remind
     const val BEFORE_START = "Before start"
     const val BEFORE_END = "Before end"
+    const val SELECT_ALL = "Select all"
+    const val DESELECT_ALL = "Deselect all"
     // sound
     const val SELECT_ALARM = "Select alarm"
     const val CREATE_ALARM = "Create alarm +"
     // vibrate
-
+    // Note
+    const val SELECT_NOTE = "Select note"
+    const val CREATE_NOTE = "Create note +"
+    // Image
+    const val ADD_IMAGE = "Add image"
+    const val NO_IMAGE_SELECTED = "No image selected"
+    const val IMAGE_FROM_LIBRARY = "Select from library"
+    const val IMAGE_FROM_CAMERA = "Capture photo"
+    const val CAPTURED_IMAGE = "Captured image"
+    const val CAMERA_PERMISSION_REQUIRED = "Camera permission required to capture photo"
     // Color
     const val SELECT_COLOR = "Select color"
     const val DEFAULT = "Default"
@@ -50,14 +63,12 @@ object AddTaskStrings {
     const val YELLOW = "Yellow"
     const val CYAN = "Cyan"
     const val MAGENTA = "Magenta"
-
     // Misc
     const val MINUTES = "Minutes"
     const val HOURS = "Hours"
     const val DAYS = "Days"
     const val WEEKS = "Weeks"
     const val MONTHS = "Months"
-
     // Content description
     const val SHOW_END_DATE = "Show end date"
     const val HIDE_END_DATE = "Hide end date"
@@ -170,6 +181,18 @@ enum class UserSoundSelection(
         CONTINUOUS -> OFF
     }
 }
+enum class UserNoteSelection(
+    override val headerText: String,
+    override val iconRes: Int
+) : SectionMeta {
+    OFF("Note off", R.drawable.note_off),
+    ON("Note on", R.drawable.note_on);
+
+    fun toggle(): UserNoteSelection = when (this) {
+        OFF -> ON
+        ON -> OFF
+    }
+}
 //Vibrate
 enum class UserVibrateSelection(
     override val headerText: String,
@@ -193,7 +216,7 @@ enum class UserLocationSelection(
     override val iconRes: Int
 ) : SectionMeta {
     OFF("No location", R.drawable.location_off),
-    ON("Custom Location", R.drawable.location_on);
+    ON("With Location", R.drawable.location_on);
 
     fun toggle(): UserLocationSelection = when (this) {
         OFF -> ON
@@ -207,6 +230,29 @@ data class TaskLocation(
     val address: String,
     val name: String = ""
 ): Serializable
+
+data class TaskImageData(
+    val displayName: String,
+    val uri: Uri? = null,
+    val bitmap: Bitmap? = null,
+    val source: TaskImageSource
+)
+
+enum class TaskImageSource { GALLERY, CAMERA }
+
+// Image
+enum class UserImageSelection(
+    override val headerText: String,
+    override val iconRes: Int
+) : SectionMeta {
+    OFF("No image", R.drawable.image_off),
+    ON("With image", R.drawable.image_on);
+
+    fun toggle(): UserImageSelection = when (this) {
+        OFF -> ON
+        ON -> OFF
+    }
+}
 
 // Color
 enum class UserColorSelection(

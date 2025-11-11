@@ -23,7 +23,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.ui.components.CustomDropdown
 import com.example.bghelp.ui.components.DropdownItem
-import com.example.bghelp.ui.screens.task.add.AddTaskConstants
+import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.deselectedStyle
@@ -61,7 +61,7 @@ private fun DaySelection(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(end = AddTaskConstants.START_PADDING.dp),
+            .padding(end = CONST.START_PADDING.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         days.forEachIndexed { i, day ->
@@ -93,7 +93,7 @@ private fun WeekSelection(
     ) {
         Text(
             modifier = Modifier
-                .widthIn(min = AddTaskConstants.REPEAT_LABEL_WIDTH.dp),
+                .widthIn(min = CONST.REPEAT_LABEL_WIDTH.dp),
             text = "Every",
             style = deselectedStyle
         )

@@ -1,6 +1,7 @@
 package com.example.bghelp.ui
 
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.bghelp.ui.navigation.Screen
 
 fun getCurrentScreen(bottomRoute: String?, optionsRoute: String?): Screen {
@@ -28,7 +29,7 @@ fun navigateToWallpaperScreen(navController: NavController, currentScreen: Scree
         is Screen.Tasks -> Screen.Tasks.Wallpaper.route
         is Screen.Targets -> Screen.Targets.Wallpaper.route
         is Screen.Items -> Screen.Items.Wallpaper.route
-        is Screen.Events -> Screen.Events.Wallpaper.route
+        is Screen.Notes -> Screen.Notes.Wallpaper.route
         else -> Screen.Home.Wallpaper.route
     }
     navController.navigate(wallpaperRoute) {
@@ -41,7 +42,7 @@ fun navigateToAddScreen(navController: NavController, currentScreen: Screen) {
         is Screen.Tasks -> Screen.Tasks.Add.route
         is Screen.Targets -> Screen.Targets.Add.route
         is Screen.Items -> Screen.Items.Add.route
-        is Screen.Events -> Screen.Events.Add.route
+        is Screen.Notes -> Screen.Notes.Add.route
         else -> null
     }
     if (addRoute != null) {
@@ -72,12 +73,22 @@ fun resetAndNavigateToTab(
     bottomNavController: NavController,
     route: String
 ) {
-    overlayNavController.navigate("empty") {
-        popUpTo("empty") { inclusive = true }
-        launchSingleTop = true
+    val overlayDestination = overlayNavController.currentDestination?.route
+    if (overlayDestination != null && overlayDestination != "empty") {
+        val didPop = overlayNavController.popBackStack("empty", inclusive = false)
+        if (!didPop) {
+            overlayNavController.navigate("empty") {
+                popUpTo("empty") { inclusive = true }
+                launchSingleTop = true
+            }
+        }
     }
-    bottomNavController.navigate(route) {
-        popUpTo(bottomNavController.graph.startDestinationId) { inclusive = false }
-        launchSingleTop = true
+    val startDestinationId = bottomNavController.graph.findStartDestination().id
+    if (bottomNavController.currentDestination?.route != route) {
+        bottomNavController.navigate(route) {
+            popUpTo(startDestinationId) { saveState = true }
+            launchSingleTop = true
+            restoreState = true
+        }
     }
 }

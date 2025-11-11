@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -16,7 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerMedium
-import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.RepeatMonthlyDaySelection
 import com.example.bghelp.ui.screens.task.add.deselectedStyle
@@ -70,14 +68,14 @@ private fun MonthSelection(
             Text(
                 modifier = Modifier
                     .clickable { viewModel.selectAllMonthlySelectedMonths() },
-                text = "Select all",
+                text = STR.SELECT_ALL,
                 style = deselectedStyle
             )
 
             Text(
                 modifier = Modifier
                     .clickable { viewModel.deselectAllMonthlySelectedMonths() },
-                text = "Deselect all",
+                text = STR.DESELECT_ALL,
                 style = deselectedStyle
             )
         }
@@ -186,14 +184,14 @@ private fun DaySelection(
             ) {
                 Text(
                     modifier = Modifier
-                        .clickable { viewModel.toggleAllMonthSelectedDays() },
+                        .clickable { viewModel.selectAllMonthlySelectedDays() },
                     text = "Select all",
                     style = deselectedStyle
                 )
 
                 Text(
                     modifier = Modifier
-                        .clickable { viewModel.toggleAllMonthSelectedDays() },
+                        .clickable { viewModel.deselectAllMonthlySelectedDays() },
                     text = "Deselect all",
                     style = deselectedStyle
                 )

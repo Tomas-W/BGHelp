@@ -20,9 +20,9 @@ import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
 import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableRipple
-import com.example.bghelp.ui.screens.task.add.AddTaskConstants
+import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 import com.example.bghelp.ui.screens.task.add.DateField
 import com.example.bghelp.ui.screens.task.add.deselectedStyle
 import com.example.bghelp.ui.theme.Sizes
@@ -41,14 +41,12 @@ fun DateSelection(
     val isEndDateVisible by viewModel.isEndDateVisible.collectAsState()
 
     Row(
-//        modifier = Modifier.fillMaxWidth(),
-//        horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
         // startDate
         Text(
             modifier = Modifier
-                .widthIn(min = AddTaskConstants.MIN_WIDTH.dp)
+                .widthIn(min = CONST.MIN_WIDTH.dp)
                 .clickableDismissFocus {
                     viewModel.toggleCalendarFromDateField(DateField.START)
                 },
@@ -73,7 +71,7 @@ fun DateSelection(
                 Icon(
                     modifier = Modifier.size(Sizes.Icon.Small),
                     painter = painterResource(R.drawable.double_arrow_right),
-                    contentDescription = if (isEndDateVisible) AddTaskStrings.HIDE_END_DATE else AddTaskStrings.SHOW_END_DATE
+                    contentDescription = if (isEndDateVisible) STR.HIDE_END_DATE else STR.SHOW_END_DATE
                 )
             }
         }

@@ -10,12 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.example.bghelp.ui.components.MainContentContainer
-import com.example.bghelp.ui.screens.task.add.title.TitleSection
-import com.example.bghelp.ui.screens.task.add.date.DateSection
+import com.example.bghelp.ui.screens.task.add.title.Title
+import com.example.bghelp.ui.screens.task.add.date.Date
 import com.example.bghelp.ui.screens.task.add.remind.Remind
-import com.example.bghelp.ui.screens.task.add.color.ColorSection
+import com.example.bghelp.ui.screens.task.add.color.Color
 import com.example.bghelp.ui.screens.task.add.repeat.Repeat
 import com.example.bghelp.ui.screens.task.add.location.Location
+import com.example.bghelp.ui.screens.task.add.image.Image
+import com.example.bghelp.ui.screens.task.add.note.Note
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.utils.dismissKeyboardOnTap
 
@@ -36,11 +38,11 @@ fun AddTaskScreen(
         MainContentContainer(modifier = Modifier.verticalScroll(rememberScrollState())) {
             AddTaskSpacerLarge()
 
-            TitleSection(viewModel = viewModel)
+            Title(viewModel = viewModel)
 
             AddTaskDivider()
 
-            DateSection(viewModel = viewModel)
+            Date(viewModel = viewModel)
 
             AddTaskDivider()
 
@@ -55,6 +57,13 @@ fun AddTaskScreen(
 
             AddTaskDivider()
 
+            Note(
+                viewModel = viewModel,
+                navController = navController
+            )
+
+            AddTaskDivider()
+
             Location(
                 viewModel = viewModel,
                 navController = navController,
@@ -63,7 +72,13 @@ fun AddTaskScreen(
 
             AddTaskDivider()
 
-            ColorSection(viewModel = viewModel)
+            Image(
+                viewModel = viewModel
+            )
+
+            AddTaskDivider()
+
+            Color(viewModel = viewModel)
         }
     }
 }

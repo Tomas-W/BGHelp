@@ -1,4 +1,4 @@
-package com.example.bghelp.ui.screens.events
+package com.example.bghelp.ui.screens.note
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun EventScreen(
+fun NoteScreen(
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -25,8 +25,9 @@ fun EventScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("Events Screen")
-            Text("This will show events functionality")
+            Text("Notes Screen")
+            Text("This will show notes functionality")
         }
     }
 }
+

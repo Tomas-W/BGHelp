@@ -1,5 +1,7 @@
 package com.example.bghelp.ui.screens.task.add
 
+import android.graphics.Bitmap
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.example.bghelp.utils.AudioManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -109,6 +111,12 @@ class AddTaskViewModel @Inject constructor(
     // Selected audio file
     private val _selectedAudioFile = MutableStateFlow<String>("")
     val selectedAudioFile: StateFlow<String> = _selectedAudioFile.asStateFlow()
+    
+    // Note selection
+    private val _userNoteSelection = MutableStateFlow(UserNoteSelection.OFF)
+    val userNoteSelection: StateFlow<UserNoteSelection> = _userNoteSelection.asStateFlow()
+    private val _selectedNote = MutableStateFlow("")
+    val selectedNote: StateFlow<String> = _selectedNote.asStateFlow()
     // Vibrate selection
     private val _userVibrateSelection = MutableStateFlow(UserVibrateSelection.OFF)
     val userVibrateSelection: StateFlow<UserVibrateSelection> = _userVibrateSelection.asStateFlow()
@@ -118,6 +126,12 @@ class AddTaskViewModel @Inject constructor(
     val userLocationSelection: StateFlow<UserLocationSelection> = _userLocationSelection.asStateFlow()
     private val _selectedLocations = MutableStateFlow<List<TaskLocation>>(emptyList())
     val selectedLocations: StateFlow<List<TaskLocation>> = _selectedLocations.asStateFlow()
+
+    // Image
+    private val _userImageSelection = MutableStateFlow(UserImageSelection.OFF)
+    val userImageSelection: StateFlow<UserImageSelection> = _userImageSelection.asStateFlow()
+    private val _selectedImage = MutableStateFlow<TaskImageData?>(null)
+    val selectedImage: StateFlow<TaskImageData?> = _selectedImage.asStateFlow()
 
     // Color
     private val _userColorSelection = MutableStateFlow(UserColorSelection.OFF)
@@ -323,6 +337,7 @@ class AddTaskViewModel @Inject constructor(
             currentDays.add(day)
         }
         _monthlySelectedDays.value = currentDays
+        _allMonthDaysSelected.value = currentDays.size == 31
     }
     fun selectAllMonthlySelectedMonths() {
         _monthlySelectedMonths.value = (1..12).toSet()
@@ -333,13 +348,13 @@ class AddTaskViewModel @Inject constructor(
     fun toggleMonthlyDaySelection(newSelection: RepeatMonthlyDaySelection) {
         _userMonthlyDaySelection.value = newSelection
     }
-    fun toggleAllMonthSelectedDays() {
-        if (_allMonthDaysSelected.value) {
-            _monthlySelectedDays.value = emptySet()
-        } else {
-            _monthlySelectedDays.value = (1..31).toSet()
-        }
-        _allMonthDaysSelected.value = !_allMonthDaysSelected.value
+    fun selectAllMonthlySelectedDays() {
+        _monthlySelectedDays.value = (1..31).toSet()
+        _allMonthDaysSelected.value = true
+    }
+    fun deselectAllMonthlySelectedDays() {
+        _monthlySelectedDays.value = emptySet()
+        _allMonthDaysSelected.value = false
     }
 
     // Remind
@@ -421,6 +436,15 @@ class AddTaskViewModel @Inject constructor(
     fun setSelectedAudioFile(fileName: String) {
         _selectedAudioFile.value = fileName
     }
+    fun toggleNoteSelection() {
+        _userNoteSelection.value = _userNoteSelection.value.toggle()
+        if (_userNoteSelection.value == UserNoteSelection.OFF) {
+            _selectedNote.value = ""
+        }
+    }
+    fun setSelectedNote(note: String) {
+        _selectedNote.value = note
+    }
     fun toggleVibrateSelection() {
         _userVibrateSelection.value = _userVibrateSelection.value.toggle()
     }
@@ -436,9 +460,6 @@ class AddTaskViewModel @Inject constructor(
     // Location
     fun toggleLocationSelection() {
         _userLocationSelection.value = _userLocationSelection.value.toggle()
-        if (_userLocationSelection.value == UserLocationSelection.OFF) {
-            _selectedLocations.value = emptyList()
-        }
     }
     fun generateRandomLocation() {
         val latitude = Random.nextDouble(from = -90.0, until = 90.0)
@@ -485,6 +506,31 @@ class AddTaskViewModel @Inject constructor(
         _selectedLocations.value = updatedLocations
         _userLocationSelection.value =
             if (updatedLocations.isEmpty()) UserLocationSelection.OFF else UserLocationSelection.ON
+    }
+
+    // Image
+    fun toggleImageSelection() {
+        _userImageSelection.value = _userImageSelection.value.toggle()
+    }
+    fun setImageFromGallery(uri: Uri, displayName: String?) {
+        val label = displayName?.takeIf { it.isNotBlank() } ?: AddTaskStrings.NO_IMAGE_SELECTED
+        _selectedImage.value = TaskImageData(
+            displayName = label,
+            uri = uri,
+            bitmap = null,
+            source = TaskImageSource.GALLERY
+        )
+    }
+    fun setImageFromCamera(bitmap: Bitmap, displayName: String = AddTaskStrings.CAPTURED_IMAGE) {
+        _selectedImage.value = TaskImageData(
+            displayName = displayName,
+            uri = null,
+            bitmap = bitmap,
+            source = TaskImageSource.CAMERA
+        )
+    }
+    fun clearSelectedImage() {
+        _selectedImage.value = null
     }
 
     // Misc

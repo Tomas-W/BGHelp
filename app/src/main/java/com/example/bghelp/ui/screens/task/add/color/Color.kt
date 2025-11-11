@@ -9,7 +9,7 @@ import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.UserColorSelection
 
 @Composable
-fun ColorSection(
+fun Color(
     viewModel: AddTaskViewModel
 ) {
     val userColorSelection by viewModel.userColorSelection.collectAsState()

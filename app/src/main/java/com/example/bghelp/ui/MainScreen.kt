@@ -19,6 +19,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.bghelp.ui.components.BottomNavigationBar
 import com.example.bghelp.ui.components.TopBar
 import com.example.bghelp.ui.navigation.Screen
+import com.example.bghelp.ui.theme.MainBlue
+import com.example.bghelp.ui.theme.SecondaryBlue
 import kotlinx.coroutines.launch
 
 @Composable
@@ -70,7 +72,8 @@ fun MainScreen() {
             floatingActionButton = {
                 if (currentScreen in Screen.featureMains) {
                     FloatingActionButton(
-                        onClick = { navigateToAddScreen(navController, currentScreen) }
+                        onClick = { navigateToAddScreen(navController, currentScreen) },
+                        containerColor = MainBlue
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Add,

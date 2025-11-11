@@ -9,7 +9,7 @@ import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.UserTitleSelection
 
 @Composable
-fun TitleSection(
+fun Title(
     viewModel: AddTaskViewModel
 ) {
     val userTitleSelection by viewModel.userTitleSelection.collectAsState()

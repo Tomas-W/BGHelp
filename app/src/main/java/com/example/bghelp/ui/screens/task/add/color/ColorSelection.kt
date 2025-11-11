@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -22,9 +21,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import com.example.bghelp.ui.components.CustomDropdown
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.UserColorChoices
 import com.example.bghelp.ui.theme.Sizes
@@ -65,12 +63,12 @@ fun ColorDropdown(
     }
     val colorStringMap = remember {
         mapOf(
-            UserColorChoices.DEFAULT to AddTaskStrings.DEFAULT,
-            UserColorChoices.RED to AddTaskStrings.RED,
-            UserColorChoices.GREEN to AddTaskStrings.GREEN,
-            UserColorChoices.YELLOW to AddTaskStrings.YELLOW,
-            UserColorChoices.CYAN to AddTaskStrings.CYAN,
-            UserColorChoices.MAGENTA to AddTaskStrings.MAGENTA
+            UserColorChoices.DEFAULT to STR.DEFAULT,
+            UserColorChoices.RED to STR.RED,
+            UserColorChoices.GREEN to STR.GREEN,
+            UserColorChoices.YELLOW to STR.YELLOW,
+            UserColorChoices.CYAN to STR.CYAN,
+            UserColorChoices.MAGENTA to STR.MAGENTA
         )
     }
     val colorMap = remember {
@@ -85,7 +83,7 @@ fun ColorDropdown(
     }
 
     val displayText = remember(selectedColor, colorStringMap) {
-        colorStringMap[selectedColor] ?: AddTaskStrings.SELECT_COLOR
+        colorStringMap[selectedColor] ?: STR.SELECT_COLOR
     }
     val displayColor = remember(selectedColor, colorMap) {
         colorMap[selectedColor] ?: TaskDefault

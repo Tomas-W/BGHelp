@@ -7,8 +7,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings
-import com.example.bghelp.ui.screens.task.add.AddTaskConstants
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
+import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.components.OutlinedStringInput
 import com.example.bghelp.ui.screens.task.add.TitleInputType
@@ -26,10 +26,10 @@ fun InfoSelection(
         modifier = Modifier.fillMaxWidth(),
         value = infoText,
         onValueChange = { viewModel.setInfoText(it) },
-        hint = AddTaskStrings.INFO_HINT,
+        hint = STR.INFO_HINT,
         textStyle = TextStyles.Default.Italic.Small,
-        minLines = AddTaskConstants.INFO_MIN_LINES,
-        maxLines = AddTaskConstants.INFO_MAX_LINES,
+        minLines = CONST.INFO_MIN_LINES,
+        maxLines = CONST.INFO_MAX_LINES,
         isActive = activeTitleInput == TitleInputType.INFO,
         onActiveChange = { active ->
             if (active) {

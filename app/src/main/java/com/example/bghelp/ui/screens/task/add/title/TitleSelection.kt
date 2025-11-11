@@ -6,8 +6,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings
-import com.example.bghelp.ui.screens.task.add.AddTaskConstants
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
+import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.components.OutlinedStringInput
 import com.example.bghelp.ui.screens.task.add.TitleInputType
@@ -23,10 +23,10 @@ fun TitleSelection(
         modifier = Modifier.fillMaxWidth(),
         value = titleText,
         onValueChange = { viewModel.setTitleText(it) },
-        hint = AddTaskStrings.TITLE_HINT,
+        hint = STR.TITLE_HINT,
         textStyle = TextStyles.Default.Bold.Small,
-        minLines = AddTaskConstants.TITLE_MIN_LINES,
-        maxLines = AddTaskConstants.TITLE_MAX_LINES,
+        minLines = CONST.TITLE_MIN_LINES,
+        maxLines = CONST.TITLE_MAX_LINES,
         isActive = activeTitleInput == TitleInputType.TITLE,
         onActiveChange = { active ->
             if (active) {

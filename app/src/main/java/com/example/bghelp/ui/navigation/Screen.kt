@@ -34,12 +34,12 @@ sealed class Screen(
         object Wallpaper : Items("Items Wallpaper", "items/wallpaper")
     }
     
-    // Events Feature Screens
-    sealed class Events(title: String, route: String) : Screen(title, route) {
-        object Main : Events("Events", "events")
-        object Add : Events("Add Event", "events/add")
-        object Calendar : Events("Events Calendar", "events/calendar")
-        object Wallpaper : Events("Events Wallpaper", "events/wallpaper")
+    // Notes Feature Screens
+    sealed class Notes(title: String, route: String) : Screen(title, route) {
+        object Main : Notes("Notes", "notes")
+        object Add : Notes("Add Note", "notes/add")
+        object Calendar : Notes("Notes Calendar", "notes/calendar")
+        object Wallpaper : Notes("Notes Wallpaper", "notes/wallpaper")
     }
     
     // Options Feature Screens (renamed from Settings)
@@ -73,10 +73,10 @@ sealed class Screen(
                 Items.Add.route -> Items.Add
                 Items.Calendar.route -> Items.Calendar
                 Items.Wallpaper.route -> Items.Wallpaper
-                Events.Main.route -> Events.Main
-                Events.Add.route -> Events.Add
-                Events.Calendar.route -> Events.Calendar
-                Events.Wallpaper.route -> Events.Wallpaper
+                Notes.Main.route -> Notes.Main
+                Notes.Add.route -> Notes.Add
+                Notes.Calendar.route -> Notes.Calendar
+                Notes.Wallpaper.route -> Notes.Wallpaper
                 Options.Settings.route -> Options.Settings
                 Options.CreateAlarm.route -> Options.CreateAlarm
                 LocationPicker.route -> LocationPicker
@@ -113,11 +113,11 @@ sealed class Screen(
             Items.Calendar.route
         )
 
-        val eventScreens = listOf(
-            Events.Main.route,
-            Events.Add.route,
-            Events.Wallpaper.route,
-            Events.Calendar.route
+        val noteScreens = listOf(
+            Notes.Main.route,
+            Notes.Add.route,
+            Notes.Wallpaper.route,
+            Notes.Calendar.route
         )
 
         val bottomNavScreens = listOf(
@@ -125,21 +125,21 @@ sealed class Screen(
             Tasks.Main,
             Targets.Main,
             Items.Main,
-            Events.Main
+            Notes.Main
         )
 
         val addScreens = listOf(
             Tasks.Add,
             Targets.Add,
             Items.Add,
-            Events.Add
+            Notes.Add
         )
 
         val calendarScreens = listOf(
             Tasks.Calendar,
             Targets.Calendar,
             Items.Calendar,
-            Events.Calendar
+            Notes.Calendar
         )
 
         val wallpaperScreens = listOf(
@@ -147,12 +147,12 @@ sealed class Screen(
             Tasks.Wallpaper,
             Targets.Wallpaper,
             Items.Wallpaper,
-            Events.Wallpaper
+            Notes.Wallpaper
         )
 
         val optionsScreens = listOf(
             Options.Settings,
-            Options.CreateAlarm
+            Options.CreateAlarm,
         )
 
         val noBottomNavScreens = listOf(
@@ -163,7 +163,7 @@ sealed class Screen(
             Tasks.Main,
             Targets.Main,
             Items.Main,
-            Events.Main
+            Notes.Main
         )
     }
 }

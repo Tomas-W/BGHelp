@@ -54,19 +54,6 @@ fun <T> Header(
             text = userSectionSelection.headerText,
             style = TextStyles.Grey.Bold.Medium
         )
-
-//        if (hasToggle) {
-//            SelectionToggle(
-//                selectedIndex = userSectionSelection.ordinal,
-//                numberOfStates = userSectionSelection.javaClass.enumConstants?.size ?: 2,
-//                enabled = true,
-//                onClick = {
-//                    viewModel.clearAllInputSelections()
-//                    toggleSection()
-//                }
-//            )
-//        }
-
     }
     
     AddTaskSpacerSmall()

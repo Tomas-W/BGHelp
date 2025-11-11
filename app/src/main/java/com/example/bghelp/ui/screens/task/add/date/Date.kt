@@ -12,7 +12,7 @@ import com.example.bghelp.ui.screens.task.add.UserDateSelection
 import com.example.bghelp.ui.screens.task.add.DateField
 
 @Composable
-fun DateSection(
+fun Date(
     viewModel: AddTaskViewModel
 ) {
     val userDateSelection by viewModel.userDateSelection.collectAsState()

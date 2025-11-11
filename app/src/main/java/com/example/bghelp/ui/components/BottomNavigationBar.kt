@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.bghelp.R
 import com.example.bghelp.constants.UiConstants as UI
 import com.example.bghelp.ui.navigation.Screen
@@ -40,7 +41,7 @@ private fun getIconResource(screen: Screen, currentRoute: String?): Int {
             Screen.Tasks.Main -> if (isSelected) R.drawable.tasks_filled else R.drawable.tasks_outlined
             Screen.Targets.Main -> if (isSelected) R.drawable.targets_filled else R.drawable.targets_outlined
             Screen.Items.Main -> if (isSelected) R.drawable.items_filled else R.drawable.items_outlined
-            Screen.Events.Main -> if (isSelected) R.drawable.events_filled else R.drawable.events_outlined
+            Screen.Notes.Main -> if (isSelected) R.drawable.notes_filled else R.drawable.notes_outlined
             else -> R.drawable.tasks_outlined
         }
     }
@@ -125,7 +126,7 @@ fun BottomNavigationBar(
         }
         if (currentRoute != route) {
             navController.navigate(route) {
-                popUpTo(navController.graph.startDestinationId) {
+                popUpTo(navController.graph.findStartDestination().id) {
                     saveState = true
                 }
                 launchSingleTop = true
@@ -174,12 +175,12 @@ fun BottomNavigationBar(
             onClick = { navigateTo(Screen.Items.Main.route) }
         )
 
-        // Events
+        // Notes
         NavigationItem(
-            screen = Screen.Events.Main,
+            screen = Screen.Notes.Main,
             currentRoute = currentRoute,
-            isSelected = currentRoute in Screen.eventScreens,
-            onClick = { navigateTo(Screen.Events.Main.route) }
+            isSelected = currentRoute in Screen.noteScreens,
+            onClick = { navigateTo(Screen.Notes.Main.route) }
         )
     }
 }
