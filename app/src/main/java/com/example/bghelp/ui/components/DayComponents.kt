@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
+import com.example.bghelp.domain.model.Task
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.domain.model.AlarmMode
@@ -63,6 +64,16 @@ fun <T: SchedulableItem> DayComponent(
             description = item.description,
             isExpanded = isExpanded
         )
+        if (isExpanded && item is Task) {
+            val imageAttachment = item.image
+            if (imageAttachment?.uri != null) {
+                Spacer(modifier = Modifier.height(Sizes.Size.Small))
+                TaskImagePreview(
+                    imagePath = imageAttachment.uri,
+                    displayName = imageAttachment.displayName
+                )
+            }
+        }
     }
 }
 
@@ -121,9 +132,15 @@ private fun AlarmIcons(
 
 @Composable
 private fun SoundIcon(soundMode: AlarmMode) {
-    if (soundMode != AlarmMode.OFF) {
+     val iconRes = when (soundMode) {
+         AlarmMode.OFF -> null
+         AlarmMode.ONCE -> R.drawable.sound_once
+         AlarmMode.CONTINUOUS -> R.drawable.sound_continuous
+     }
+
+    if (iconRes != null) {
         Image(
-            painter = painterResource(R.drawable.sound),
+            painter = painterResource(iconRes),
             contentDescription = soundMode.value,
             modifier = Modifier.size(Sizes.Icon.Small)
         )
@@ -134,9 +151,15 @@ private fun SoundIcon(soundMode: AlarmMode) {
 
 @Composable
 private fun VibrateIcon(vibrateMode: AlarmMode) {
-    if (vibrateMode != AlarmMode.OFF) {
+    val iconRes = when (vibrateMode) {
+        AlarmMode.OFF -> null
+        AlarmMode.ONCE -> R.drawable.vibrate_once
+        AlarmMode.CONTINUOUS -> R.drawable.vibrate_continuous
+    }
+
+    if (iconRes != null) {
         Image(
-            painter = painterResource(R.drawable.vibrate),
+            painter = painterResource(iconRes),
             contentDescription = vibrateMode.value,
             modifier = Modifier.size(Sizes.Icon.Small)
         )

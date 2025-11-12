@@ -1,6 +1,7 @@
 package com.example.bghelp.ui.screens.task.add
 
 import android.graphics.Bitmap
+import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,11 +16,16 @@ import com.example.bghelp.domain.model.TaskImageSourceOption
 import com.example.bghelp.domain.model.TaskLocationEntry
 import com.example.bghelp.domain.model.TaskReminderEntry
 import com.example.bghelp.utils.AudioManager
+import com.example.bghelp.utils.TaskImageStorage
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings.NO_IMAGE_SELECTED
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -27,12 +33,16 @@ import java.time.LocalTime
 import java.time.YearMonth
 import javax.inject.Inject
 import java.util.Locale
+import java.util.UUID
+import java.io.File
+import java.io.FileOutputStream
 import kotlin.random.Random
 
 @HiltViewModel
 class AddTaskViewModel @Inject constructor(
     val audioManager: AudioManager,
-    private val taskRepository: TaskRepository
+    private val taskRepository: TaskRepository,
+    @ApplicationContext private val appContext: Context
 ) : ViewModel() {
     
     // Title selection
@@ -104,9 +114,8 @@ class AddTaskViewModel @Inject constructor(
     val monthlySelectedDays: StateFlow<Set<Int>> = _monthlySelectedDays.asStateFlow()
     private val _allMonthDaysSelected = MutableStateFlow(true)
     val allMonthDaysSelected: StateFlow<Boolean> = _allMonthDaysSelected.asStateFlow()
-
+    // RRULE
     private val _repeatRRule = MutableStateFlow<String?>(null)
-    val repeatRRule: StateFlow<String?> = _repeatRRule.asStateFlow()
 
     // Reminder selection
     private val _userRemindSelection = MutableStateFlow(UserRemindSelection.OFF)
@@ -690,10 +699,11 @@ class AddTaskViewModel @Inject constructor(
 
     fun saveTask() {
         if (_saveState.value == SaveTaskState.Saving) return
+        _saveState.value = SaveTaskState.Saving
         viewModelScope.launch {
-            _saveState.value = SaveTaskState.Saving
             try {
-                val task = buildCreateTask()
+                val imageAttachment = persistSelectedImageIfNeeded()
+                val task = buildCreateTask(imageAttachment)
                 taskRepository.addTask(task)
                 _saveState.value = SaveTaskState.Success
             } catch (t: Throwable) {
@@ -706,7 +716,9 @@ class AddTaskViewModel @Inject constructor(
         _saveState.value = SaveTaskState.Idle
     }
 
-    private fun buildCreateTask(): CreateTask {
+    private fun buildCreateTask(
+        imageAttachment: TaskImageAttachment?
+    ): CreateTask {
         val allDay = _userDateSelection.value == UserDateSelection.ON
         val startDate = _dateStartSelection.value
         val startTime = if (allDay) LocalTime.MIDNIGHT else _timeStartSelection.value
@@ -737,7 +749,6 @@ class AddTaskViewModel @Inject constructor(
             emptyList()
         }
 
-        val image = _selectedImage.value?.toDomainImage()
         val locations = buildLocations()
 
         return CreateTask(
@@ -755,7 +766,7 @@ class AddTaskViewModel @Inject constructor(
             soundUri = _selectedAudioFile.value.takeIf { it.isNotBlank() },
             snoozeTime = 0,
             color = _selectedColor.value.toDomainColor(),
-            image = image,
+            image = imageAttachment,
             reminders = reminders,
             locations = locations
         )
@@ -805,13 +816,83 @@ class AddTaskViewModel @Inject constructor(
         UserColorChoices.MAGENTA -> TaskColorOption.MAGENTA
     }
 
-    private fun TaskImageData.toDomainImage(): TaskImageAttachment? {
-        val source = source.toDomainSource() ?: return null
-        return TaskImageAttachment(
-            uri = uri?.toString(),
-            displayName = displayName.takeIf { it.isNotBlank() },
-            source = source
-        )
+    private suspend fun persistSelectedImageIfNeeded(): TaskImageAttachment? {
+        if (_userImageSelection.value != UserImageSelection.ON) return null
+        val selectedImage = _selectedImage.value ?: return null
+        val source = selectedImage.source.toDomainSource() ?: return null
+        return withContext(Dispatchers.IO) {
+            val directory = TaskImageStorage.taskImageDirectory(appContext)
+            val extension = resolveImageExtension(selectedImage)
+            val fileName = "${UUID.randomUUID()}.$extension"
+            val targetFile = File(directory, fileName)
+
+            try {
+                when {
+                    selectedImage.bitmap != null -> {
+                        FileOutputStream(targetFile).use { stream ->
+                            val format = extension.toCompressFormat()
+                            val success = selectedImage.bitmap.compress(format, 92, stream)
+                            if (!success) {
+                                throw IllegalStateException("Unable to persist image: compression failed.")
+                            }
+                        }
+                    }
+                    selectedImage.uri != null -> {
+                        appContext.contentResolver.openInputStream(selectedImage.uri)?.use { input ->
+                            FileOutputStream(targetFile).use { output ->
+                                input.copyTo(output)
+                            }
+                        } ?: throw IllegalStateException("Unable to open selected image stream.")
+                    }
+                    else -> return@withContext null
+                }
+
+                val storedDisplayName = selectedImage.displayName
+                    .takeUnless { it.isBlank() || it == NO_IMAGE_SELECTED }
+                TaskImageAttachment(
+                    uri = TaskImageStorage.buildRelativePath(targetFile.name),
+                    displayName = storedDisplayName,
+                    source = source
+                )
+            } catch (throwable: Throwable) {
+                if (targetFile.exists()) {
+                    targetFile.delete()
+                }
+                throw throwable
+            }
+        }
+    }
+
+    private fun resolveImageExtension(image: TaskImageData): String {
+        val fromMime = image.uri?.let { uri ->
+            appContext.contentResolver.getType(uri)?.substringAfterLast("/")
+        }
+        val normalizedMime = fromMime?.let(::normalizeExtension)
+        if (normalizedMime != null) return normalizedMime
+
+        val fromName = image.displayName.substringAfterLast(".", "")
+        val normalizedName = normalizeExtension(fromName)
+        if (normalizedName != null) return normalizedName
+
+        return "jpg"
+    }
+
+    private fun normalizeExtension(raw: String?): String? {
+        if (raw.isNullOrBlank()) return null
+        val cleaned = raw.lowercase(Locale.getDefault())
+        return when (cleaned) {
+            "jpeg" -> "jpg"
+            "jpg" -> "jpg"
+            "png" -> "png"
+            "webp" -> "webp"
+            else -> null
+        }
+    }
+
+    private fun String.toCompressFormat(): Bitmap.CompressFormat = when (lowercase(Locale.getDefault())) {
+        "png" -> Bitmap.CompressFormat.PNG
+        "webp" -> Bitmap.CompressFormat.WEBP
+        else -> Bitmap.CompressFormat.JPEG
     }
 
     private fun TaskImageSource.toDomainSource(): TaskImageSourceOption? = when (this) {

@@ -1,12 +1,16 @@
 package com.example.bghelp.ui.screens.task.main
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bghelp.data.repository.TaskRepository
 import com.example.bghelp.domain.model.CreateTask
 import com.example.bghelp.domain.model.Task
+import com.example.bghelp.utils.TaskImageStorage
 import com.example.bghelp.utils.getEpochRange
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,6 +20,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -25,7 +30,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TaskViewModel @Inject constructor(
-    private val taskRepository: TaskRepository
+    private val taskRepository: TaskRepository,
+    @ApplicationContext private val appContext: Context
 ) : ViewModel() {
     private val _selectedDate = MutableStateFlow<LocalDateTime>(LocalDateTime.now())
     val selectedDate: StateFlow<LocalDateTime> = _selectedDate.asStateFlow()
@@ -110,6 +116,13 @@ class TaskViewModel @Inject constructor(
     fun deleteTask(task: Task) {
         viewModelScope.launch {
             taskRepository.deleteTask(task)
+            task.image?.uri?.let { relativePath ->
+                withContext(Dispatchers.IO) {
+                    runCatching {
+                        TaskImageStorage.deleteImage(appContext, relativePath)
+                    }
+                }
+            }
         }
     }
 

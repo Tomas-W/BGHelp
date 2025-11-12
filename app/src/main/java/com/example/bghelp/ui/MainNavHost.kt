@@ -1,12 +1,17 @@
 package com.example.bghelp.ui
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
@@ -36,6 +41,23 @@ import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 
 private const val OVERLAY_GRAPH_ROUTE = "overlay_graph"
 
+private inline fun NavGraphBuilder.noTransitionComposable(
+    route: String,
+    arguments: List<NamedNavArgument> = emptyList(),
+    crossinline content: @Composable (NavBackStackEntry) -> Unit
+) {
+    composable(
+        route = route,
+        arguments = arguments,
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None }
+    ) { backStackEntry ->
+        content(backStackEntry)
+    }
+}
+
 @Composable
 fun BottomNavHost(
     navController: NavHostController,
@@ -46,11 +68,21 @@ fun BottomNavHost(
         startDestination = Screen.Tasks.Main.route,
         modifier = modifier
     ) {
-        composable(Screen.Home.Main.route) { HomeScreen() }
-        composable(Screen.Tasks.Main.route) { TaskScreen() }
-        composable(Screen.Targets.Main.route) { TargetScreen() }
-        composable(Screen.Items.Main.route) { ItemScreen() }
-        composable(Screen.Notes.Main.route) { NoteScreen() }
+        noTransitionComposable(route = Screen.Home.Main.route) { _ ->
+            HomeScreen()
+        }
+        noTransitionComposable(route = Screen.Tasks.Main.route) { _ ->
+            TaskScreen()
+        }
+        noTransitionComposable(route = Screen.Targets.Main.route) { _ ->
+            TargetScreen()
+        }
+        noTransitionComposable(route = Screen.Items.Main.route) { _ ->
+            ItemScreen()
+        }
+        noTransitionComposable(route = Screen.Notes.Main.route) { _ ->
+            NoteScreen()
+        }
     }
 }
 
@@ -65,10 +97,12 @@ fun OverlayNavHost(
         modifier = modifier,
         route = OVERLAY_GRAPH_ROUTE
     ) {
-        composable("empty") { /* Empty placeholder */ }
+        noTransitionComposable(route = "empty") { _ ->
+            /* Empty placeholder */
+        }
 
         // Add screens (full screens)
-        composable(Screen.Tasks.Add.route) { backStackEntry ->
+        noTransitionComposable(route = Screen.Tasks.Add.route) { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(OVERLAY_GRAPH_ROUTE)
             }
@@ -79,7 +113,7 @@ fun OverlayNavHost(
             )
         }
 
-        composable(Screen.Targets.Add.route) { backStackEntry ->
+        noTransitionComposable(route = Screen.Targets.Add.route) { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(OVERLAY_GRAPH_ROUTE)
             }
@@ -90,7 +124,7 @@ fun OverlayNavHost(
             )
         }
 
-        composable(Screen.Items.Add.route) { backStackEntry ->
+        noTransitionComposable(route = Screen.Items.Add.route) { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(OVERLAY_GRAPH_ROUTE)
             }
@@ -101,7 +135,7 @@ fun OverlayNavHost(
             )
         }
 
-        composable(Screen.Notes.Add.route) { backStackEntry ->
+        noTransitionComposable(route = Screen.Notes.Add.route) { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(OVERLAY_GRAPH_ROUTE)
             }
@@ -113,7 +147,7 @@ fun OverlayNavHost(
         }
 
         // Options screens
-        composable(Screen.Options.Settings.route) {
+        noTransitionComposable(route = Screen.Options.Settings.route) { _ ->
             SettingsScreen(
                 onNavigateToCreateAlarm = {
                     navController.navigate(Screen.Options.CreateAlarm.route) {
@@ -123,11 +157,11 @@ fun OverlayNavHost(
             )
         }
 
-        composable(Screen.Options.CreateAlarm.route) {
+        noTransitionComposable(route = Screen.Options.CreateAlarm.route) { _ ->
             CreateAlarmScreen()
         }
 
-        composable(
+        noTransitionComposable(
             route = Screen.LocationPicker.ROUTE_WITH_ARGS,
             arguments = listOf(
                 navArgument(Screen.LocationPicker.ALLOW_MULTIPLE_ARG) {
@@ -146,11 +180,21 @@ fun OverlayNavHost(
         }
 
         // Wallpaper screens for each feature
-        composable(Screen.Home.Wallpaper.route) { HomeWallpaperScreen() }
-        composable(Screen.Tasks.Wallpaper.route) { TaskWallpaperScreen() }
-        composable(Screen.Targets.Wallpaper.route) { TargetWallpaperScreen() }
-        composable(Screen.Items.Wallpaper.route) { ItemWallpaperScreen() }
-        composable(Screen.Notes.Wallpaper.route) { NoteWallpaperScreen() }
+        noTransitionComposable(route = Screen.Home.Wallpaper.route) { _ ->
+            HomeWallpaperScreen()
+        }
+        noTransitionComposable(route = Screen.Tasks.Wallpaper.route) { _ ->
+            TaskWallpaperScreen()
+        }
+        noTransitionComposable(route = Screen.Targets.Wallpaper.route) { _ ->
+            TargetWallpaperScreen()
+        }
+        noTransitionComposable(route = Screen.Items.Wallpaper.route) { _ ->
+            ItemWallpaperScreen()
+        }
+        noTransitionComposable(route = Screen.Notes.Wallpaper.route) { _ ->
+            NoteWallpaperScreen()
+        }
     }
 }
 

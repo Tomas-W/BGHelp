@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.bghelp.ui.components.MainContentContainer
-import com.example.bghelp.ui.components.SchedulableContainer
 import com.example.bghelp.ui.screens.task.add.title.Title
 import com.example.bghelp.ui.screens.task.add.date.Date
 import com.example.bghelp.ui.screens.task.add.remind.Remind
@@ -39,7 +38,6 @@ fun AddTaskScreen(
     navController: NavController,
     viewModel: AddTaskViewModel
 ) {
-    val repeatRuleState = viewModel.repeatRRule.collectAsState()
     val saveState by viewModel.saveState.collectAsState()
     val scrollState = rememberScrollState()
 
@@ -65,15 +63,6 @@ fun AddTaskScreen(
                     .weight(1f, fill = true)
                     .verticalScroll(scrollState)
             ) {
-                repeatRuleState.value?.let { rule ->
-                    AddTaskSpacerLarge()
-                    Text(
-                        text = rule,
-                        style = TextStyles.Grey.Small
-                    )
-                    AddTaskSpacerMedium()
-                }
-
                 AddTaskSpacerLarge()
 
                 Title(viewModel = viewModel)
