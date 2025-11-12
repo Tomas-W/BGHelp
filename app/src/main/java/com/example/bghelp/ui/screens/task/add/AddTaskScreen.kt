@@ -1,15 +1,26 @@
 package com.example.bghelp.ui.screens.task.add
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.bghelp.ui.components.MainContentContainer
+import com.example.bghelp.ui.components.SchedulableContainer
 import com.example.bghelp.ui.screens.task.add.title.Title
 import com.example.bghelp.ui.screens.task.add.date.Date
 import com.example.bghelp.ui.screens.task.add.remind.Remind
@@ -19,15 +30,26 @@ import com.example.bghelp.ui.screens.task.add.location.Location
 import com.example.bghelp.ui.screens.task.add.image.Image
 import com.example.bghelp.ui.screens.task.add.note.Note
 import com.example.bghelp.ui.theme.Sizes
+import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.utils.dismissKeyboardOnTap
 
- 
 
 @Composable
 fun AddTaskScreen(
     navController: NavController,
     viewModel: AddTaskViewModel
 ) {
+    val repeatRuleState = viewModel.repeatRRule.collectAsState()
+    val saveState by viewModel.saveState.collectAsState()
+    val scrollState = rememberScrollState()
+
+    LaunchedEffect(saveState) {
+        if (saveState is AddTaskViewModel.SaveTaskState.Success) {
+            navController.popBackStack()
+            viewModel.consumeSaveState()
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -35,50 +57,89 @@ fun AddTaskScreen(
                 viewModel.clearAllInputSelections()
             }
     ) {
-        MainContentContainer(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            AddTaskSpacerLarge()
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            MainContentContainer(
+                modifier = Modifier
+                    .weight(1f, fill = true)
+                    .verticalScroll(scrollState)
+            ) {
+                repeatRuleState.value?.let { rule ->
+                    AddTaskSpacerLarge()
+                    Text(
+                        text = rule,
+                        style = TextStyles.Grey.Small
+                    )
+                    AddTaskSpacerMedium()
+                }
 
-            Title(viewModel = viewModel)
+                AddTaskSpacerLarge()
 
-            AddTaskDivider()
+                Title(viewModel = viewModel)
 
-            Date(viewModel = viewModel)
+                AddTaskDivider()
 
-            AddTaskDivider()
+                Date(viewModel = viewModel)
 
-            Repeat(viewModel = viewModel)
+                AddTaskDivider()
 
-            AddTaskDivider()
+                Repeat(viewModel = viewModel)
 
-            Remind(
-                viewModel = viewModel,
-                navController = navController
-            )
+                AddTaskDivider()
 
-            AddTaskDivider()
+                Remind(
+                    viewModel = viewModel,
+                    navController = navController
+                )
 
-            Note(
-                viewModel = viewModel,
-                navController = navController
-            )
+                AddTaskDivider()
 
-            AddTaskDivider()
+                Note(
+                    viewModel = viewModel,
+                    navController = navController
+                )
 
-            Location(
-                viewModel = viewModel,
-                navController = navController,
-                allowMultiple = true
-            )
+                AddTaskDivider()
 
-            AddTaskDivider()
+                Location(
+                    viewModel = viewModel,
+                    navController = navController,
+                    allowMultiple = true
+                )
 
-            Image(
-                viewModel = viewModel
-            )
+                AddTaskDivider()
 
-            AddTaskDivider()
+                Image(
+                    viewModel = viewModel
+                )
 
-            Color(viewModel = viewModel)
+                AddTaskDivider()
+
+                Color(viewModel = viewModel)
+
+                AddTaskSpacerLarge()
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Button(
+                    onClick = { viewModel.saveTask() },
+                    enabled = saveState != AddTaskViewModel.SaveTaskState.Saving,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = if (saveState == AddTaskViewModel.SaveTaskState.Saving) {
+                            "Saving..."
+                        } else {
+                            "Save Task"
+                        }
+                    )
+                }
+            }
         }
     }
 }

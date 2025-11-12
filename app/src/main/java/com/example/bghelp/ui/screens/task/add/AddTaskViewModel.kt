@@ -3,11 +3,24 @@ package com.example.bghelp.ui.screens.task.add
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.bghelp.data.repository.TaskRepository
+import com.example.bghelp.domain.model.AlarmMode
+import com.example.bghelp.domain.model.CreateTask
+import com.example.bghelp.domain.model.ReminderKind
+import com.example.bghelp.domain.model.ReminderOffsetUnit
+import com.example.bghelp.domain.model.TaskColorOption
+import com.example.bghelp.domain.model.TaskImageAttachment
+import com.example.bghelp.domain.model.TaskImageSourceOption
+import com.example.bghelp.domain.model.TaskLocationEntry
+import com.example.bghelp.domain.model.TaskReminderEntry
 import com.example.bghelp.utils.AudioManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -18,7 +31,8 @@ import kotlin.random.Random
 
 @HiltViewModel
 class AddTaskViewModel @Inject constructor(
-    val audioManager: AudioManager
+    val audioManager: AudioManager,
+    private val taskRepository: TaskRepository
 ) : ViewModel() {
     
     // Title selection
@@ -91,6 +105,9 @@ class AddTaskViewModel @Inject constructor(
     private val _allMonthDaysSelected = MutableStateFlow(true)
     val allMonthDaysSelected: StateFlow<Boolean> = _allMonthDaysSelected.asStateFlow()
 
+    private val _repeatRRule = MutableStateFlow<String?>(null)
+    val repeatRRule: StateFlow<String?> = _repeatRRule.asStateFlow()
+
     // Reminder selection
     private val _userRemindSelection = MutableStateFlow(UserRemindSelection.OFF)
     val userRemindSelection: StateFlow<UserRemindSelection> = _userRemindSelection.asStateFlow()
@@ -143,8 +160,12 @@ class AddTaskViewModel @Inject constructor(
     private val _keyboardDismissKey = MutableStateFlow(0)
     val keyboardDismissKey: StateFlow<Int> = _keyboardDismissKey.asStateFlow()
 
+    private val _saveState = MutableStateFlow<SaveTaskState>(SaveTaskState.Idle)
+    val saveState: StateFlow<SaveTaskState> = _saveState.asStateFlow()
+
     init {
         updateTimeValidationState()
+        refreshRepeatRule()
     }
 
     private fun updateTimeValidationState() {
@@ -201,6 +222,7 @@ class AddTaskViewModel @Inject constructor(
             }
         }
         updateTimeValidationState()
+        refreshRepeatRule()
     }
     fun toggleEndDateVisible() {
         if (_isEndDateVisible.value) {
@@ -223,6 +245,7 @@ class AddTaskViewModel @Inject constructor(
         hiddenDateEndValue = date
         _dateStartSelection.value = _dateStartSelection.value.coerceAtMost(date)
         updateTimeValidationState()
+        refreshRepeatRule()
     }
     fun setTimeStart(time: LocalTime) {
         _timeStartSelection.value = time
@@ -307,6 +330,7 @@ class AddTaskViewModel @Inject constructor(
     // Repeat
     fun toggleRepeatSelection() {
         _userRepeatSelection.value = _userRepeatSelection.value.toggle()
+        refreshRepeatRule()
     }
     fun toggleWeeklySelectedDays(day: Int) {
         val currentDays = _weeklySelectedDays.value.toMutableSet()
@@ -316,9 +340,11 @@ class AddTaskViewModel @Inject constructor(
             currentDays.add(day)
         }
         _weeklySelectedDays.value = currentDays
+        refreshRepeatRule()
     }
     fun setWeeklyIntervalWeeks(weeks: Int) {
         _weeklyIntervalWeeks.value = weeks
+        refreshRepeatRule()
     }
     fun toggleMonthlySelectedMonths(month: Int) {
         val currentMonths = _monthlySelectedMonths.value.toMutableSet()
@@ -328,6 +354,7 @@ class AddTaskViewModel @Inject constructor(
             currentMonths.add(month)
         }
         _monthlySelectedMonths.value = currentMonths
+        refreshRepeatRule()
     }
     fun toggleMonthSelectedDays(day: Int) {
         val currentDays = _monthlySelectedDays.value.toMutableSet()
@@ -338,23 +365,143 @@ class AddTaskViewModel @Inject constructor(
         }
         _monthlySelectedDays.value = currentDays
         _allMonthDaysSelected.value = currentDays.size == 31
+        refreshRepeatRule()
     }
     fun selectAllMonthlySelectedMonths() {
         _monthlySelectedMonths.value = (1..12).toSet()
+        refreshRepeatRule()
     }
     fun deselectAllMonthlySelectedMonths() {
         _monthlySelectedMonths.value = emptySet()
+        refreshRepeatRule()
     }
     fun toggleMonthlyDaySelection(newSelection: RepeatMonthlyDaySelection) {
         _userMonthlyDaySelection.value = newSelection
+        refreshRepeatRule()
     }
     fun selectAllMonthlySelectedDays() {
         _monthlySelectedDays.value = (1..31).toSet()
         _allMonthDaysSelected.value = true
+        refreshRepeatRule()
     }
     fun deselectAllMonthlySelectedDays() {
         _monthlySelectedDays.value = emptySet()
         _allMonthDaysSelected.value = false
+        refreshRepeatRule()
+    }
+
+    private fun buildRepeatRRule(
+        selection: UserRepeatSelection,
+        weeklyDays: Set<Int>,
+        weeklyInterval: Int,
+        monthlyMonths: Set<Int>,
+        monthlyDaySelection: RepeatMonthlyDaySelection,
+        monthlyDays: Set<Int>,
+        startDate: LocalDate
+    ): String? {
+        return when (selection) {
+            UserRepeatSelection.OFF -> null
+            UserRepeatSelection.WEEKLY -> buildWeeklyRRule(
+                weeklyDays = weeklyDays,
+                weeklyInterval = weeklyInterval,
+                startDate = startDate
+            )
+            UserRepeatSelection.MONTHLY -> buildMonthlyRRule(
+                selectedMonths = monthlyMonths,
+                monthlyDaySelection = monthlyDaySelection,
+                selectedDays = monthlyDays,
+                startDate = startDate
+            )
+        }
+    }
+
+    private fun buildWeeklyRRule(
+        weeklyDays: Set<Int>,
+        weeklyInterval: Int,
+        startDate: LocalDate
+    ): String {
+        val normalizedDays = weeklyDays.mapNotNull { it.toDayOfWeekOrNull() }
+        val effectiveDays = if (normalizedDays.isEmpty()) {
+            listOf(startDate.dayOfWeek)
+        } else {
+            normalizedDays
+        }
+        val dayTokens = effectiveDays
+            .distinct()
+            .sortedBy { it.value }
+            .joinToString(",") { it.toRRuleToken() }
+
+        return buildString {
+            append("FREQ=WEEKLY")
+            if (weeklyInterval > 1) {
+                append(";INTERVAL=$weeklyInterval")
+            }
+            append(";BYDAY=$dayTokens")
+        }
+    }
+
+    private fun buildMonthlyRRule(
+        selectedMonths: Set<Int>,
+        monthlyDaySelection: RepeatMonthlyDaySelection,
+        selectedDays: Set<Int>,
+        startDate: LocalDate
+    ): String {
+        val months = selectedMonths
+            .filter { it in 1..12 }
+            .distinct()
+            .sorted()
+            .let {
+                when {
+                    it.isEmpty() -> listOf(startDate.monthValue)
+                    it.size == 12 -> emptyList()
+                    else -> it
+                }
+            }
+
+        val days = when (monthlyDaySelection) {
+            RepeatMonthlyDaySelection.ALL -> (1..31).toList()
+            RepeatMonthlyDaySelection.SELECT -> {
+                val normalized = selectedDays.filter { it in 1..31 }.distinct().sorted()
+                if (normalized.isEmpty()) listOf(startDate.dayOfMonth) else normalized
+            }
+            RepeatMonthlyDaySelection.LAST -> listOf(-1)
+        }
+
+        return buildString {
+            append("FREQ=MONTHLY")
+            if (months.isNotEmpty()) {
+                append(";BYMONTH=${months.joinToString(",")}")
+            }
+            if (days.isNotEmpty()) {
+                append(";BYMONTHDAY=${days.joinToString(",")}")
+            }
+        }
+    }
+
+    private fun Int.toDayOfWeekOrNull(): DayOfWeek? = runCatching {
+        DayOfWeek.of(this)
+    }.getOrNull()
+
+    private fun DayOfWeek.toRRuleToken(): String = when (this) {
+        DayOfWeek.MONDAY -> "MO"
+        DayOfWeek.TUESDAY -> "TU"
+        DayOfWeek.WEDNESDAY -> "WE"
+        DayOfWeek.THURSDAY -> "TH"
+        DayOfWeek.FRIDAY -> "FR"
+        DayOfWeek.SATURDAY -> "SA"
+        DayOfWeek.SUNDAY -> "SU"
+    }
+
+    private fun refreshRepeatRule() {
+        _repeatRRule.value = buildRepeatRRule(
+            selection = _userRepeatSelection.value,
+            weeklyDays = _weeklySelectedDays.value,
+            weeklyInterval = _weeklyIntervalWeeks.value,
+            monthlyMonths = _monthlySelectedMonths.value,
+            monthlyDaySelection = _userMonthlyDaySelection.value,
+            monthlyDays = _monthlySelectedDays.value,
+            startDate = _dateStartSelection.value
+        )
     }
 
     // Remind
@@ -539,5 +686,154 @@ class AddTaskViewModel @Inject constructor(
         clearReminderInputSelection()
         clearTitleInputSelection()
         setCalendarVisible(false)
+    }
+
+    fun saveTask() {
+        if (_saveState.value == SaveTaskState.Saving) return
+        viewModelScope.launch {
+            _saveState.value = SaveTaskState.Saving
+            try {
+                val task = buildCreateTask()
+                taskRepository.addTask(task)
+                _saveState.value = SaveTaskState.Success
+            } catch (t: Throwable) {
+                _saveState.value = SaveTaskState.Error(t)
+            }
+        }
+    }
+
+    fun consumeSaveState() {
+        _saveState.value = SaveTaskState.Idle
+    }
+
+    private fun buildCreateTask(): CreateTask {
+        val allDay = _userDateSelection.value == UserDateSelection.ON
+        val startDate = _dateStartSelection.value
+        val startTime = if (allDay) LocalTime.MIDNIGHT else _timeStartSelection.value
+        val startDateTime = LocalDateTime.of(startDate, startTime)
+
+        val hasEnd = _isEndDateVisible.value || _isEndTimeVisible.value
+        val endDate = if (_isEndDateVisible.value) _dateEndSelection.value else null
+        val endTime = if (_isEndTimeVisible.value) _timeEndSelection.value else null
+        val effectiveEndDate = when {
+            hasEnd -> endDate ?: startDate
+            else -> null
+        }
+        val effectiveEndTime = when {
+            !hasEnd -> null
+            endTime != null -> endTime
+            allDay -> LocalTime.of(23, 59)
+            else -> _timeStartSelection.value
+        }
+        val endDateTime = if (effectiveEndDate != null && effectiveEndTime != null) {
+            LocalDateTime.of(effectiveEndDate, effectiveEndTime)
+        } else {
+            null
+        }
+
+        val reminders = if (_userRemindSelection.value == UserRemindSelection.ON) {
+            buildReminders()
+        } else {
+            emptyList()
+        }
+
+        val image = _selectedImage.value?.toDomainImage()
+        val locations = buildLocations()
+
+        return CreateTask(
+            date = startDateTime,
+            endDate = endDateTime,
+            allDay = allDay,
+            title = _titleText.value,
+            description = _infoText.value.takeIf { it.isNotBlank() },
+            note = _selectedNote.value.takeIf { it.isNotBlank() },
+            rrule = _repeatRRule.value,
+            expired = false,
+            alarmName = _selectedAudioFile.value.takeIf { it.isNotBlank() },
+            sound = _userSoundSelection.value.toAlarmMode(),
+            vibrate = _userVibrateSelection.value.toAlarmMode(),
+            soundUri = _selectedAudioFile.value.takeIf { it.isNotBlank() },
+            snoozeTime = 0,
+            color = _selectedColor.value.toDomainColor(),
+            image = image,
+            reminders = reminders,
+            locations = locations
+        )
+    }
+
+    private fun buildReminders(): List<TaskReminderEntry> {
+        val start = _startReminders.value.mapNotNull { it.toDomain(ReminderKind.START) }
+        val end = _endReminders.value.mapNotNull { it.toDomain(ReminderKind.END) }
+        return start + end
+    }
+
+    private fun Reminder.toDomain(type: ReminderKind): TaskReminderEntry? {
+        val unit = timeUnit.toDomainUnit() ?: return null
+        return TaskReminderEntry(
+            type = type,
+            offsetValue = value,
+            offsetUnit = unit
+        )
+    }
+
+    private fun TimeUnit.toDomainUnit(): ReminderOffsetUnit? = when (this) {
+        TimeUnit.MINUTES -> ReminderOffsetUnit.MINUTES
+        TimeUnit.HOURS -> ReminderOffsetUnit.HOURS
+        TimeUnit.DAYS -> ReminderOffsetUnit.DAYS
+        TimeUnit.WEEKS -> ReminderOffsetUnit.WEEKS
+        TimeUnit.MONTHS -> ReminderOffsetUnit.MONTHS
+    }
+
+    private fun UserSoundSelection.toAlarmMode(): AlarmMode = when (this) {
+        UserSoundSelection.OFF -> AlarmMode.OFF
+        UserSoundSelection.ONCE -> AlarmMode.ONCE
+        UserSoundSelection.CONTINUOUS -> AlarmMode.CONTINUOUS
+    }
+
+    private fun UserVibrateSelection.toAlarmMode(): AlarmMode = when (this) {
+        UserVibrateSelection.OFF -> AlarmMode.OFF
+        UserVibrateSelection.ONCE -> AlarmMode.ONCE
+        UserVibrateSelection.CONTINUOUS -> AlarmMode.CONTINUOUS
+    }
+
+    private fun UserColorChoices.toDomainColor(): TaskColorOption = when (this) {
+        UserColorChoices.DEFAULT -> TaskColorOption.DEFAULT
+        UserColorChoices.RED -> TaskColorOption.RED
+        UserColorChoices.GREEN -> TaskColorOption.GREEN
+        UserColorChoices.YELLOW -> TaskColorOption.YELLOW
+        UserColorChoices.CYAN -> TaskColorOption.CYAN
+        UserColorChoices.MAGENTA -> TaskColorOption.MAGENTA
+    }
+
+    private fun TaskImageData.toDomainImage(): TaskImageAttachment? {
+        val source = source.toDomainSource() ?: return null
+        return TaskImageAttachment(
+            uri = uri?.toString(),
+            displayName = displayName.takeIf { it.isNotBlank() },
+            source = source
+        )
+    }
+
+    private fun TaskImageSource.toDomainSource(): TaskImageSourceOption? = when (this) {
+        TaskImageSource.GALLERY -> TaskImageSourceOption.GALLERY
+        TaskImageSource.CAMERA -> TaskImageSourceOption.CAMERA
+    }
+
+    private fun buildLocations(): List<TaskLocationEntry> =
+        _selectedLocations.value.mapIndexed { index, location ->
+            TaskLocationEntry(
+                latitude = location.latitude,
+                longitude = location.longitude,
+                address = location.address,
+                name = location.name,
+                order = index
+            )
+        }
+
+    sealed interface SaveTaskState {
+        data object Idle : SaveTaskState
+        data object Saving : SaveTaskState
+        data object Success : SaveTaskState
+        data class Error(val throwable: Throwable) : SaveTaskState
     }
 }

@@ -63,7 +63,7 @@ fun TaskScreen(taskViewModel: TaskViewModel = hiltViewModel()) {
     Column(
         modifier = Modifier.fillMaxSize()
         ) {
-        AddButtonRow(taskViewModel)
+//        AddButtonRow(taskViewModel)
 
         WeekNavigationRow(
             monthYear = navMonthYear,
