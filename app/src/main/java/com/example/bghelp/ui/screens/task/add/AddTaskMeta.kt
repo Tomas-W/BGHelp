@@ -77,6 +77,7 @@ object AddTaskStrings {
 
     const val PREVIOUS_MONTH = "Previous month"
     const val NEXT_MONTH = "Next month"
+    const val HIDE_CALENDAR = "Hide calendar"
 
     const val ADD_REMINDER = "Add reminder"
     const val REMOVE_REMINDER = "Remove reminder"
@@ -89,8 +90,8 @@ object AddTaskStrings {
     const val LOCATION_ADDRESS_LABEL = "Address"
 }
 
-val selectedStyle = TextStyles.Default.Bold.Medium
-val deselectedStyle = TextStyles.Default.Medium
+val selectedStyle = TextStyles.Default.Bold.M
+val deselectedStyle = TextStyles.Default.M
 
 interface SectionMeta {
     val headerText: String

@@ -117,7 +117,7 @@ private fun AddReminder(
             style = deselectedStyle,
         )
 
-        Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
+        Spacer(modifier = Modifier.width(Sizes.Icon.M))
 
         // + Icon
         WithRipple {
@@ -128,12 +128,12 @@ private fun AddReminder(
                             viewModel.clearReminderInputSelection()
                             onClick()
                         },
-                        radius = Sizes.Icon.Small
+                        radius = Sizes.Icon.S
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    modifier = Modifier.size(Sizes.Icon.Small),
+                    modifier = Modifier.size(Sizes.Icon.S),
                     painter = painterResource(R.drawable.add),
                     contentDescription = STR.ADD_REMINDER
                 )
@@ -172,7 +172,7 @@ private fun ReminderItem(
             }
         )
 
-        Spacer(modifier = Modifier.width(Sizes.Size.Small))
+        Spacer(modifier = Modifier.width(Sizes.Size.S))
 
         // Dropdown
         TimeDropdown(
@@ -185,7 +185,7 @@ private fun ReminderItem(
             }
         )
 
-        Spacer(modifier = Modifier.width(Sizes.Size.Medium))
+        Spacer(modifier = Modifier.width(Sizes.Size.M))
 
         // Delete icon
         WithRipple {
@@ -193,12 +193,12 @@ private fun ReminderItem(
                 modifier = Modifier
                     .clickableRippleDismiss(
                         onClick = { viewModel.removeReminder(remindType, reminder.id) },
-                        radius = Sizes.Icon.Medium
+                        radius = Sizes.Icon.M
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    modifier = Modifier.size(Sizes.Icon.Medium),
+                    modifier = Modifier.size(Sizes.Icon.M),
                     painter = painterResource(R.drawable.delete),
                     contentDescription = STR.REMOVE_REMINDER
                 )
@@ -279,7 +279,7 @@ private fun TimeInput(
     Row(
         modifier = modifier
             .width(CONST.REMINDER_INPUT_WIDTH.dp)
-            .clip(RoundedCornerShape(Sizes.Corner.Small))
+            .clip(RoundedCornerShape(Sizes.Corner.S))
             .clickable {
                 if (isActive) {
                     dismissKeyboard()
@@ -303,7 +303,7 @@ private fun TimeInput(
         ) {
             Text(
                 text = value.toString(),
-                style = if (isActive) TextStyles.Main.Bold.Small else TextStyles.Default.Small
+                style = if (isActive) TextStyles.Main.Bold.S else TextStyles.Default.S
             )
         }
     }
@@ -331,7 +331,7 @@ private fun TimeDropdown(
     Box(modifier = modifier) {
         Text(
             text = unitLabels[selectedUnit] ?: "",
-            style = TextStyles.Default.Small,
+            style = TextStyles.Default.S,
             modifier = Modifier
                 .width(80.dp)
                 .clickable {
@@ -351,7 +351,7 @@ private fun TimeDropdown(
                         onUnitSelected(unit)
                         isExpanded = false
                     },
-                    textStyle = TextStyles.Default.Small
+                    textStyle = TextStyles.Default.S
                 )
             }
         }

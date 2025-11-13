@@ -109,7 +109,7 @@ fun ItemScreen(
     // HighlightedContainerLarge, HighlightedContainerSmall
     LazyColumnContainer {
         items(items) { item ->
-            Text(item.name, style = TextStyles.Default.Medium)
+            Text(item.name, style = TextStyles.Default.M)
         }
     }
 }
@@ -128,11 +128,11 @@ fun ItemScreen(
 ### Text Styling
 ```kotlin
 // Use TextStyles hierarchy: [Color].[Variant].[Size]
-TextStyles.Default.Medium      // Black, medium
-TextStyles.Grey.Bold.Large     // Grey, bold, large
-TextStyles.Error.Small         // Red, small
+TextStyles.Default.M      // Black, medium
+TextStyles.Grey.Bold.L     // Grey, bold, large
+TextStyles.Error.S         // Red, small
 // Colors: Default, Grey, White, Error, Warning, Success, Info
-// Sizes: ExtraSmall, Small, Medium, Large, ExtraLarge
+// Sizes: XXS, XS, S, M, L, XL, XXL
 ```
 
 ### Navigation

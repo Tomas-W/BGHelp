@@ -60,7 +60,7 @@ fun NoteSelection(
                     onNoteSelected("")
                     isExpanded = false
                 },
-                textStyle = TextStyles.Default.Small
+                textStyle = TextStyles.Default.S
             )
             DropdownItem(
                 label = STR.CREATE_NOTE,
@@ -68,7 +68,7 @@ fun NoteSelection(
                     onNoteSelected("CREATE")
                     isExpanded = false
                 },
-                textStyle = TextStyles.Default.Small
+                textStyle = TextStyles.Default.S
             )
             noteOptions.forEach { option ->
                 DropdownItem(
@@ -77,7 +77,7 @@ fun NoteSelection(
                         onNoteSelected(option)
                         isExpanded = false
                     },
-                    textStyle = TextStyles.Default.Small
+                    textStyle = TextStyles.Default.S
                 )
             }
         }

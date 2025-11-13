@@ -102,7 +102,7 @@ fun AlarmDropdown(
                     onAudioFileSelected("")
                     isExpanded = false
                 },
-                textStyle = TextStyles.Default.Small
+                textStyle = TextStyles.Default.S
             )
             DropdownItem(
                 label = STR.CREATE_ALARM,
@@ -112,7 +112,7 @@ fun AlarmDropdown(
                     }
                     isExpanded = false
                 },
-                textStyle = TextStyles.Default.Small
+                textStyle = TextStyles.Default.S
             )
             userRecordings.forEach { filePath ->
                 DropdownItem(
@@ -121,7 +121,7 @@ fun AlarmDropdown(
                         onAudioFileSelected(filePath)
                         isExpanded = false
                     },
-                    textStyle = TextStyles.Default.Small
+                    textStyle = TextStyles.Default.S
                 )
             }
             defaultAudioFiles.forEach { fileName ->
@@ -131,7 +131,7 @@ fun AlarmDropdown(
                         onAudioFileSelected(fileName)
                         isExpanded = false
                     },
-                    textStyle = TextStyles.Default.Small
+                    textStyle = TextStyles.Default.S
                 )
             }
         }

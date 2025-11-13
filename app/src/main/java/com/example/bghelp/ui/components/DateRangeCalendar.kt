@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,9 +17,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,10 +52,11 @@ fun DateRangeCalendar(
     onDayClicked: (LocalDate) -> Unit,
     onMonthChanged: (YearMonth) -> Unit,
     isRangeMode: Boolean = true,
-    minDate: LocalDate? = null
-) = WithRipple {
-    val fMonthLong = remember { DateTimeFormatter.ofPattern("MMMM") }
-    val fYearLong = remember { DateTimeFormatter.ofPattern("yyyy") }
+    minDate: LocalDate? = null,
+    onDismissRequest: (() -> Unit)? = null
+) {
+    val monthFormatter = remember { DateTimeFormatter.ofPattern("MMMM") }
+    val yearFormatter = remember { DateTimeFormatter.ofPattern("yyyy") }
     val firstDayOfWeek = DayOfWeek.MONDAY
     val weeks = remember(currentMonth, firstDayOfWeek) { buildMonthWeeks(currentMonth, firstDayOfWeek) }
     var isMonthMenuOpen by remember { mutableStateOf(false) }
@@ -62,189 +64,332 @@ fun DateRangeCalendar(
     val months = remember { Month.entries }
     val years = remember { (AddTaskConstants.MIN_YEAR..AddTaskConstants.MAX_YEAR).toList() }
 
-    Column(modifier = modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        CalendarDismissRow(onDismissRequest)
+
+        CalendarMonthNavigation(
+            currentMonth = currentMonth,
+            monthFormatter = monthFormatter,
+            yearFormatter = yearFormatter,
+            isMonthMenuOpen = isMonthMenuOpen,
+            onMonthMenuOpenChange = { isMonthMenuOpen = it },
+            isYearMenuOpen = isYearMenuOpen,
+            onYearMenuOpenChange = { isYearMenuOpen = it },
+            months = months,
+            years = years,
+            onMonthChanged = onMonthChanged
+        )
+
+        Spacer(modifier = Modifier.height(Sizes.Size.S))
+
+        CalendarWeekdayHeader(firstDayOfWeek = firstDayOfWeek)
+
+        CalendarWeeksGrid(
+            weeks = weeks,
+            currentMonth = currentMonth,
+            startDate = startDate,
+            endDate = endDate,
+            isRangeMode = isRangeMode,
+            minDate = minDate,
+            onDayClicked = onDayClicked
+        )
+    }
+}
+
+@Composable
+private fun CalendarDismissRow(onDismissRequest: (() -> Unit)?) {
+    if (onDismissRequest == null) return
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(end = 24.dp, top = 8.dp, bottom = 8.dp),
+        horizontalArrangement = Arrangement.End
+    ) {
+        TextButton(onClick = onDismissRequest) {
+            Text(
+                text = AddTaskStrings.HIDE_CALENDAR,
+                style = TextStyles.Grey.Bold.S
+            )
+        }
+    }
+}
+
+@Composable
+private fun CalendarMonthNavigation(
+    currentMonth: YearMonth,
+    monthFormatter: DateTimeFormatter,
+    yearFormatter: DateTimeFormatter,
+    isMonthMenuOpen: Boolean,
+    onMonthMenuOpenChange: (Boolean) -> Unit,
+    isYearMenuOpen: Boolean,
+    onYearMenuOpenChange: (Boolean) -> Unit,
+    months: List<Month>,
+    years: List<Int>,
+    onMonthChanged: (YearMonth) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            CalendarMonthDropdown(
+                currentMonth = currentMonth,
+                formatter = monthFormatter,
+                isMenuOpen = isMonthMenuOpen,
+                onMenuOpenChange = onMonthMenuOpenChange,
+                months = months,
+                onMonthChanged = onMonthChanged
+            )
+
+            Spacer(modifier = Modifier.width(Sizes.Icon.S))
+
+            CalendarYearDropdown(
+                currentMonth = currentMonth,
+                formatter = yearFormatter,
+                isMenuOpen = isYearMenuOpen,
+                onMenuOpenChange = onYearMenuOpenChange,
+                years = years,
+                onMonthChanged = onMonthChanged
+            )
+        }
+
+        Row {
+            CalendarNavigationButton(
+                iconRes = R.drawable.navigation_arrow_left,
+                contentDescription = AddTaskStrings.PREVIOUS_MONTH
+            ) {
+                onMonthChanged(currentMonth.minusMonths(1))
+            }
+
+            Spacer(modifier = Modifier.width(Sizes.Icon.XXL))
+
+            CalendarNavigationButton(
+                iconRes = R.drawable.navigation_arrow_right,
+                contentDescription = AddTaskStrings.NEXT_MONTH
+            ) {
+                onMonthChanged(currentMonth.plusMonths(1))
+            }
+        }
+    }
+}
+
+@Composable
+private fun CalendarMonthDropdown(
+    currentMonth: YearMonth,
+    formatter: DateTimeFormatter,
+    isMenuOpen: Boolean,
+    onMenuOpenChange: (Boolean) -> Unit,
+    months: List<Month>,
+    onMonthChanged: (YearMonth) -> Unit
+) {
+    Box {
+        Text(
+            text = currentMonth.format(formatter),
+            style = TextStyles.Grey.Bold.L,
+            modifier = Modifier.clickable { onMenuOpenChange(true) }
+        )
+        CustomDropdown(
+            expanded = isMenuOpen,
+            onDismissRequest = { onMenuOpenChange(false) }
         ) {
-            // Previous month
-            IconButton(
-                modifier = Modifier
-                    .size(Sizes.Icon.Large),
-                onClick = { onMonthChanged(currentMonth.minusMonths(1)) }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.arrow_left),
-                    contentDescription = AddTaskStrings.PREVIOUS_MONTH
-                )
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // Month label
-                Box {
-                    Text(
-                        text = currentMonth.format(fMonthLong),
-                        style = TextStyles.Grey.Bold.Large,
-                        modifier = Modifier.clickable { isMonthMenuOpen = true }
-                    )
-
-                    // Month dropdown
-                    CustomDropdown(
-                        expanded = isMonthMenuOpen,
-                        onDismissRequest = { isMonthMenuOpen = false }
-                    ) {
-                        months.forEach { m ->
-                            val label = YearMonth.of(currentMonth.year, m).format(fMonthLong)
-                            DropdownItem(
-                                label = label,
-                                onClick = {
-                                    onMonthChanged(YearMonth.of(currentMonth.year, m))
-                                    isMonthMenuOpen = false
-                                },
-                                textStyle = TextStyles.Default.Medium
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.width(Sizes.Size.Medium))
-
-                Box {
-                    // Year label
-                    Text(
-                        text = currentMonth.format(fYearLong),
-                        style = TextStyles.Grey.Bold.Large,
-                        modifier = Modifier.clickable { isYearMenuOpen = true }
-                    )
-
-                    // Year dropdown
-                    CustomDropdown(
-                        expanded = isYearMenuOpen,
-                        onDismissRequest = { isYearMenuOpen = false }
-                    ) {
-                        years.forEach { y ->
-                            val label = YearMonth.of(y, currentMonth.month).format(fYearLong)
-                            DropdownItem(
-                                label = label,
-                                onClick = {
-                                    onMonthChanged(YearMonth.of(y, currentMonth.month))
-                                    isYearMenuOpen = false
-                                },
-                                textStyle = TextStyles.Default.Medium
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Next month
-            IconButton(
-                modifier = Modifier
-                    .size(Sizes.Icon.Large),
-                onClick = { onMonthChanged(currentMonth.plusMonths(1)) }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.arrow_right),
-                    contentDescription = AddTaskStrings.NEXT_MONTH
+            months.forEach { month ->
+                val label = YearMonth.of(currentMonth.year, month).format(formatter)
+                DropdownItem(
+                    label = label,
+                    onClick = {
+                        onMonthChanged(YearMonth.of(currentMonth.year, month))
+                        onMenuOpenChange(false)
+                    },
+                    textStyle = TextStyles.Default.M
                 )
             }
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(Sizes.Size.ExtraSmall))
-
-        // Days of week header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+@Composable
+private fun CalendarYearDropdown(
+    currentMonth: YearMonth,
+    formatter: DateTimeFormatter,
+    isMenuOpen: Boolean,
+    onMenuOpenChange: (Boolean) -> Unit,
+    years: List<Int>,
+    onMonthChanged: (YearMonth) -> Unit
+) {
+    Box {
+        Text(
+            text = currentMonth.format(formatter),
+            style = TextStyles.Grey.Bold.L,
+            modifier = Modifier.clickable { onMenuOpenChange(true) }
+        )
+        CustomDropdown(
+            expanded = isMenuOpen,
+            onDismissRequest = { onMenuOpenChange(false) }
         ) {
-            for (dow in dayOfWeekOrder(firstDayOfWeek)) {
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    Text(
-                        text = dow.name.take(1),
-                        style = TextStyles.Grey.Medium
+            years.forEach { year ->
+                val label = YearMonth.of(year, currentMonth.month).format(formatter)
+                DropdownItem(
+                    label = label,
+                    onClick = {
+                        onMonthChanged(YearMonth.of(year, currentMonth.month))
+                        onMenuOpenChange(false)
+                    },
+                    textStyle = TextStyles.Default.M
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CalendarNavigationButton(
+    iconRes: Int,
+    contentDescription: String,
+    onClick: () -> Unit
+) {
+    WithRipple {
+        Box(
+            modifier = Modifier
+                .size(Sizes.Icon.XXL)
+                .clickableRipple(onClick),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                modifier = Modifier.size(Sizes.Icon.XL),
+                painter = painterResource(iconRes),
+                contentDescription = contentDescription
+            )
+        }
+    }
+}
+
+@Composable
+private fun CalendarWeekdayHeader(firstDayOfWeek: DayOfWeek) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        for (dow in dayOfWeekOrder(firstDayOfWeek)) {
+            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                Text(
+                    text = dow.name.take(1),
+                    style = TextStyles.Grey.Bold.M
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CalendarWeeksGrid(
+    weeks: List<List<LocalDate>>,
+    currentMonth: YearMonth,
+    startDate: LocalDate,
+    endDate: LocalDate,
+    isRangeMode: Boolean,
+    minDate: LocalDate?,
+    onDayClicked: (LocalDate) -> Unit
+) {
+    val rangeStart = if (isRangeMode) minOf(startDate, endDate) else startDate
+    val rangeEnd = if (isRangeMode) maxOf(startDate, endDate) else startDate
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        weeks.forEach { week ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                week.forEach { day ->
+                    val inCurrentMonth = day.month == currentMonth.month
+                    val isStart = day == startDate
+                    val isEnd = isRangeMode && day == endDate
+                    val isBeforeMin = minDate?.let { day.isBefore(it) } ?: false
+                    val isSelectable = !isBeforeMin
+                    val inRange = isRangeMode && isSelectable && !day.isBefore(rangeStart) && !day.isAfter(rangeEnd)
+
+                    val rangeBgColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                    val startEndBgColor = MaterialTheme.colorScheme.primary
+                    val startEndTextColor = MaterialTheme.colorScheme.onPrimary
+
+                    CalendarDayCell(
+                        day = day,
+                        inCurrentMonth = inCurrentMonth,
+                        isStart = isStart,
+                        isEnd = isEnd,
+                        inRange = inRange,
+                        isSelectable = isSelectable,
+                        rangeBackgroundColor = rangeBgColor,
+                        startEndBackgroundColor = startEndBgColor,
+                        startEndTextColor = startEndTextColor,
+                        onClick = onDayClicked
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(4.dp))
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(Sizes.Size.ExtraSmall))
-
-        val rangeStart = if (isRangeMode) minOf(startDate, endDate) else startDate
-        val rangeEnd = if (isRangeMode) maxOf(startDate, endDate) else startDate
-
-        // Weeks grid
-        Column(modifier = Modifier.fillMaxWidth()) {
-            weeks.forEach { week ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    week.forEach { day ->
-                        val inCurrentMonth = day.month == currentMonth.month
-                        val isStart = day == startDate
-                        val isEnd = isRangeMode && day == endDate
-                        val isBeforeMin = minDate?.let { day.isBefore(it) } ?: false
-                        val isSelectable = !isBeforeMin
-                        val inRange = isRangeMode && isSelectable && !day.isBefore(rangeStart) && !day.isAfter(rangeEnd)
-
-                        val rangeBgColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-                        val startEndBgColor = MaterialTheme.colorScheme.primary
-                        val startEndTextColor = MaterialTheme.colorScheme.onPrimary
-
-                        // Day container
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(1f)
-                                .clip(RoundedCornerShape(Sizes.Corner.Small))
-                                .background(
-                                    // Highlight if in selection range
-                                    color = if (inRange && !isStart && !isEnd) rangeBgColor else Color.Transparent
-                                )
-                                .clickableWithCalendarRipple(
-                                    onClick = { onDayClicked(day) },
-                                    enabled = isSelectable
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            // Start & End highlight
-                            if ((isStart || isEnd) && isSelectable) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(38.dp)
-                                        .clip(CircleShape)
-                                        .background(startEndBgColor),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = day.dayOfMonth.toString(),
-                                        style = TextStyles.Default.Bold.Medium,
-                                        color = startEndTextColor,
-                                    )
-                                }
-                            } else {
-                                Text(
-                                    text = day.dayOfMonth.toString(),
-                                    style = TextStyles.Default.Medium,
-                                    color = when {
-                                        !isSelectable -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-                                        inCurrentMonth -> MaterialTheme.colorScheme.onSurface
-                                        else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(4.dp))
+@Composable
+private fun RowScope.CalendarDayCell(
+    day: LocalDate,
+    inCurrentMonth: Boolean,
+    isStart: Boolean,
+    isEnd: Boolean,
+    inRange: Boolean,
+    isSelectable: Boolean,
+    rangeBackgroundColor: Color,
+    startEndBackgroundColor: Color,
+    startEndTextColor: Color,
+    onClick: (LocalDate) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .weight(1f)
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(Sizes.Corner.S))
+            .background(
+                color = if (inRange && !isStart && !isEnd) rangeBackgroundColor else Color.Transparent
+            )
+            .clickable(
+                onClick = { onClick(day) },
+                enabled = isSelectable
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        if ((isStart || isEnd) && isSelectable) {
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(CircleShape)
+                    .background(startEndBackgroundColor),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = day.dayOfMonth.toString(),
+                    style = TextStyles.Default.Bold.M,
+                    color = startEndTextColor,
+                )
             }
+        } else {
+            Text(
+                text = day.dayOfMonth.toString(),
+                style = TextStyles.Default.M,
+                color = when {
+                    !isSelectable -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                    inCurrentMonth -> MaterialTheme.colorScheme.onSurface
+                    else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                }
+            )
         }
     }
 }

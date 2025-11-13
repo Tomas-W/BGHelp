@@ -51,10 +51,10 @@ fun DateSelection(
                     viewModel.toggleCalendarFromDateField(DateField.START)
                 },
             text = dateStartSelection.format(fMonthYearDayShort),
-            style = if (activeDateField == DateField.START) TextStyles.Main.Bold.Medium else deselectedStyle,
+            style = if (activeDateField == DateField.START) TextStyles.Main.Bold.M else deselectedStyle,
         )
 
-        Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
+        Spacer(modifier = Modifier.width(Sizes.Icon.M))
 
         // Double arrow
         WithRipple {
@@ -64,19 +64,19 @@ fun DateSelection(
                         onClick = {
                             viewModel.toggleEndDateVisible()
                         },
-                        radius = Sizes.Icon.Small
+                        radius = Sizes.Icon.S
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    modifier = Modifier.size(Sizes.Icon.Small),
+                    modifier = Modifier.size(Sizes.Icon.S),
                     painter = painterResource(R.drawable.double_arrow_right),
                     contentDescription = if (isEndDateVisible) STR.HIDE_END_DATE else STR.SHOW_END_DATE
                 )
             }
         }
 
-        Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
+        Spacer(modifier = Modifier.width(Sizes.Icon.M))
 
         // endDate
         Text(
@@ -92,7 +92,7 @@ fun DateSelection(
                     }
                 ),
             text = dateEndSelection?.format(fMonthYearDayShort) ?: dateStartSelection.format(fMonthYearDayShort),
-            style = if (activeDateField == DateField.END) TextStyles.Main.Bold.Medium else deselectedStyle
+            style = if (activeDateField == DateField.END) TextStyles.Main.Bold.M else deselectedStyle
         )
     }
 }

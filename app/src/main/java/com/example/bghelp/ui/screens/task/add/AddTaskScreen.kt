@@ -29,7 +29,6 @@ import com.example.bghelp.ui.screens.task.add.location.Location
 import com.example.bghelp.ui.screens.task.add.image.Image
 import com.example.bghelp.ui.screens.task.add.note.Note
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.utils.dismissKeyboardOnTap
 
 
@@ -52,7 +51,7 @@ fun AddTaskScreen(
         modifier = Modifier
             .fillMaxSize()
             .dismissKeyboardOnTap {
-                viewModel.clearAllInputSelections()
+                viewModel.clearNonCalendarInputSelections()
             }
     ) {
         Column(
@@ -135,17 +134,17 @@ fun AddTaskScreen(
 
 @Composable
 fun AddTaskSpacerLarge() {
-    Spacer(modifier = Modifier.height(Sizes.Size.Medium))
+    Spacer(modifier = Modifier.height(Sizes.Size.M))
 }
 
 @Composable
 fun AddTaskSpacerMedium() {
-    Spacer(modifier = Modifier.height(Sizes.Size.Small))
+    Spacer(modifier = Modifier.height(Sizes.Size.S))
 }
 
 @Composable
 fun AddTaskSpacerSmall() {
-    Spacer(modifier = Modifier.height(Sizes.Size.ExtraSmall))
+    Spacer(modifier = Modifier.height(Sizes.Size.XS))
 }
 
 @Composable

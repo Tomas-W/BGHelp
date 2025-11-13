@@ -1,4 +1,4 @@
-package com.example.bghelp.ui.components
+package com.example.bghelp.ui.screens.task.main
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -42,6 +42,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import com.example.bghelp.ui.theme.Sizes
@@ -80,7 +81,7 @@ fun TaskImagePreview(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.height(Sizes.Size.ExtraSmall))
+                Spacer(modifier = Modifier.height(Sizes.Size.XS))
             }
             val painter = remember(previewImage) { BitmapPainter(previewImage!!) }
             Image(
@@ -89,7 +90,7 @@ fun TaskImagePreview(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(Sizes.Corner.Small))
+                    .clip(RoundedCornerShape(Sizes.Corner.S))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .pointerInput(Unit) {
                         detectTapGestures(onTap = { showModal = true })
@@ -136,7 +137,7 @@ private fun TaskImageModal(
                 )
             }
 
-            var scale by remember { mutableStateOf(1f) }
+            var scale by remember { mutableFloatStateOf(1f) }
             var offset by remember { mutableStateOf(Offset.Zero) }
 
             val transformState = rememberTransformableState { zoomChange, panChange, _ ->

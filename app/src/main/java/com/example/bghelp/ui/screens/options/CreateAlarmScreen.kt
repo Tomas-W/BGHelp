@@ -97,18 +97,18 @@ fun SelectDayField(
         Column {
             Text(
                 text = "Day",
-                style = TextStyles.Grey.Bold.Large
+                style = TextStyles.Grey.Bold.L
             )
 
             Text(
                 text = selectedDate.format(formatter),
-                style = TextStyles.Default.Italic.Small
+                style = TextStyles.Default.Italic.S
             )
         }
 
         IconButton(onClick = { dateDialogState.show() }) {
             Icon(
-                modifier = Modifier.size(Sizes.Icon.MegaLarge),
+                modifier = Modifier.size(Sizes.Icon.XXL),
                 painter = painterResource(R.drawable.events_outlined),
                 contentDescription = "Calendar"
             )
@@ -150,18 +150,18 @@ fun SelectTimeField(
         Column {
             Text(
                 text = "Time",
-                style = TextStyles.Grey.Bold.Large
+                style = TextStyles.Grey.Bold.L
             )
 
             Text(
                 text = selectedTime.format(formatter),
-                style = TextStyles.Default.Italic.Small
+                style = TextStyles.Default.Italic.S
             )
         }
 
         IconButton(onClick = { timeDialogState.show() }) {
             Icon(
-                modifier = Modifier.size(Sizes.Icon.MegaLarge),
+                modifier = Modifier.size(Sizes.Icon.XXL),
                 painter = painterResource(R.drawable.events_outlined),
                 contentDescription = "Clock"
             )

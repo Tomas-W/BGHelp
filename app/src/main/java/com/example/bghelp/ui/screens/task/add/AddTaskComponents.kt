@@ -33,7 +33,7 @@ fun <T> Header(
     ) {
         Icon(
             modifier = Modifier
-                .size(Sizes.Icon.Medium)
+                .size(Sizes.Icon.M)
                 .clickableDismissFocus {
                     viewModel.clearAllInputSelections()
                     toggleSection()
@@ -42,7 +42,7 @@ fun <T> Header(
             contentDescription = userSectionSelection.headerText
         )
 
-        Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
+        Spacer(modifier = Modifier.width(Sizes.Icon.M))
 
         Text(
             modifier = Modifier
@@ -52,7 +52,7 @@ fun <T> Header(
                     toggleSection()
                 },
             text = userSectionSelection.headerText,
-            style = TextStyles.Grey.Bold.Medium
+            style = TextStyles.Grey.Bold.M
         )
     }
     
@@ -67,9 +67,9 @@ fun SubContainer(
 ) {
     var inputPaddingOffset =
         if (hasInputStart) {
-            2 * Sizes.Icon.Medium - 6.dp
+            2 * Sizes.Icon.M - 6.dp
         } else {
-            2 * Sizes.Icon.Medium
+            2 * Sizes.Icon.M
         }
     Column(
         modifier = modifier

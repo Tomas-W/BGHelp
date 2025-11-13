@@ -50,10 +50,10 @@ fun SearchPanel(
             placeholder = {
                 Text(
                     text = STR.SEARCH_PLACEHOLDER,
-                    style = TextStyles.Default.Medium
+                    style = TextStyles.Default.M
                 )
             },
-            textStyle = TextStyles.Default.Medium,
+            textStyle = TextStyles.Default.M,
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
@@ -84,7 +84,7 @@ fun SearchPanel(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(Sizes.Corner.ExtraSmall))
+                    .clip(RoundedCornerShape(Sizes.Corner.XS))
                     .background(MaterialTheme.colorScheme.surface)
                     .shadow(6.dp)
             ) {
@@ -118,14 +118,14 @@ private fun SuggestionRow(
     ) {
         Text(
             text = suggestion.title,
-            style = TextStyles.Default.Small,
+            style = TextStyles.Default.S,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
         if (suggestion.subtitle.isNotEmpty()) {
             Text(
                 text = suggestion.subtitle,
-                style = TextStyles.Default.Italic.ExtraSmall,
+                style = TextStyles.Default.Italic.XS,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

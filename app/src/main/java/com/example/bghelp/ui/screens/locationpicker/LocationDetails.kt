@@ -53,7 +53,7 @@ fun LocationDetails(
             modifier = modifier
                 .fillMaxWidth(),
             text = STR.EMPTY_LOCATIONS_HINT,
-            style = TextStyles.Default.Small,
+            style = TextStyles.Default.S,
         )
     } else {
         LazyColumn(
@@ -92,7 +92,7 @@ private fun LocationDetailsItem(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(Sizes.Corner.ExtraSmall))
+            .clip(RoundedCornerShape(Sizes.Corner.XS))
             .background(
                 if (isActive) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surface
             )
@@ -117,7 +117,7 @@ private fun LocationDetailsItem(
             )
             Icon(
                 modifier = Modifier
-                    .size(Sizes.Icon.Small)
+                    .size(Sizes.Icon.S)
                     .clickable {
                         focusManager.clearFocus(force = true)
                         onRemove()
@@ -128,7 +128,7 @@ private fun LocationDetailsItem(
         }
         Text(
             text = location.address,
-            style = TextStyles.Default.Small,
+            style = TextStyles.Default.S,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -155,13 +155,13 @@ private fun LocationNameField(
             if (value.isEmpty()) {
                 Text(
                     text = STR.NAME_PLACEHOLDER,
-                    style = TextStyles.Default.Italic.Small
+                    style = TextStyles.Default.Italic.S
                 )
             }
             BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
-                textStyle = TextStyles.Default.Small.copy(
+                textStyle = TextStyles.Default.S.copy(
                     color = MaterialTheme.colorScheme.onSurface
                 ),
                 singleLine = true,

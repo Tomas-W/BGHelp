@@ -29,7 +29,7 @@ fun LocationSelection(
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(Sizes.Size.Small)
+        verticalArrangement = Arrangement.spacedBy(Sizes.Size.S)
     ) {
         Text(
             modifier = Modifier
@@ -78,7 +78,7 @@ private fun LocationSummary(
             verticalArrangement = Arrangement.Center
         ) {
             IconButton(
-                modifier = Modifier.size(Sizes.Icon.Large),
+                modifier = Modifier.size(Sizes.Icon.L),
                 onClick = onRemove
             ) {
                 Icon(

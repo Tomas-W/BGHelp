@@ -5,208 +5,119 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import java.util.EnumMap
 
 object TextSizes {
-    const val EXTRA_SMALL = 16f
-    const val SMALL = 18f
-    const val MEDIUM = 20f
-    const val LARGE = 26f
-    const val EXTRA_LARGE = 32f
+    const val XXS = 14f
+    const val XS = 16f
+    const val S = 18f
+    const val M = 20f
+    const val L = 24f
+    const val XL = 28f
+    const val XXL = 32f
+}
+
+private enum class TextSizeToken(val value: Float) {
+    XXS(TextSizes.XXS),
+    XS(TextSizes.XS),
+    S(TextSizes.S),
+    M(TextSizes.M),
+    L(TextSizes.L),
+    XL(TextSizes.XL),
+    XXL(TextSizes.XXL)
+}
+
+private fun create(
+    size: Float,
+    color: Color,
+    weight: FontWeight = FontWeight.Normal,
+    style: FontStyle = FontStyle.Normal
+) = TextStyle(
+    fontSize = size.sp,
+    fontWeight = weight,
+    color = color,
+    fontStyle = style
+)
+
+private fun create(
+    size: TextSizeToken,
+    color: Color,
+    weight: FontWeight = FontWeight.Normal,
+    style: FontStyle = FontStyle.Normal
+): TextStyle = create(size.value, color, weight, style)
+
+private class TextStyleBranch(
+    private val color: Color,
+    private val weight: FontWeight = FontWeight.Normal,
+    private val style: FontStyle = FontStyle.Normal
+) {
+    private val cache = EnumMap<TextSizeToken, TextStyle>(TextSizeToken::class.java)
+
+    private fun resolve(size: TextSizeToken): TextStyle =
+        cache.getOrPut(size) { create(size, color, weight, style) }
+
+    val XXS get() = resolve(TextSizeToken.XXS)
+    val XS get() = resolve(TextSizeToken.XS)
+    val S get() = resolve(TextSizeToken.S)
+    val M get() = resolve(TextSizeToken.M)
+    val L get() = resolve(TextSizeToken.L)
+    val XL get() = resolve(TextSizeToken.XL)
+    val XXL get() = resolve(TextSizeToken.XXL)
 }
 
 object TextStyles {
-    private fun create(
-        size: Float,
-        weight: FontWeight = FontWeight.Normal,
-        color: Color = TextBlack,
-        style: FontStyle = FontStyle.Normal
-    ) = TextStyle(
-        fontSize = size.sp,
-        fontWeight = weight,
-        color = color,
-        fontStyle = style
-    )
+    private fun colorGroup(color: Color): ColorGroup = ColorGroup(color)
 
-    // Default (Black)
-    object Default {
-        val ExtraSmall = create(TextSizes.EXTRA_SMALL)
-        val Small = create(TextSizes.SMALL)
-        val Medium = create(TextSizes.MEDIUM)
-        val Large = create(TextSizes.LARGE)
-        val ExtraLarge = create(TextSizes.EXTRA_LARGE)
+    val Default = colorGroup(TextBlack)
+    val Grey = colorGroup(TextGrey)
+    val White = colorGroup(TextWhite)
+    val Error = colorGroup(ErrorRed)
+    val Warning = colorGroup(WarningOrange)
+    val Success = colorGroup(SuccessGreen)
+    val Main = colorGroup(MainBlue)
 
-        object Bold {
-            val ExtraSmall = create(TextSizes.EXTRA_SMALL, weight = FontWeight.Bold)
-            val Small = create(TextSizes.SMALL, weight = FontWeight.Bold)
-            val Medium = create(TextSizes.MEDIUM, weight = FontWeight.Bold)
-            val Large = create(TextSizes.LARGE, weight = FontWeight.Bold)
-            val ExtraLarge = create(TextSizes.EXTRA_LARGE, weight = FontWeight.Bold)
+    class ColorGroup(private val color: Color) {
+        private val normal = TextStyleBranch(color)
+
+        val XXS get() = normal.XXS
+        val XS get() = normal.XS
+        val S get() = normal.S
+        val M get() = normal.M
+        val L get() = normal.L
+        val XL get() = normal.XL
+        val XXL get() = normal.XXL
+
+        val Bold = BoldGroup(color)
+        val Italic = ItalicGroup(color)
+
+        class BoldGroup internal constructor(color: Color) {
+            private val branch = TextStyleBranch(color, weight = FontWeight.Bold)
+
+            val XS get() = branch.XS
+            val S get() = branch.S
+            val M get() = branch.M
+            val L get() = branch.L
+            val XL get() = branch.XL
+            val XXL get() = branch.XXL
         }
 
-        object Italic {
-            val ExtraSmall = create(TextSizes.EXTRA_SMALL, style = FontStyle.Italic)
-            val Small = create(TextSizes.SMALL, style = FontStyle.Italic)
-            val Medium = create(TextSizes.MEDIUM, style = FontStyle.Italic)
-            val Large = create(TextSizes.LARGE, style = FontStyle.Italic)
-            val ExtraLarge = create(TextSizes.EXTRA_LARGE, style = FontStyle.Italic)
-        }
-    }
+        class ItalicGroup internal constructor(color: Color) {
+            private val branch = TextStyleBranch(color, style = FontStyle.Italic)
 
-    // Grey
-    object Grey {
-        val ExtraSmall = create(TextSizes.EXTRA_SMALL, color = TextGrey)
-        val Small = create(TextSizes.SMALL, color = TextGrey)
-        val Medium = create(TextSizes.MEDIUM, color = TextGrey)
-        val Large = create(TextSizes.LARGE, color = TextGrey)
-        val ExtraLarge = create(TextSizes.EXTRA_LARGE, color = TextGrey)
-
-        object Bold {
-            val ExtraSmall = create(TextSizes.EXTRA_SMALL, weight = FontWeight.Bold, color = TextGrey)
-            val Small = create(TextSizes.SMALL, weight = FontWeight.Bold, color = TextGrey)
-            val Medium = create(TextSizes.MEDIUM, weight = FontWeight.Bold, color = TextGrey)
-            val Large = create(TextSizes.LARGE, weight = FontWeight.Bold, color = TextGrey)
-            val ExtraLarge = create(TextSizes.EXTRA_LARGE, weight = FontWeight.Bold, color = TextGrey)
-        }
-
-        object Italic {
-            val ExtraSmall = create(TextSizes.EXTRA_SMALL, style = FontStyle.Italic, color = TextGrey)
-            val Small = create(TextSizes.SMALL, style = FontStyle.Italic, color = TextGrey)
-            val Medium = create(TextSizes.MEDIUM, style = FontStyle.Italic, color = TextGrey)
-            val Large = create(TextSizes.LARGE, style = FontStyle.Italic, color = TextGrey)
-            val ExtraLarge = create(TextSizes.EXTRA_LARGE, style = FontStyle.Italic, color = TextGrey)
+            val XXS get() = branch.XXS
+            val XS get() = branch.XS
+            val S get() = branch.S
+            val M get() = branch.M
+            val L get() = branch.L
+            val XL get() = branch.XL
+            val XXL get() = branch.XXL
         }
     }
 
-    // White
-    object White {
-        val ExtraSmall = create(TextSizes.EXTRA_SMALL, color = TextWhite)
-        val Small = create(TextSizes.SMALL, color = TextWhite)
-        val Medium = create(TextSizes.MEDIUM, color = TextWhite)
-        val Large = create(TextSizes.LARGE, color = TextWhite)
-        val ExtraLarge = create(TextSizes.EXTRA_LARGE, color = TextWhite)
-
-        object Bold {
-            val ExtraSmall = create(TextSizes.EXTRA_SMALL, weight = FontWeight.Bold, color = TextWhite)
-            val Small = create(TextSizes.SMALL, weight = FontWeight.Bold, color = TextWhite)
-            val Medium = create(TextSizes.MEDIUM, weight = FontWeight.Bold, color = TextWhite)
-            val Large = create(TextSizes.LARGE, weight = FontWeight.Bold, color = TextWhite)
-            val ExtraLarge = create(TextSizes.EXTRA_LARGE, weight = FontWeight.Bold, color = TextWhite)
-        }
-
-        object Italic {
-            val ExtraSmall = create(TextSizes.EXTRA_SMALL, style = FontStyle.Italic, color = TextWhite)
-            val Small = create(TextSizes.SMALL, style = FontStyle.Italic, color = TextWhite)
-            val Medium = create(TextSizes.MEDIUM, style = FontStyle.Italic, color = TextWhite)
-            val Large = create(TextSizes.LARGE, style = FontStyle.Italic, color = TextWhite)
-            val ExtraLarge = create(TextSizes.EXTRA_LARGE, style = FontStyle.Italic, color = TextWhite)
-        }
-    }
-
-    // Error (Red)
-    object Error {
-        val ExtraSmall = create(TextSizes.EXTRA_SMALL, color = ErrorRed)
-        val Small = create(TextSizes.SMALL, color = ErrorRed)
-        val Medium = create(TextSizes.MEDIUM, color = ErrorRed)
-        val Large = create(TextSizes.LARGE, color = ErrorRed)
-        val ExtraLarge = create(TextSizes.EXTRA_LARGE, color = ErrorRed)
-
-        object Bold {
-            val ExtraSmall = create(TextSizes.EXTRA_SMALL, weight = FontWeight.Bold, color = ErrorRed)
-            val Small = create(TextSizes.SMALL, weight = FontWeight.Bold, color = ErrorRed)
-            val Medium = create(TextSizes.MEDIUM, weight = FontWeight.Bold, color = ErrorRed)
-            val Large = create(TextSizes.LARGE, weight = FontWeight.Bold, color = ErrorRed)
-            val ExtraLarge = create(TextSizes.EXTRA_LARGE, weight = FontWeight.Bold, color = ErrorRed)
-        }
-
-        object Italic {
-            val ExtraSmall = create(TextSizes.EXTRA_SMALL, style = FontStyle.Italic, color = ErrorRed)
-            val Small = create(TextSizes.SMALL, style = FontStyle.Italic, color = ErrorRed)
-            val Medium = create(TextSizes.MEDIUM, style = FontStyle.Italic, color = ErrorRed)
-            val Large = create(TextSizes.LARGE, style = FontStyle.Italic, color = ErrorRed)
-            val ExtraLarge = create(TextSizes.EXTRA_LARGE, style = FontStyle.Italic, color = ErrorRed)
-        }
-    }
-
-    // Warning (Orange)
-    object Warning {
-        val ExtraSmall = create(TextSizes.EXTRA_SMALL, color = WarningOrange)
-        val Small = create(TextSizes.SMALL, color = WarningOrange)
-        val Medium = create(TextSizes.MEDIUM, color = WarningOrange)
-        val Large = create(TextSizes.LARGE, color = WarningOrange)
-        val ExtraLarge = create(TextSizes.EXTRA_LARGE, color = WarningOrange)
-
-        object Bold {
-            val ExtraSmall = create(TextSizes.EXTRA_SMALL, weight = FontWeight.Bold, color = WarningOrange)
-            val Small = create(TextSizes.SMALL, weight = FontWeight.Bold, color = WarningOrange)
-            val Medium = create(TextSizes.MEDIUM, weight = FontWeight.Bold, color = WarningOrange)
-            val Large = create(TextSizes.LARGE, weight = FontWeight.Bold, color = WarningOrange)
-            val ExtraLarge = create(TextSizes.EXTRA_LARGE, weight = FontWeight.Bold, color = WarningOrange)
-        }
-
-        object Italic {
-            val ExtraSmall = create(TextSizes.EXTRA_SMALL, style = FontStyle.Italic, color = WarningOrange)
-            val Small = create(TextSizes.SMALL, style = FontStyle.Italic, color = WarningOrange)
-            val Medium = create(TextSizes.MEDIUM, style = FontStyle.Italic, color = WarningOrange)
-            val Large = create(TextSizes.LARGE, style = FontStyle.Italic, color = WarningOrange)
-            val ExtraLarge = create(TextSizes.EXTRA_LARGE, style = FontStyle.Italic, color = WarningOrange)
-        }
-    }
-
-    // Success (Green)
-    object Success {
-        val ExtraSmall = create(TextSizes.EXTRA_SMALL, color = SuccessGreen)
-        val Small = create(TextSizes.SMALL, color = SuccessGreen)
-        val Medium = create(TextSizes.MEDIUM, color = SuccessGreen)
-        val Large = create(TextSizes.LARGE, color = SuccessGreen)
-        val ExtraLarge = create(TextSizes.EXTRA_LARGE, color = SuccessGreen)
-
-        object Bold {
-            val ExtraSmall = create(TextSizes.EXTRA_SMALL, weight = FontWeight.Bold, color = SuccessGreen)
-            val Small = create(TextSizes.SMALL, weight = FontWeight.Bold, color = SuccessGreen)
-            val Medium = create(TextSizes.MEDIUM, weight = FontWeight.Bold, color = SuccessGreen)
-            val Large = create(TextSizes.LARGE, weight = FontWeight.Bold, color = SuccessGreen)
-            val ExtraLarge = create(TextSizes.EXTRA_LARGE, weight = FontWeight.Bold, color = SuccessGreen)
-        }
-
-        object Italic {
-            val ExtraSmall = create(TextSizes.EXTRA_SMALL, style = FontStyle.Italic, color = SuccessGreen)
-            val Small = create(TextSizes.SMALL, style = FontStyle.Italic, color = SuccessGreen)
-            val Medium = create(TextSizes.MEDIUM, style = FontStyle.Italic, color = SuccessGreen)
-            val Large = create(TextSizes.LARGE, style = FontStyle.Italic, color = SuccessGreen)
-            val ExtraLarge = create(TextSizes.EXTRA_LARGE, style = FontStyle.Italic, color = SuccessGreen)
-        }
-    }
-
-    // Info (Blue)
-    object Main {
-        val ExtraSmall = create(TextSizes.EXTRA_SMALL, color = MainBlue)
-        val Small = create(TextSizes.SMALL, color = MainBlue)
-        val Medium = create(TextSizes.MEDIUM, color = MainBlue)
-        val Large = create(TextSizes.LARGE, color = MainBlue)
-        val ExtraLarge = create(TextSizes.EXTRA_LARGE, color = MainBlue)
-
-        object Bold {
-            val ExtraSmall = create(TextSizes.EXTRA_SMALL, weight = FontWeight.Bold, color = MainBlue)
-            val Small = create(TextSizes.SMALL, weight = FontWeight.Bold, color = MainBlue)
-            val Medium = create(TextSizes.MEDIUM, weight = FontWeight.Bold, color = MainBlue)
-            val Large = create(TextSizes.LARGE, weight = FontWeight.Bold, color = MainBlue)
-            val ExtraLarge = create(TextSizes.EXTRA_LARGE, weight = FontWeight.Bold, color = MainBlue)
-        }
-
-        object Italic {
-            val ExtraSmall = create(TextSizes.EXTRA_SMALL, style = FontStyle.Italic, color = MainBlue)
-            val Small = create(TextSizes.SMALL, style = FontStyle.Italic, color = MainBlue)
-            val Medium = create(TextSizes.MEDIUM, style = FontStyle.Italic, color = MainBlue)
-            val Large = create(TextSizes.LARGE, style = FontStyle.Italic, color = MainBlue)
-            val ExtraLarge = create(TextSizes.EXTRA_LARGE, style = FontStyle.Italic, color = MainBlue)
-        }
-    }
-
-    // Custom
     fun custom(
         size: Float,
         weight: FontWeight = FontWeight.Normal,
         color: Color = TextBlack,
         style: FontStyle = FontStyle.Normal
-    ) = create(size, weight, color, style)
+    ): TextStyle = create(size, color, weight, style)
 }

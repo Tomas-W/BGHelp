@@ -86,17 +86,17 @@ fun ItemScreen(
                             ) {
                                 Text(
                                     item.name,
-                                    style = TextStyles.Default.Medium,
+                                    style = TextStyles.Default.M,
                                     modifier = Modifier.weight(2f)
                                 )
                                 Text(
                                     item.quantity.toString(),
-                                    style = TextStyles.Default.Medium,
+                                    style = TextStyles.Default.M,
                                     modifier = Modifier.weight(1f)
                                 )
                                 Text(
                                     item.unit.toString(),
-                                    style = TextStyles.Default.Medium,
+                                    style = TextStyles.Default.M,
                                     modifier = Modifier.weight(1f)
                                 )
                                 Icon(

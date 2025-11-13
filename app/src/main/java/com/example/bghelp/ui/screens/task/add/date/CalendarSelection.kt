@@ -25,6 +25,7 @@ fun CalendarSelection(
         },
         onMonthChanged = { ym -> viewModel.setCurrentMonth(ym) },
         isRangeMode = isEndDateVisible,
-        minDate = LocalDate.now()
+        minDate = LocalDate.now(),
+        onDismissRequest = { viewModel.setCalendarVisible(false) }
     )
 }

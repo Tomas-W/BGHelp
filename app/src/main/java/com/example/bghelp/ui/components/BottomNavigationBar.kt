@@ -55,6 +55,7 @@ private fun RowScope.NavigationItem(
     onClick: () -> Unit
 ) {
     val iconRes = getIconResource(screen, currentRoute)
+    val navigationTopInset = 6.dp
     
     NavigationBarItem(
         selected = isSelected,
@@ -63,7 +64,7 @@ private fun RowScope.NavigationItem(
             Image(
                 painter = painterResource(iconRes),
                 contentDescription = screen.title,
-                modifier = Modifier.size(Sizes.Icon.Large),
+                modifier = Modifier.size(Sizes.Icon.L),
                 colorFilter = ColorFilter.tint(
                     if (isSelected) MaterialTheme.colorScheme.onSurface
                      else MaterialTheme.colorScheme.onTertiary

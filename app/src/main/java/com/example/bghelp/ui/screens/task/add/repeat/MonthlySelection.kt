@@ -58,7 +58,7 @@ private fun MonthSelection(
     Column(
         modifier = Modifier
             .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(Sizes.Size.ExtraSmall)
+        verticalArrangement = Arrangement.spacedBy(Sizes.Size.XS)
     ) {
         Row(
             modifier = Modifier
@@ -120,7 +120,7 @@ private fun DaySelection(
     Column(
         modifier = Modifier
             .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(Sizes.Size.ExtraSmall)
+        verticalArrangement = Arrangement.spacedBy(Sizes.Size.XS)
     ) {
         Row(
             modifier = Modifier
@@ -155,7 +155,7 @@ private fun DaySelection(
             dayChunks.forEach { chunk ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(Sizes.Size.Small)
+                    horizontalArrangement = Arrangement.spacedBy(Sizes.Size.S)
                 ) {
                     chunk.forEach {day ->
                         Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {

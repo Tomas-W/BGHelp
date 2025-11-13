@@ -73,15 +73,15 @@ data class CreateTask(
 )
 
 data class Task(
-    override val id: Int,
-    override val date: LocalDateTime,
-    override val title: String,
-    override val description: String?,
+    val id: Int,
+    val date: LocalDateTime,
+    val title: String,
+    val description: String?,
     val expired: Boolean,
     val alarmName: String?,
-    override val sound: AlarmMode,
-    override val vibrate: AlarmMode,
-    override val snoozeTime: Int,
+    val sound: AlarmMode,
+    val vibrate: AlarmMode,
+    val snoozeTime: Int,
     val endDate: LocalDateTime? = null,
     val allDay: Boolean = false,
     val note: String? = null,
@@ -93,9 +93,7 @@ data class Task(
     val locations: List<TaskLocationEntry> = emptyList(),
     val createdAt: LocalDateTime = LocalDateTime.now(ZoneId.systemDefault()),
     val updatedAt: LocalDateTime = LocalDateTime.now(ZoneId.systemDefault())
-) : SchedulableItem {
-    // Removed isExpired - it called LocalDateTime.now() on every access
-    // Use date.isBefore(LocalDateTime.now()) directly in UI when needed
+) {
     
     val hasAlarm: Boolean
         get() = sound != AlarmMode.OFF || vibrate != AlarmMode.OFF

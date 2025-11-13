@@ -65,7 +65,7 @@ fun TimeSelection(
             keyboardDismissKey = keyboardDismissKey
         )
 
-        Spacer(modifier = Modifier.width(Sizes.Icon.Medium))
+        Spacer(modifier = Modifier.width(Sizes.Icon.M))
 
         // Double arrow
         WithRipple {
@@ -75,19 +75,19 @@ fun TimeSelection(
                         onClick = {
                             viewModel.toggleEndTimeVisible()
                         },
-                        radius = Sizes.Icon.Small
+                        radius = Sizes.Icon.S
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    modifier = Modifier.size(Sizes.Icon.Small),
+                    modifier = Modifier.size(Sizes.Icon.S),
                     painter = painterResource(R.drawable.double_arrow_right),
                     contentDescription = if (isEndTimeVisible) STR.HIDE_END_TIME else STR.SHOW_END_TIME
                 )
             }
         }
 
-        Spacer(modifier = Modifier.width(Sizes.Icon.Medium - inputPaddingOffset))
+        Spacer(modifier = Modifier.width(Sizes.Icon.M - inputPaddingOffset))
 
         // endTime
         TimeSelectionInput(

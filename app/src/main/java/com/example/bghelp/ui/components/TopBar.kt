@@ -50,31 +50,30 @@ fun TopBar(
                 .fillMaxWidth()
                 .windowInsetsPadding(WindowInsets.statusBars)
                 .height(UI.TOP_BAR_HEIGHT.dp)
-                .padding(horizontal = 8.dp)
-                .align(Alignment.BottomStart),
+                .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (showWallpaperIcon) {
                 IconButton(onClick = onScreenshotClick) {
                     Image(
                         painter = painterResource(id = R.drawable.screenshot),
-                        contentDescription = "Wallpaper",
-                        modifier = Modifier.size(Sizes.Icon.ExtraLarge)
+                        contentDescription = "Go to wallpaper screen",
+                        modifier = Modifier.size(Sizes.Icon.L)
                     )
                 }
             } else {
                 IconButton(onClick = onBackClick) {
                     Image(
                         painter = painterResource(id = R.drawable.back),
-                        contentDescription = "Back",
-                        modifier = Modifier.size(Sizes.Icon.ExtraLarge)
+                        contentDescription = "Go to previous screen",
+                        modifier = Modifier.size(Sizes.Icon.L)
                     )
                 }
             }
 
             Text(
                 text = title,
-                style = TextStyles.White.Bold.Large,
+                style = TextStyles.White.Bold.L,
                 modifier = Modifier.padding(start = 12.dp)
             )
 
@@ -83,8 +82,8 @@ fun TopBar(
             IconButton(onClick = onSettingsClick) {
                 Image(
                     painter = painterResource(R.drawable.options_inactive),
-                    contentDescription = "Options",
-                    modifier = Modifier.size(Sizes.Icon.ExtraLarge)
+                    contentDescription = "Go to options screen",
+                    modifier = Modifier.size(Sizes.Icon.XL)
                 )
             }
         }

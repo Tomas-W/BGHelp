@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
+import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 
 @Composable
@@ -116,7 +117,7 @@ fun OutlinedStringInput(
                     onDone()
                 }
             ),
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(Sizes.Corner.S),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = MaterialTheme.colorScheme.scrim,

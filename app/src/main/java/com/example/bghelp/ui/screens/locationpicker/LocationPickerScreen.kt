@@ -298,7 +298,7 @@ private fun DragHandle(
             modifier = Modifier
                 .width(48.dp)
                 .height(4.dp)
-                .clip(RoundedCornerShape(Sizes.Corner.ExtraSmall))
+                .clip(RoundedCornerShape(Sizes.Corner.XS))
                 .background(MaterialTheme.colorScheme.onSurfaceVariant)
         )
     }

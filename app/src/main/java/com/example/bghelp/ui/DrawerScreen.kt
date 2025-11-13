@@ -84,18 +84,18 @@ private fun DrawerItem(
         label = { 
             Text(
                 text = screen.title,
-                style = if (selected) TextStyles.Default.Bold.Medium else TextStyles.Default.Medium
+                style = if (selected) TextStyles.Default.Bold.M else TextStyles.Default.M
             ) 
         },
         icon = { 
             Icon(
                 painter = painterResource(id = iconRes), 
                 contentDescription = screen.title, 
-                modifier = Modifier.size(Sizes.Icon.ExtraSmall)
+                modifier = Modifier.size(Sizes.Icon.XS)
             ) 
         },
         colors = colors,
         modifier = Modifier.padding(bottom = 8.dp),
-        shape = RoundedCornerShape(topEnd = Sizes.Corner.Large, bottomEnd = Sizes.Corner.Large)
+        shape = RoundedCornerShape(topEnd = Sizes.Corner.L, bottomEnd = Sizes.Corner.L)
     )
 }

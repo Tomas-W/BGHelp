@@ -15,6 +15,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.bghelp.ui.theme.Sizes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,7 +30,7 @@ fun WithRipple(content: @Composable () -> Unit) {
 fun Modifier.clickableRipple(
     onClick: () -> Unit,
     enabled: Boolean = true,
-    radius: Dp = 22.dp
+    radius: Dp = Sizes.Icon.M
 ): Modifier {
     val indication = ripple(
         bounded = false,
@@ -50,7 +51,7 @@ fun Modifier.clickableRipple(
 fun Modifier.clickableRippleDismiss(
     onClick: () -> Unit,
     enabled: Boolean = true,
-    radius: Dp = 22.dp
+    radius: Dp = Sizes.Icon.M
 ): Modifier {
     val focusManager = LocalFocusManager.current
     val indication = ripple(

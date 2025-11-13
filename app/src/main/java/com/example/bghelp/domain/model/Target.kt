@@ -1,8 +1,5 @@
 package com.example.bghelp.domain.model
 
-import com.example.bghelp.domain.model.AlarmMode
-import com.example.bghelp.domain.model.Coordinate
-import com.example.bghelp.domain.model.SchedulableItem
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -20,21 +17,18 @@ data class CreateTarget(
 )
 
 data class Target(
-    override val id: Int,
-    override val date: LocalDateTime,
-    override val title: String,
-    override val description: String?,
+    val id: Int,
+    val date: LocalDateTime,
+    val title: String,
+    val description: String?,
     val expired: Boolean,
     val coordinates: List<Coordinate>,
     val alertDistance: Int,
     val alarmName: String?,
-    override val sound: AlarmMode,
-    override val vibrate: AlarmMode,
-    override val snoozeTime: Int
-) : SchedulableItem {
-    // Removed isExpired - it called LocalDateTime.now() on every access
-    // Use date.isBefore(LocalDateTime.now()) directly in UI when needed
-    
+    val sound: AlarmMode,
+    val vibrate: AlarmMode,
+    val snoozeTime: Int
+) {
     val hasAlarm: Boolean
         get() = sound != AlarmMode.OFF || vibrate != AlarmMode.OFF
 }

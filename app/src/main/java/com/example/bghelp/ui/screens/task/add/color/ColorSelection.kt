@@ -103,10 +103,10 @@ fun ColorDropdown(
         ) {
             Box(
                 modifier = Modifier
-                    .size(Sizes.Icon.Large)
+                    .size(Sizes.Icon.L)
                     .background(displayColor)
             )
-            Spacer(modifier = Modifier.width(Sizes.Icon.ExtraSmall))
+            Spacer(modifier = Modifier.width(Sizes.Icon.XS))
             Text(
                 text = displayText,
                 style = deselectedStyle
@@ -148,7 +148,7 @@ fun ColorDropdownItem(
     ) {
         Text(
             text = label,
-            style = TextStyles.Default.Small
+            style = TextStyles.Default.S
         )
     }
 }

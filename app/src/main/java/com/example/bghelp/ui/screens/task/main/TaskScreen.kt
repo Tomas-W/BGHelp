@@ -9,28 +9,34 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.bghelp.domain.model.CreateTask
-import com.example.bghelp.ui.components.LazyColumnContainer
-import com.example.bghelp.ui.components.MainHeader
-import com.example.bghelp.ui.components.DayComponent
-import com.example.bghelp.ui.components.WeekNavigationRow
 import com.example.bghelp.domain.model.AlarmMode
+import com.example.bghelp.domain.model.CreateTask
+import com.example.bghelp.domain.model.Task
+import com.example.bghelp.ui.components.LazyColumnContainer
 import com.example.bghelp.ui.components.MainContentContainer
+import com.example.bghelp.ui.components.MainHeader
+import com.example.bghelp.ui.components.WeekNavigationRow
+import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.utils.toDayHeader
+import com.example.bghelp.utils.toTaskTime
 import java.time.LocalDateTime
 
-@SuppressLint("FrequentlyChangingValue")
+@SuppressLint("FrequentlyChangingValue", "FrequentlyChangedStateReadInComposition")
 @Composable
 fun TaskScreen(taskViewModel: TaskViewModel = hiltViewModel()) {
     // Task items
@@ -60,11 +66,11 @@ fun TaskScreen(taskViewModel: TaskViewModel = hiltViewModel()) {
         )
     }
 
+    var taskPendingDeletion by remember { mutableStateOf<Task?>(null) }
+
     Column(
         modifier = Modifier.fillMaxSize()
         ) {
-//        AddButtonRow(taskViewModel)
-
         WeekNavigationRow(
             monthYear = navMonthYear,
             weekNumber = navWeekNumber,
@@ -85,10 +91,10 @@ fun TaskScreen(taskViewModel: TaskViewModel = hiltViewModel()) {
                         contentType = { "task" }
                         ) { task ->
                         DayComponent(
-                            item = task,
+                            task = task,
                             isExpanded = expandedTaskIds.contains(task.id),
                             onToggleExpanded = taskViewModel::toggleTaskExpanded,
-                            onDelete = taskViewModel::deleteTask
+                            onDelete = { taskPendingDeletion = it }
                         )
                     }
                 } else {
@@ -99,6 +105,15 @@ fun TaskScreen(taskViewModel: TaskViewModel = hiltViewModel()) {
             }
         }
     }
+
+    DeleteTaskDialog(
+        task = taskPendingDeletion,
+        onDismiss = { taskPendingDeletion = null },
+        onConfirm = {
+            taskPendingDeletion?.let { taskViewModel.deleteTask(it) }
+            taskPendingDeletion = null
+        }
+    )
 }
 
 @Composable
@@ -150,4 +165,50 @@ fun AddTaskButton(
     ) {
         Text(text)
     }
+}
+
+@Composable
+private fun DeleteTaskDialog(
+    task: Task?,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    if (task == null) return
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        },
+        title = {
+            Text("Are you sure you want to delete this task?")
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = task.title,
+                    style = TextStyles.Default.Bold.M
+                )
+                task.description?.let { description ->
+                    Text(
+                        text = description,
+                        style = TextStyles.Default.M
+                    )
+                }
+                Text(
+                    text = task.date.toTaskTime(),
+                    style = TextStyles.Grey.S
+                )
+            }
+        }
+    )
 }

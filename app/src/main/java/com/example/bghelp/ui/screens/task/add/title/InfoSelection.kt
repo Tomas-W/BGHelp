@@ -27,7 +27,7 @@ fun InfoSelection(
         value = infoText,
         onValueChange = { viewModel.setInfoText(it) },
         hint = STR.INFO_HINT,
-        textStyle = TextStyles.Default.Italic.Small,
+        textStyle = TextStyles.Default.Italic.S,
         minLines = CONST.INFO_MIN_LINES,
         maxLines = CONST.INFO_MAX_LINES,
         isActive = activeTitleInput == TitleInputType.INFO,

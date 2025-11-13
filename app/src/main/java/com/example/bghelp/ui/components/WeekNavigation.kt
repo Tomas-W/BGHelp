@@ -1,56 +1,37 @@
 package com.example.bghelp.ui.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
 import com.example.bghelp.ui.theme.BGHelpTheme
-import com.example.bghelp.ui.theme.TextGrey
+import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import java.time.DayOfWeek
 import java.time.LocalDate
-
-@Composable
-private fun ClickableArrow(
-    onClick: () -> Unit,
-    painterResource: Int,
-    contentDescription: String,
-    modifier: Modifier = Modifier
-) = WithRipple {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        Image(
-            modifier = Modifier
-                .size(48.dp)
-                .clickableRipple(onClick = onClick),
-            painter = painterResource(painterResource),
-            contentScale = ContentScale.Fit,
-            contentDescription = contentDescription,
-            colorFilter = ColorFilter.tint(TextGrey)
-        )
-    }
-}
 
 @Composable
 fun WeekNavigationRow(
@@ -63,77 +44,111 @@ fun WeekNavigationRow(
     onDaySelected: (LocalDate) -> Unit
 ) {
     val today = remember { LocalDate.now() }
+    val colorScheme = MaterialTheme.colorScheme
+    val selectedDayColor = colorScheme.secondary
+    val todayDayColor = colorScheme.primary
 
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp)
+            .padding(
+                horizontal = Sizes.Icon.XL,
+                vertical = 12.dp
+            ),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        // Prev
-        ClickableArrow(
-            onClick = onPreviousWeek,
-            painterResource = R.drawable.arrow_left,
-            contentDescription = "Previous week",
-            modifier = Modifier.weight(0.15f)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Month year
+            Text(
+                text = monthYear,
+                style = TextStyles.Grey.M
+            )
 
-        Column(modifier = Modifier.weight(0.7f)) {
-            // Month Year Weeks
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.spacedBy(Sizes.Icon.M),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Month year
-                Text(
-                    text = monthYear,
-                    style = TextStyles.Default.Medium
-                )
+                // Prev arrow
+                WithRipple {
+                    Icon(
+                        modifier = Modifier
+                            .size(Sizes.Icon.M)
+                            .clickableRipple( onPreviousWeek ),
+                        painter = painterResource(R.drawable.navigation_arrow_left),
+                        contentDescription = "Previous week"
+                    )
+                }
+
                 // Week number
                 Text(
                     text = weekNumber,
-                    style = TextStyles.Default.Medium
+                    style = TextStyles.Grey.XS
                 )
-            }
 
-            // Day numbers row
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp),
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                weekDays.forEach { day ->
-                    val isToday = day == today
-                    val isSelected = day == selectedDate
-                    val style = when {
-                        isToday -> TextStyles.Main.Bold.Large
-                        isSelected -> TextStyles.Default.Bold.Large
-                        else -> TextStyles.Default.Medium
-                    }
-                    Box(
+                // Next arrow
+                WithRipple {
+                    Icon(
                         modifier = Modifier
-                            .clickable { onDaySelected(day) }
-                            .height(32.dp) // Fixed height for all days
-                            .weight(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "${day.dayOfMonth}",
-                            style = style
-                        )
-                    }
+                            .size(Sizes.Icon.M)
+                            .clickableRipple( onNextWeek ),
+                        painter = painterResource(R.drawable.navigation_arrow_right),
+                        contentDescription = "Next week"
+                    )
                 }
             }
         }
 
-        // Next week
-        ClickableArrow(
-            onClick = onNextWeek,
-            painterResource = R.drawable.arrow_right,
-            contentDescription = "Next week",
-            modifier = Modifier.weight(0.15f)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Week days
+            weekDays.forEach { day ->
+                val isToday = day == today
+                val isSelected = day == selectedDate
+                // Set selected color
+                val dayModifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(Sizes.Corner.S))
+                    .background(
+                        color = if (isSelected) selectedDayColor else Color.Transparent
+                    )
+                    .clickableRipple(onClick = { onDaySelected(day) })
+
+                Box(
+                    modifier = dayModifier,
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isToday) {
+                        Box(
+                            // Set today color
+                            modifier = Modifier
+                                .size(Sizes.Icon.XL)
+                                .clip(CircleShape)
+                                .background(todayDayColor),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "${day.dayOfMonth}",
+                                style = TextStyles.White.Bold.M,)
+                        }
+                    } else {
+                        Text(
+                            text = "${day.dayOfMonth}",
+                            style = if (isSelected) TextStyles.Default.Bold.M else TextStyles.Default.M
+                        )
+                    }
+                }
+            }
+
+        }
     }
 }
 

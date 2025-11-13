@@ -38,7 +38,7 @@ fun ImageSelection(
     val imageLabel = selectedImage?.displayName ?: STR.NO_IMAGE_SELECTED
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(Sizes.Size.Small),
+        verticalArrangement = Arrangement.spacedBy(Sizes.Size.S),
         horizontalAlignment = Alignment.Start
     ) {
         Box {
@@ -87,7 +87,7 @@ fun ImageSelection(
                 contentDescription = imageLabel,
                 modifier = Modifier
                     .size(CONST.IMAGE_SIZE.dp)
-                    .clip(RoundedCornerShape(Sizes.Corner.Small)),
+                    .clip(RoundedCornerShape(Sizes.Corner.S)),
                 contentScale = ContentScale.Crop
             )
         }

@@ -1,4 +1,4 @@
-package com.example.bghelp.ui.components
+package com.example.bghelp.ui.screens.task.main
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
@@ -15,8 +15,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -24,27 +24,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
+import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.Task
+import com.example.bghelp.ui.components.SchedulableContainer
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
-import com.example.bghelp.domain.model.AlarmMode
-import com.example.bghelp.domain.model.SchedulableItem
 import com.example.bghelp.ui.theme.TextSizes
 import com.example.bghelp.utils.isInFuture
 import com.example.bghelp.utils.toTaskTime
 
 @Composable
-fun <T: SchedulableItem> DayComponent(
-    item: T,
+fun DayComponent(
+    task: Task,
     isExpanded: Boolean,
     onToggleExpanded: (Int) -> Unit,
-    onDelete: (T) -> Unit
+    onDelete: (Task) -> Unit
 ) {
     val colorScheme = MaterialTheme.colorScheme
     val taskBackgroundColor =
-        if (item.date.isInFuture()) colorScheme.secondary else colorScheme.tertiary
-    val deleteCallback = remember(key1 = item.id) { { onDelete(item) } }
-    val toggleCallback = remember(key1 = item.id) { { onToggleExpanded(item.id) } }
+        if (task.date.isInFuture()) colorScheme.secondary else colorScheme.tertiary
+    val deleteCallback = remember(key1 = task.id) { { onDelete(task) } }
+    val toggleCallback = remember(key1 = task.id) { { onToggleExpanded(task.id) } }
 
     SchedulableContainer(
         modifier = Modifier
@@ -56,18 +56,18 @@ fun <T: SchedulableItem> DayComponent(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            TimeInfo(item = item)
-            AlarmIcons(item = item, onDelete = deleteCallback)
+            TimeInfo(task = task)
+            AlarmIcons(task = task, onDelete = deleteCallback)
         }
         TitleAndDescription(
-            title = item.title,
-            description = item.description,
+            title = task.title,
+            description = task.description,
             isExpanded = isExpanded
         )
-        if (isExpanded && item is Task) {
-            val imageAttachment = item.image
+        if (isExpanded) {
+            val imageAttachment = task.image
             if (imageAttachment?.uri != null) {
-                Spacer(modifier = Modifier.height(Sizes.Size.Small))
+                Spacer(modifier = Modifier.height(Sizes.Icon.XXS))
                 TaskImagePreview(
                     imagePath = imageAttachment.uri,
                     displayName = imageAttachment.displayName
@@ -78,24 +78,24 @@ fun <T: SchedulableItem> DayComponent(
 }
 
 @Composable
-fun TimeInfo(item: SchedulableItem) {
+private fun TimeInfo(task: Task) {
     Row {
         Text(
-            text = item.date.toTaskTime(),
-            style = TextStyles.Default.Bold.Medium,
+            text = task.date.toTaskTime(),
+            style = TextStyles.Default.Bold.M,
             modifier = Modifier.padding(end = 8.dp)
         )
-        if (item.snoozeTime > 0) {
+        if (task.snoozeTime > 0) {
             Text(
-                text = " +${item.snoozeTime}",
-                style = TextStyles.Error.ExtraSmall
+                text = " +${task.snoozeTime}",
+                style = TextStyles.Error.XS
             )
         }
     }
 }
 
 @Composable
-fun TitleAndDescription(
+private fun TitleAndDescription(
     title: String,
     description: String?,
     isExpanded: Boolean
@@ -103,28 +103,28 @@ fun TitleAndDescription(
     Column {
         Text(
             text = title,
-            style = TextStyles.Default.Medium
+            style = TextStyles.Default.M
         )
         if (isExpanded && description != null) {
             Text(
                 text = description,
-                style = TextStyles.Default.Italic.Medium
+                style = TextStyles.Default.Italic.M
             )
         } else if (isExpanded) {
-            Spacer(modifier = Modifier.height(TextSizes.MEDIUM.dp))
+            Spacer(modifier = Modifier.height(TextSizes.M.dp))
         }
     }
 }
 
 @Composable
 private fun AlarmIcons(
-    item: SchedulableItem,
+    task: Task,
     onDelete: () -> Unit
 ) {
     Row {
-        SoundIcon(soundMode = item.sound)
+        SoundIcon(soundMode = task.sound)
         Spacer(modifier = Modifier.width(16.dp))
-        VibrateIcon(vibrateMode = item.vibrate)
+        VibrateIcon(vibrateMode = task.vibrate)
         Spacer(modifier = Modifier.width(8.dp))
         DeleteIcon(onDelete = onDelete)
     }
@@ -132,20 +132,20 @@ private fun AlarmIcons(
 
 @Composable
 private fun SoundIcon(soundMode: AlarmMode) {
-     val iconRes = when (soundMode) {
-         AlarmMode.OFF -> null
-         AlarmMode.ONCE -> R.drawable.sound_once
-         AlarmMode.CONTINUOUS -> R.drawable.sound_continuous
-     }
+    val iconRes = when (soundMode) {
+        AlarmMode.OFF -> null
+        AlarmMode.ONCE -> R.drawable.sound_once
+        AlarmMode.CONTINUOUS -> R.drawable.sound_continuous
+    }
 
     if (iconRes != null) {
         Image(
             painter = painterResource(iconRes),
             contentDescription = soundMode.value,
-            modifier = Modifier.size(Sizes.Icon.Small)
+            modifier = Modifier.size(Sizes.Icon.S)
         )
     } else {
-        Spacer(modifier = Modifier.size(Sizes.Icon.Small))
+        Spacer(modifier = Modifier.size(Sizes.Icon.S))
     }
 }
 
@@ -161,10 +161,10 @@ private fun VibrateIcon(vibrateMode: AlarmMode) {
         Image(
             painter = painterResource(iconRes),
             contentDescription = vibrateMode.value,
-            modifier = Modifier.size(Sizes.Icon.Small)
+            modifier = Modifier.size(Sizes.Icon.S)
         )
     } else {
-        Spacer(modifier = Modifier.size(Sizes.Icon.Small))
+        Spacer(modifier = Modifier.size(Sizes.Icon.S))
     }
 }
 
@@ -177,3 +177,4 @@ private fun DeleteIcon(onDelete: () -> Unit) {
         modifier = Modifier.clickable(onClick = onDelete)
     )
 }
+

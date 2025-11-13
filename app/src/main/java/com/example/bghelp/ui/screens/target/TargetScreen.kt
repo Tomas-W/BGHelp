@@ -23,7 +23,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.bghelp.domain.model.CreateTarget
 import com.example.bghelp.ui.components.LazyColumnContainer
 import com.example.bghelp.ui.components.MainHeader
-import com.example.bghelp.ui.components.DayComponent
 import com.example.bghelp.ui.components.WeekNavigationRow
 import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.Coordinate
@@ -85,8 +84,8 @@ fun TargetScreen(targetViewModel: TargetViewModel = hiltViewModel()) {
                         key = { target -> target.id },
                         contentType = { "target" }
                         ) { target ->
-                        DayComponent(
-                            item = target,
+                        TargetComponent(
+                            target = target,
                             isExpanded = expandedTargetIds.contains(target.id),
                             onToggleExpanded = targetViewModel::toggleTargetExpanded,
                             onDelete = targetViewModel::deleteTarget

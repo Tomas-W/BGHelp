@@ -46,7 +46,7 @@ class TaskViewModel @Inject constructor(
     val expandedTaskIds: StateFlow<Set<Int>> = _expandedTaskIds.asStateFlow()
 
     val monthYear: StateFlow<String> = selectedWeek
-        .map { it.format(DateTimeFormatter.ofPattern("MMMM ''yy")) }
+        .map { it.format(DateTimeFormatter.ofPattern("MMMM yyyy")) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -54,7 +54,7 @@ class TaskViewModel @Inject constructor(
         )
 
     val weekNumber: StateFlow<String> = selectedWeek
-        .map { "week ${it.get(WeekFields.ISO.weekOfYear())}" }
+        .map { "${it.get(WeekFields.ISO.weekOfYear())}" }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

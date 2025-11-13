@@ -24,7 +24,7 @@ fun TitleSelection(
         value = titleText,
         onValueChange = { viewModel.setTitleText(it) },
         hint = STR.TITLE_HINT,
-        textStyle = TextStyles.Default.Bold.Small,
+        textStyle = TextStyles.Default.Bold.S,
         minLines = CONST.TITLE_MIN_LINES,
         maxLines = CONST.TITLE_MAX_LINES,
         isActive = activeTitleInput == TitleInputType.TITLE,

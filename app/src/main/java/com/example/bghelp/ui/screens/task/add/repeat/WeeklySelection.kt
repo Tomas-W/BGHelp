@@ -98,7 +98,7 @@ private fun WeekSelection(
             style = deselectedStyle
         )
 
-        Spacer(modifier = Modifier.width(Sizes.Icon.Small))
+        Spacer(modifier = Modifier.width(Sizes.Icon.S))
 
         Box(
             modifier = Modifier.wrapContentWidth()
@@ -142,7 +142,7 @@ private fun WeekSelection(
             }
         }
 
-        Spacer(modifier = Modifier.width(Sizes.Icon.Small))
+        Spacer(modifier = Modifier.width(Sizes.Icon.S))
 
         Text(
             text = "weeks",

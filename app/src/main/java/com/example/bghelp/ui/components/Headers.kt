@@ -12,6 +12,6 @@ import com.example.bghelp.ui.theme.TextStyles
 fun MainHeader(text: String) {
     Text(
         text = text,
-        style = TextStyles.Grey.Bold.Large
+        style = TextStyles.Grey.Bold.L
     )
 }

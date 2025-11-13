@@ -690,10 +690,14 @@ class AddTaskViewModel @Inject constructor(
     }
 
     // Misc
-    fun clearAllInputSelections() {
+    fun clearNonCalendarInputSelections() {
         clearTimeInputSelection()
         clearReminderInputSelection()
         clearTitleInputSelection()
+    }
+
+    fun clearAllInputSelections() {
+        clearNonCalendarInputSelections()
         setCalendarVisible(false)
     }
 
