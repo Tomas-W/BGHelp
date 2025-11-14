@@ -12,6 +12,7 @@ val SecondaryBlue = Color(200, 220, 245)
 val BackgroundGrey = Color(237, 237, 237)
 val SecondaryGrey = Color(210, 210, 210)
 val TertiaryGrey = Color(155, 155, 155)
+//val ButtonGrey = Color(130, 130, 130)
 
 val TaskDefault = MainBlue.copy(alpha = 0.15f)
 val TaskRed = Color.Red.copy(alpha = 0.25f)

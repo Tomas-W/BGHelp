@@ -33,7 +33,6 @@ fun TimeSelection(
     val timeEndSelection by viewModel.timeEndSelection.collectAsState()
     val activeTimeField by viewModel.activeTimeField.collectAsState()
     val activeTimeSegment by viewModel.activeTimeSegment.collectAsState()
-    val isTimeRangeInvalid by viewModel.isTimeRangeInvalid.collectAsState()
     val isEndTimeVisible by viewModel.isEndTimeVisible.collectAsState()
     val keyboardDismissKey by viewModel.keyboardDismissKey.collectAsState()
 
@@ -114,8 +113,7 @@ fun TimeSelection(
                     viewModel.clearTimeInputSelection()
                 }
             },
-            keyboardDismissKey = keyboardDismissKey,
-            isError = isTimeRangeInvalid && isEndTimeVisible
+            keyboardDismissKey = keyboardDismissKey
         )
     }
 }

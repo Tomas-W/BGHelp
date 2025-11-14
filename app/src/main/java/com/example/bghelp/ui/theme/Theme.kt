@@ -23,7 +23,7 @@ private val LightColorScheme = lightColorScheme(
     // onPrimaryContainer = MainBlue, // Text on primary container backgrounds
     secondary = SecondaryBlue, // Secondary brand color for accent elements
     onSecondary = TextBlack, // Text/icons on secondary colored elements
-    // secondaryContainer = SecondaryBlue.copy(alpha = 0.1f), // Subtle secondary backgrounds
+//    secondaryContainer = ButtonGrey, // Subtle secondary backgrounds
     // onSecondaryContainer = SecondaryBlue, // Text on secondary container backgrounds
     tertiary = SecondaryGrey, // Third brand color for additional accents
     onTertiary = TextGrey, // Text/icons on tertiary colored elements

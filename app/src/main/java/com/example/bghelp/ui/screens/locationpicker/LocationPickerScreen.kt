@@ -2,9 +2,8 @@ package com.example.bghelp.ui.screens.locationpicker
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -15,11 +14,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import com.example.bghelp.ui.components.CancelButton
+import com.example.bghelp.ui.components.ConfirmButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -236,27 +235,28 @@ private fun BottomButtonRow(
 ) {
     val canSave = selectedLocations.isNotEmpty() &&
             selectedLocations.all { it.name.isNotBlank() }
+    val canAddMarker = allowMultiple || selectedLocations.isEmpty()
 
     Row(
         modifier = Modifier
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        val canAddMarker = allowMultiple || selectedLocations.isEmpty()
-        OutlinedButton(
-            modifier = Modifier.weight(1f),
-            enabled = canAddMarker,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+        CancelButton(
+            text = STR.ADD_MARKER,
             onClick = {
                 val target = cameraPositionState.position.target
                 viewModel.onAddMarker(target)
-            }
-        ) {
-            Text(text = STR.ADD_MARKER)
-        }
-        Button(
+            },
             modifier = Modifier.weight(1f),
-            enabled = canSave,
+            enabled = canAddMarker
+        )
+        ConfirmButton(
+            text = if (selectedLocations.size <= 1) {
+                STR.SAVE_LOCATION
+            } else {
+                STR.SAVE_LOCATIONS
+            },
             onClick = {
                 navController.previousBackStackEntry
                     ?.savedStateHandle
@@ -265,16 +265,10 @@ private fun BottomButtonRow(
                         ArrayList(selectedLocations)
                     )
                 navController.popBackStack()
-            }
-        ) {
-            Text(
-                text = if (selectedLocations.size <= 1) {
-                    STR.SAVE_LOCATION
-                } else {
-                    STR.SAVE_LOCATIONS
-                }
-            )
-        }
+            },
+            modifier = Modifier.weight(1f),
+            enabled = canSave
+        )
     }
 }
 

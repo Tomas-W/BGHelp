@@ -91,6 +91,12 @@ object AddTaskStrings {
     const val LOCATION_LAT_LABEL = "Latitude"
     const val LOCATION_LONG_LABEL = "Longitude"
     const val LOCATION_ADDRESS_LABEL = "Address"
+    // Validation errors
+    const val VALIDATION_TITLE_EMPTY = "Title cannot be empty"
+    const val VALIDATION_START_TIME_PAST = "Start time cannot be in the past"
+    const val VALIDATION_END_TIME_BEFORE_START = "End time must be after start time"
+    const val VALIDATION_REPEAT_MIN_DAYS = "Repeats require a 1 day minimum"
+    const val VALIDATION_REMINDERS_PAST = "Reminders cannot be in the past"
 }
 
 val selectedStyle = TextStyles.Default.Bold.M

@@ -330,12 +330,12 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
         val baseDate = task.date.toLocalDate()
         if (date.isBefore(baseDate)) return false
 
-        val byDays = if (rule.byDay.isEmpty()) {
-            setOf(task.date.dayOfWeek)
-        } else {
-            rule.byDay
+        // Filter out tasks with no days selected (empty byDay means user deselected all days)
+        if (rule.byDay.isEmpty()) {
+            return false
         }
-        if (date.dayOfWeek !in byDays) return false
+
+        if (date.dayOfWeek !in rule.byDay) return false
 
         val daysBetween = ChronoUnit.DAYS.between(baseDate, date)
         if (daysBetween < 0) return false
@@ -357,13 +357,12 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
 
         if (rule.byMonth.isNotEmpty() && date.monthValue !in rule.byMonth) return false
 
-        val dayCandidates = if (rule.byMonthDay.isEmpty()) {
-            listOf(baseDate.dayOfMonth)
-        } else {
-            rule.byMonthDay
+        // Filter out tasks with no days selected (empty byMonthDay means user deselected all days)
+        if (rule.byMonthDay.isEmpty()) {
+            return false
         }
 
-        val matchesDay = dayCandidates.any { day ->
+        val matchesDay = rule.byMonthDay.any { day ->
             when {
                 day == -1 -> date == date.with(TemporalAdjusters.lastDayOfMonth())
                 day > 0 -> date.dayOfMonth == day

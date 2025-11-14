@@ -1,4 +1,5 @@
 package com.example.bghelp.ui.screens.task.add
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,9 +10,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
+import com.example.bghelp.ui.components.CancelButton
+import com.example.bghelp.ui.components.ConfirmButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,6 +41,7 @@ fun AddTaskScreen(
     viewModel: AddTaskViewModel
 ) {
     val saveState by viewModel.saveState.collectAsState()
+    val isValid by viewModel.isValid.collectAsState()
     val scrollState = rememberScrollState()
 
     LaunchedEffect(saveState) {
@@ -114,21 +116,27 @@ fun AddTaskScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Button(
+                CancelButton(
+                    text = "Cancel",
+                    onClick = {
+                        viewModel.resetAllData()
+                        navController.popBackStack()
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+                ConfirmButton(
+                    text = if (saveState is SaveTaskState.Saving) {
+                        "Saving..."
+                    } else {
+                        "Save Task"
+                    },
                     onClick = { viewModel.saveTask() },
-                    enabled = saveState !is SaveTaskState.Saving,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = if (saveState is SaveTaskState.Saving) {
-                            "Saving..."
-                        } else {
-                            "Save Task"
-                        }
-                    )
-                }
+                    modifier = Modifier.weight(1f),
+                    enabled = isValid && saveState !is SaveTaskState.Saving
+                )
             }
         }
 
@@ -136,7 +144,7 @@ fun AddTaskScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 4.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
             ReusableSnackbarHost(

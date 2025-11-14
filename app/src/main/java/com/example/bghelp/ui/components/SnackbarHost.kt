@@ -19,9 +19,9 @@ fun ReusableSnackbarHost(
     val message by snackbarMessage.collectAsState()
 
     LaunchedEffect(message) {
-        message?.let {
-            hostState.showSnackbar(it)
-            onMessageShown()
+        message?.let { msg ->
+            hostState.showSnackbar(msg)
+            onMessageShown() // Clear the message after showing
         }
     }
 

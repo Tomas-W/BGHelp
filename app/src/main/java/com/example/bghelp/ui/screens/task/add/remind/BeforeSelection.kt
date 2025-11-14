@@ -48,6 +48,7 @@ import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 import com.example.bghelp.ui.screens.task.add.Reminder
 import com.example.bghelp.ui.screens.task.add.RemindType
+import com.example.bghelp.ui.screens.task.add.UserDateSelection
 import com.example.bghelp.ui.screens.task.add.deselectedStyle
 import com.example.bghelp.ui.screens.task.add.TimeUnit
 import com.example.bghelp.ui.screens.task.add.highlightedStyle
@@ -59,6 +60,9 @@ fun BeforeSelection (
 ) {
     val startReminders by viewModel.startReminders.collectAsState()
     val endReminders by viewModel.endReminders.collectAsState()
+    val isEndTimeVisible by viewModel.isEndTimeVisible.collectAsState()
+    val userDateSelection by viewModel.userDateSelection.collectAsState()
+    val showEndReminders = isEndTimeVisible && userDateSelection != UserDateSelection.ON
 
     // Before Start
     AddReminder(
@@ -78,21 +82,23 @@ fun BeforeSelection (
     }
     if (startReminders.isNotEmpty()) AddTaskSpacerMedium()
 
-    // Before end
-    AddReminder(
-        remindType = RemindType.END,
-        onClick = { viewModel.addReminder(RemindType.END) },
-        viewModel = viewModel
-    )
-    AddTaskSpacerSmall()
-
-    // Before end items
-    endReminders.forEach { reminder ->
-        ReminderItem(
-            reminder = reminder,
+    // Before end - only show if end time is visible and not all-day
+    if (showEndReminders) {
+        AddReminder(
             remindType = RemindType.END,
+            onClick = { viewModel.addReminder(RemindType.END) },
             viewModel = viewModel
         )
+        AddTaskSpacerSmall()
+
+        // Before end items
+        endReminders.forEach { reminder ->
+            ReminderItem(
+                reminder = reminder,
+                remindType = RemindType.END,
+                viewModel = viewModel
+            )
+        }
     }
 }
 

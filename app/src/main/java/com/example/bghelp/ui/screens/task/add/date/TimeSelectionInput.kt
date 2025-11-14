@@ -1,13 +1,11 @@
 package com.example.bghelp.ui.screens.task.add.date
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -24,7 +22,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -37,7 +34,6 @@ import com.example.bghelp.ui.screens.task.add.TimeSegment
 import com.example.bghelp.ui.screens.task.add.deselectedStyle
 import com.example.bghelp.ui.screens.task.add.highlightedStyle
 import com.example.bghelp.ui.screens.task.add.selectedStyle
-import com.example.bghelp.ui.theme.ErrorRed
 import java.time.LocalTime
 import java.util.Locale
 
@@ -52,8 +48,7 @@ fun TimeSelectionInput(
     onTimeInputClicked: () -> Unit = {},
     onSegmentSelected: (TimeField, TimeSegment) -> Unit,
     onSelectionCleared: () -> Unit,
-    keyboardDismissKey: Int = 0,
-    isError: Boolean = false
+    keyboardDismissKey: Int = 0
 ) = WithRipple {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -138,12 +133,9 @@ fun TimeSelectionInput(
         }
     }
 
-    val errorBackgroundColor = remember { ErrorRed.copy(alpha = 0.15f) }
-
     // Time select row
     Row(
-        modifier = modifier
-            .background(if (isError) errorBackgroundColor else Color.Transparent, RoundedCornerShape(8.dp)),
+        modifier = modifier,
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
