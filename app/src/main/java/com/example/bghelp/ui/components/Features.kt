@@ -29,9 +29,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.constants.UiConstants as UI
-import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 
 @SuppressLint("RememberInComposition")
 @Composable
@@ -155,21 +155,22 @@ fun CustomDropdown(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
-    itemHeight: Int? = null,
+    heightMultiplier: Float = 1f,
+    offset: DpOffset = DpOffset.Zero,
     content: @Composable () -> Unit
 ) {
-    val maxHeight = remember(itemHeight) {
-        val items = itemHeight ?: AddTaskConstants.DROPDOWN_ITEMS
-        (items * UI.DROPDOWN_ITEM_HEIGHT).dp
+    val maxHeight = remember(heightMultiplier) {
+        heightMultiplier * UI.DROPDOWN_HEIGHT
     }
     
     DropdownMenu(
         modifier = modifier
             .cropVertical(8.dp)
-            .heightIn(max = maxHeight)
+            .heightIn(max = maxHeight.dp)
             .background(MaterialTheme.colorScheme.tertiary),
         expanded = expanded,
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
+        offset = offset
     ) {
         content()
     }
@@ -179,14 +180,15 @@ fun CustomDropdown(
 fun DropdownItem(
     label: String,
     onClick: () -> Unit,
-    textStyle: TextStyle
+    textStyle: TextStyle,
+    spacing: Dp
 ) {
     Row(
         modifier = Modifier
             .wrapContentWidth()
-            .height(48.dp)
+            // .height(itemHeight)
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp),
+            .padding(horizontal = 14.dp, vertical = spacing / 2),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = label, style = textStyle)

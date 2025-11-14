@@ -59,7 +59,8 @@ fun ImageSelection(
                         onSelectFromLibrary()
                         onDismissMenu()
                     },
-                    textStyle = deselectedStyle
+                    textStyle = deselectedStyle,
+                    spacing = Sizes.Icon.XXL
                 )
                 DropdownItem(
                     label = STR.IMAGE_FROM_CAMERA,
@@ -67,7 +68,8 @@ fun ImageSelection(
                         onCapturePhoto()
                         onDismissMenu()
                     },
-                    textStyle = deselectedStyle
+                    textStyle = deselectedStyle,
+                    spacing = Sizes.Icon.XXL
                 )
             }
         }

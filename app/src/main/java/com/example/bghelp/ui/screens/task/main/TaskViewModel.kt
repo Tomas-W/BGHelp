@@ -24,7 +24,10 @@ import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Month
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import javax.inject.Inject
 
@@ -45,20 +48,62 @@ class TaskViewModel @Inject constructor(
     private val _expandedTaskIds = MutableStateFlow<Set<Int>>(emptySet())
     val expandedTaskIds: StateFlow<Set<Int>> = _expandedTaskIds.asStateFlow()
 
+    private val monthYearFormatter = DateTimeFormatter.ofPattern("MMMM yyyy")
+    private val isoWeekFields = WeekFields.ISO
+
     val monthYear: StateFlow<String> = selectedWeek
-        .map { it.format(DateTimeFormatter.ofPattern("MMMM yyyy")) }
+        .map { weekStart ->
+            weekStart.plusDays(3)
+                .format(monthYearFormatter)
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = ""
+            initialValue = _selectedWeek.value.plusDays(3).format(monthYearFormatter)
         )
 
-    val weekNumber: StateFlow<String> = selectedWeek
-        .map { "${it.get(WeekFields.ISO.weekOfYear())}" }
+    val weekDisplay: StateFlow<WeekDisplay> = selectedWeek
+        .map { weekStart ->
+            val weekNumber = weekStart.get(isoWeekFields.weekOfWeekBasedYear())
+            val weekYear = weekStart.get(isoWeekFields.weekBasedYear())
+            WeekDisplay(weekNumber, weekYear)
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = ""
+            initialValue = _selectedWeek.value.let { weekStart ->
+                val weekNumber = weekStart.get(isoWeekFields.weekOfWeekBasedYear())
+                val weekYear = weekStart.get(isoWeekFields.weekBasedYear())
+                WeekDisplay(weekNumber, weekYear)
+            }
+        )
+
+    val availableWeekNumbers: StateFlow<List<Int>> = weekDisplay
+        .map { display ->
+            val lastWeekNumber = LocalDate.of(display.year, 12, 28)
+                .get(isoWeekFields.weekOfWeekBasedYear())
+            (1..lastWeekNumber).toList()
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = run {
+                val initialYear = _selectedWeek.value.get(isoWeekFields.weekBasedYear())
+                val lastWeekNumber = LocalDate.of(initialYear, 12, 28)
+                    .get(isoWeekFields.weekOfWeekBasedYear())
+                (1..lastWeekNumber).toList()
+            }
+        )
+    
+    val currentYearMonth: StateFlow<YearMonth> = selectedWeek
+        .map { weekStart ->
+            val referenceDay = weekStart.plusDays(3)
+            YearMonth.of(referenceDay.year, referenceDay.month)
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = YearMonth.of(_selectedWeek.value.year, _selectedWeek.value.month)
         )
     
     val weekDays: StateFlow<List<LocalDate>> = selectedWeek
@@ -77,6 +122,37 @@ class TaskViewModel @Inject constructor(
 
     fun goToNextWeek() {
         updateSelectedWeek(_selectedWeek.value.plusWeeks(1))
+    }
+
+    fun goToMonth(yearMonth: YearMonth) {
+        val firstDayOfMonth = yearMonth.atDay(1)
+        val weekStart = firstDayOfMonth.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        updateSelectedWeek(weekStart)
+    }
+
+    fun goToMonth(month: Month) {
+        val currentWeekYear = _selectedWeek.value.get(isoWeekFields.weekBasedYear())
+        goToMonth(YearMonth.of(currentWeekYear, month))
+    }
+
+    fun goToYear(year: Int) {
+        val currentWeekNumber = _selectedWeek.value.get(isoWeekFields.weekOfWeekBasedYear())
+        val maxWeek = LocalDate.of(year, 12, 28).get(isoWeekFields.weekOfWeekBasedYear())
+        val targetWeek = currentWeekNumber.coerceAtMost(maxWeek)
+        goToWeek(targetWeek, year)
+    }
+
+    fun goToWeek(weekNumber: Int) {
+        val currentWeekYear = _selectedWeek.value.get(isoWeekFields.weekBasedYear())
+        goToWeek(weekNumber, currentWeekYear)
+    }
+
+    private fun goToWeek(weekNumber: Int, weekYear: Int) {
+        val referenceDate = LocalDate.of(weekYear, 1, 4)
+        val weekStart = referenceDate
+            .with(isoWeekFields.weekOfWeekBasedYear(), weekNumber.toLong())
+            .with(isoWeekFields.dayOfWeek(), DayOfWeek.MONDAY.value.toLong())
+        updateSelectedWeek(weekStart)
     }
 
     fun goToDay(day: LocalDate) {
@@ -147,3 +223,8 @@ class TaskViewModel @Inject constructor(
                 initialValue = emptyList()
             )
 }
+
+data class WeekDisplay(
+    val number: Int,
+    val year: Int
+)

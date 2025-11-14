@@ -30,7 +30,7 @@ import com.example.bghelp.domain.model.Task
 import com.example.bghelp.ui.components.LazyColumnContainer
 import com.example.bghelp.ui.components.MainContentContainer
 import com.example.bghelp.ui.components.MainHeader
-import com.example.bghelp.ui.components.WeekNavigationRow
+import com.example.bghelp.ui.components.WeekNavigation
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.utils.toDayHeader
 import com.example.bghelp.utils.toTaskTime
@@ -44,10 +44,14 @@ fun TaskScreen(taskViewModel: TaskViewModel = hiltViewModel()) {
     val selectedDate by taskViewModel.selectedDate.collectAsState()
     val expandedTaskIds by taskViewModel.expandedTaskIds.collectAsState()
     // Week navigation
-    val navSelectedDate by remember { derivedStateOf { selectedDate.toLocalDate() } }
-    val navMonthYear by taskViewModel.monthYear.collectAsState()
-    val navWeekNumber by taskViewModel.weekNumber.collectAsState()
+    val rawSelectedDate by remember { derivedStateOf { selectedDate.toLocalDate() } }
+    val navYearMonth by taskViewModel.currentYearMonth.collectAsState()
+    val navWeekDisplay by taskViewModel.weekDisplay.collectAsState()
+    val navWeekNumbers by taskViewModel.availableWeekNumbers.collectAsState()
     val navWeekDays by taskViewModel.weekDays.collectAsState()
+    val navSelectedDate = remember(rawSelectedDate, navWeekDays) {
+        navWeekDays.firstOrNull { it == rawSelectedDate }
+    }
     // Scroll state
     val listState = rememberLazyListState()
     val savedIndex = taskViewModel.getSavedScrollIndex()
@@ -71,14 +75,19 @@ fun TaskScreen(taskViewModel: TaskViewModel = hiltViewModel()) {
     Column(
         modifier = Modifier.fillMaxSize()
         ) {
-        WeekNavigationRow(
-            monthYear = navMonthYear,
-            weekNumber = navWeekNumber,
+        WeekNavigation(
+            currentYearMonth = navYearMonth,
+            weekNumber = navWeekDisplay.number,
+            weekYear = navWeekDisplay.year,
+            availableWeeks = navWeekNumbers,
             weekDays = navWeekDays,
             selectedDate = navSelectedDate,
             onPreviousWeek = { taskViewModel.goToPreviousWeek() },
             onNextWeek = { taskViewModel.goToNextWeek() },
             onDaySelected = taskViewModel::goToDay,
+            onMonthSelected = taskViewModel::goToMonth,
+            onYearSelected = taskViewModel::goToYear,
+            onWeekSelected = taskViewModel::goToWeek
         )
         MainContentContainer {
             MainHeader(selectedDate.toDayHeader())

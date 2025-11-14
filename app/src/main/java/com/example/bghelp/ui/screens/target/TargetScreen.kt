@@ -23,7 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.bghelp.domain.model.CreateTarget
 import com.example.bghelp.ui.components.LazyColumnContainer
 import com.example.bghelp.ui.components.MainHeader
-import com.example.bghelp.ui.components.WeekNavigationRow
+import com.example.bghelp.ui.components.WeekNavigation
 import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.Coordinate
 import com.example.bghelp.ui.components.MainContentContainer
@@ -65,15 +65,15 @@ fun TargetScreen(targetViewModel: TargetViewModel = hiltViewModel()) {
         ) {
         AddButtonRow(targetViewModel)
 
-        WeekNavigationRow(
-            monthYear = navMonthYear,
-            weekNumber = navWeekNumber,
-            weekDays = navWeekDays,
-            selectedDate = navSelectedDate,
-            onPreviousWeek = { targetViewModel.goToPreviousWeek() },
-            onNextWeek = { targetViewModel.goToNextWeek() },
-            onDaySelected = targetViewModel::goToDay,
-        )
+//        WeekNavigation(
+//            monthYear = navMonthYear,
+//            weekNumber = navWeekNumber,
+//            weekDays = navWeekDays,
+//            selectedDate = navSelectedDate,
+//            onPreviousWeek = { targetViewModel.goToPreviousWeek() },
+//            onNextWeek = { targetViewModel.goToNextWeek() },
+//            onDaySelected = targetViewModel::goToDay,
+//        )
         MainContentContainer {
             MainHeader(selectedDate.toDayHeader())
 

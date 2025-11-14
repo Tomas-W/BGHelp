@@ -20,6 +20,7 @@ object Sizes {
         val L = TextSizes.L.dp
         val XL = TextSizes.XL.dp
         val XXL = TextSizes.XXL.dp
+        val XXXL = 38f.dp
     }
 
     object Size {

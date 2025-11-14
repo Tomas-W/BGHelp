@@ -351,7 +351,8 @@ private fun TimeDropdown(
                         onUnitSelected(unit)
                         isExpanded = false
                     },
-                    textStyle = TextStyles.Default.S
+                    textStyle = TextStyles.Default.S,
+                    spacing = Sizes.Icon.XXL
                 )
             }
         }

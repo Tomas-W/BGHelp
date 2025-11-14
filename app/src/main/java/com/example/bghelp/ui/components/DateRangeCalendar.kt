@@ -197,7 +197,7 @@ private fun CalendarMonthDropdown(
         )
         CustomDropdown(
             expanded = isMenuOpen,
-            onDismissRequest = { onMenuOpenChange(false) }
+            onDismissRequest = { onMenuOpenChange(false) },
         ) {
             months.forEach { month ->
                 val label = YearMonth.of(currentMonth.year, month).format(formatter)
@@ -207,7 +207,8 @@ private fun CalendarMonthDropdown(
                         onMonthChanged(YearMonth.of(currentMonth.year, month))
                         onMenuOpenChange(false)
                     },
-                    textStyle = TextStyles.Default.M
+                    textStyle = TextStyles.Default.M,
+                    spacing = Sizes.Icon.L
                 )
             }
         }
@@ -231,7 +232,7 @@ private fun CalendarYearDropdown(
         )
         CustomDropdown(
             expanded = isMenuOpen,
-            onDismissRequest = { onMenuOpenChange(false) }
+            onDismissRequest = { onMenuOpenChange(false) },
         ) {
             years.forEach { year ->
                 val label = YearMonth.of(year, currentMonth.month).format(formatter)
@@ -241,7 +242,8 @@ private fun CalendarYearDropdown(
                         onMonthChanged(YearMonth.of(year, currentMonth.month))
                         onMenuOpenChange(false)
                     },
-                    textStyle = TextStyles.Default.M
+                    textStyle = TextStyles.Default.M,
+                    spacing = Sizes.Icon.L
                 )
             }
         }

@@ -23,7 +23,7 @@ fun MainContentContainer(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp),
         content = content
     )
 }

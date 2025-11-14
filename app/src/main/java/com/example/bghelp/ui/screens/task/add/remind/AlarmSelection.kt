@@ -20,6 +20,7 @@ import com.example.bghelp.ui.navigation.Screen
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.deselectedStyle
+import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 
 @Composable
@@ -102,7 +103,8 @@ fun AlarmDropdown(
                     onAudioFileSelected("")
                     isExpanded = false
                 },
-                textStyle = TextStyles.Default.S
+                textStyle = TextStyles.Default.S,
+                spacing = Sizes.Icon.XXL
             )
             DropdownItem(
                 label = STR.CREATE_ALARM,
@@ -112,7 +114,8 @@ fun AlarmDropdown(
                     }
                     isExpanded = false
                 },
-                textStyle = TextStyles.Default.S
+                textStyle = TextStyles.Default.S,
+                spacing = Sizes.Icon.XXL
             )
             userRecordings.forEach { filePath ->
                 DropdownItem(
@@ -121,7 +124,8 @@ fun AlarmDropdown(
                         onAudioFileSelected(filePath)
                         isExpanded = false
                     },
-                    textStyle = TextStyles.Default.S
+                    textStyle = TextStyles.Default.S,
+                    spacing = Sizes.Icon.XXL
                 )
             }
             defaultAudioFiles.forEach { fileName ->
@@ -131,7 +135,8 @@ fun AlarmDropdown(
                         onAudioFileSelected(fileName)
                         isExpanded = false
                     },
-                    textStyle = TextStyles.Default.S
+                    textStyle = TextStyles.Default.S,
+                    spacing = Sizes.Icon.XXL
                 )
             }
         }

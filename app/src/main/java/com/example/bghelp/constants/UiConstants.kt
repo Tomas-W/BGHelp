@@ -4,7 +4,7 @@ object UiConstants {
     const val TOP_BAR_HEIGHT = 56
     const val BOTTOM_BAR_HEIGHT = 66
 
-    const val DROPDOWN_ITEM_HEIGHT = 48
+    const val DROPDOWN_HEIGHT = 250
 
     const val XXS = 16
     const val XS = 18

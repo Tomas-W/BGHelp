@@ -136,7 +136,8 @@ private fun WeekSelection(
                             deselectedStyle
                         }).copy(
                             textDecoration = TextDecoration.Underline
-                        )
+                        ),
+                        spacing = Sizes.Icon.XXL
                     )
                 }
             }
