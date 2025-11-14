@@ -16,10 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.bghelp.ui.components.MainContentContainer
+import com.example.bghelp.ui.components.ReusableSnackbarHost
 import com.example.bghelp.ui.screens.task.add.title.Title
 import com.example.bghelp.ui.screens.task.add.date.Date
 import com.example.bghelp.ui.screens.task.add.remind.Remind
@@ -128,6 +130,19 @@ fun AddTaskScreen(
                     )
                 }
             }
+        }
+
+        // Snackbar positioned at bottom
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            ReusableSnackbarHost(
+                snackbarMessage = viewModel.snackbarMessage,
+                onMessageShown = { viewModel.clearSnackbarMessage() }
+            )
         }
     }
 }

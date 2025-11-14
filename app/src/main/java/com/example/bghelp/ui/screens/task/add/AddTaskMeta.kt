@@ -36,6 +36,7 @@ object AddTaskStrings {
     const val TITLE_HINT = "Title"
     const val INFO_HINT = "Info"
     // When
+    const val DATE_CANNOT_BE_IN_PAST = "Date cannot be in the past"
     // Remind
     const val BEFORE_START = "Before start"
     const val BEFORE_END = "Before end"
@@ -45,6 +46,9 @@ object AddTaskStrings {
     const val SELECT_ALARM = "Select alarm"
     const val CREATE_ALARM = "Create alarm +"
     // vibrate
+    // Repeat
+    const val ADD_REMINDER = "Add reminder"
+    const val REMOVE_REMINDER = "Remove reminder"
     // Note
     const val SELECT_NOTE = "Select note"
     const val CREATE_NOTE = "Create note +"
@@ -79,8 +83,7 @@ object AddTaskStrings {
     const val NEXT_MONTH = "Next month"
     const val HIDE_CALENDAR = "Hide calendar"
 
-    const val ADD_REMINDER = "Add reminder"
-    const val REMOVE_REMINDER = "Remove reminder"
+    
 
     // Location
     const val ADD_LOCATION = "Add location"

@@ -58,7 +58,8 @@ fun DateRangeCalendar(
     onMonthChanged: (YearMonth) -> Unit,
     isRangeMode: Boolean = true,
     minDate: LocalDate? = null,
-    onDismissRequest: (() -> Unit)? = null
+    onDismissRequest: (() -> Unit)? = null,
+    onInvalidDateClicked: ((LocalDate) -> Unit)? = null
 ) {
     val monthFormatter = remember { DateTimeFormatter.ofPattern("MMMM") }
     val yearFormatter = remember { DateTimeFormatter.ofPattern("yyyy") }
@@ -99,7 +100,8 @@ fun DateRangeCalendar(
             endDate = endDate,
             isRangeMode = isRangeMode,
             minDate = minDate,
-            onDayClicked = onDayClicked
+            onDayClicked = onDayClicked,
+            onInvalidDateClicked = onInvalidDateClicked
         )
     }
 }
@@ -335,7 +337,8 @@ private fun CalendarWeeksGrid(
     endDate: LocalDate,
     isRangeMode: Boolean,
     minDate: LocalDate?,
-    onDayClicked: (LocalDate) -> Unit
+    onDayClicked: (LocalDate) -> Unit,
+    onInvalidDateClicked: ((LocalDate) -> Unit)? = null
 ) {
     val rangeStart = if (isRangeMode) minOf(startDate, endDate) else startDate
     val rangeEnd = if (isRangeMode) maxOf(startDate, endDate) else startDate
@@ -369,7 +372,8 @@ private fun CalendarWeeksGrid(
                         rangeBackgroundColor = rangeBgColor,
                         startEndBackgroundColor = startEndBgColor,
                         startEndTextColor = startEndTextColor,
-                        onClick = onDayClicked
+                        onClick = onDayClicked,
+                        onInvalidClick = onInvalidDateClicked
                     )
                 }
             }
@@ -389,7 +393,8 @@ private fun RowScope.CalendarDayCell(
     rangeBackgroundColor: Color,
     startEndBackgroundColor: Color,
     startEndTextColor: Color,
-    onClick: (LocalDate) -> Unit
+    onClick: (LocalDate) -> Unit,
+    onInvalidClick: ((LocalDate) -> Unit)? = null
 ) {
     Box(
         modifier = Modifier
@@ -400,8 +405,13 @@ private fun RowScope.CalendarDayCell(
                 color = if (inRange && !isStart && !isEnd) rangeBackgroundColor else Color.Transparent
             )
             .clickable(
-                onClick = { onClick(day) },
-                enabled = isSelectable
+                onClick = {
+                    if (isSelectable) {
+                        onClick(day)
+                    } else {
+                        onInvalidClick?.invoke(day)
+                    }
+                }
             ),
         contentAlignment = Alignment.Center
     ) {

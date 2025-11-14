@@ -131,52 +131,6 @@ fun EmptyTask() {
 }
 
 @Composable
-fun AddButtonRow(taskViewModel: TaskViewModel) {
-    val oneHour = remember { 60 * 60 * 1000L }
-    val oneDay = remember { 24 * 60 * 60 * 1000L }
-    val threeDays = remember { 3 * 24 * 60 * 60 * 1000L }
-    val oneWeek = remember { 7 * 24 * 60 * 60 * 1000L }
-
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        AddTaskButton(taskViewModel = taskViewModel, time = oneHour, text = "Hour")
-        AddTaskButton(taskViewModel = taskViewModel, time = oneDay, text = "Day")
-        AddTaskButton(taskViewModel = taskViewModel, time = threeDays, text = "3 Days")
-        AddTaskButton(taskViewModel = taskViewModel, time = oneWeek, text = "Week")
-    }
-}
-
-@Composable
-fun AddTaskButton(
-    taskViewModel: TaskViewModel,
-    time: Long,
-    text: String
-) {
-    Button(
-        onClick = {
-            val now = LocalDateTime.now()
-            val localDateTime = now.plusSeconds(time / 1000)
-            taskViewModel.addTask(
-                CreateTask(
-                    date = localDateTime,
-                    title = "Order Zweistra",
-                    description = null,
-                    expired = false,
-                    alarmName = "AlarmOne",
-                    sound = AlarmMode.CONTINUOUS,
-                    vibrate = AlarmMode.ONCE,
-                    snoozeTime = 55
-                )
-            )
-        }
-    ) {
-        Text(text)
-    }
-}
-
-@Composable
 private fun DeleteTaskDialog(
     task: Task?,
     onDismiss: () -> Unit,

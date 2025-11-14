@@ -62,6 +62,15 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
     override fun getAllTasks(): Flow<List<Task>> =
         taskDao.getAllTasks().map { entities ->
             entities.map { it.toDomain() }
+                .filter { task ->
+                    // If it's a recurring task, check if its date matches the pattern
+                    if (task.rrule != null) {
+                        val rule = parseRRule(task.rrule) ?: return@filter true
+                        occursOnDate(task, rule, task.date.toLocalDate())
+                    } else {
+                        true // Non-recurring tasks always included
+                    }
+                }
         }
 
     override fun getTasksByDateRange(startDate: Long, endDate: Long): Flow<List<Task>> {
@@ -78,6 +87,15 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
 
         return combine(baseFlow, recurringFlow) { baseTasks, recurringTasks ->
             val baseDomain = baseTasks.map { it.toDomain() }
+                .filter { task ->
+                    // If it's a recurring task, check if its date matches the pattern
+                    if (task.rrule != null) {
+                        val rule = parseRRule(task.rrule) ?: return@filter true
+                        occursOnDate(task, rule, task.date.toLocalDate())
+                    } else {
+                        true // Non-recurring tasks always included
+                    }
+                }
             val baseOccurrences = baseDomain.map { it.id to it.date }.toSet()
 
             val additional = recurringTasks.flatMap { relation ->
@@ -112,12 +130,22 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
             .atZone(zone)
             .toLocalDateTime()
 
+        // Recalculate expiration for all tasks
+        val now = LocalDateTime.now()
+        val isExpired = if (task.allDay && endDateTime != null) {
+            // All-day task - check endDate
+            endDateTime.isBefore(now)
+        } else {
+            // Regular task - check start date
+            startDateTime.isBefore(now)
+        }
+
         return Task(
             id = task.id,
             date = startDateTime,
             title = task.title,
             description = task.info,
-            expired = task.expired,
+            expired = isExpired,
             alarmName = task.alarmName,
             sound = task.sound,
             vibrate = task.vibrate,
@@ -287,6 +315,11 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
     }
 
     private fun occursOnDate(task: Task, rule: RecurrenceRule, date: LocalDate): Boolean {
+        // Check if date is after UNTIL date
+        if (rule.until != null && date.isAfter(rule.until)) {
+            return false
+        }
+        
         return when (rule.frequency) {
             Frequency.WEEKLY -> occursWeekly(task, rule, date)
             Frequency.MONTHLY -> occursMonthly(task, rule, date)
@@ -344,7 +377,12 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
     private fun Task.createOccurrence(start: LocalDateTime): Task {
         val duration = endDate?.let { Duration.between(date, it) }
         val newEnd = duration?.let { start.plus(it) }
-        val isExpired = start.isBefore(LocalDateTime.now())
+        val now = LocalDateTime.now()
+        val isExpired = if (allDay && newEnd != null) {
+            newEnd.isBefore(now)
+        } else {
+            start.isBefore(now)
+        }
         return copy(
             date = start,
             endDate = newEnd,
@@ -374,6 +412,10 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
         }
 
         val interval = values["INTERVAL"]?.toIntOrNull()?.coerceAtLeast(1) ?: 1
+        
+        val until = values["UNTIL"]?.let { untilStr ->
+            parseUntilDate(untilStr)
+        }
 
         return when (frequency) {
             Frequency.WEEKLY -> {
@@ -385,7 +427,8 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
                 RecurrenceRule(
                     frequency = frequency,
                     interval = interval,
-                    byDay = byDay
+                    byDay = byDay,
+                    until = until
                 )
             }
 
@@ -407,7 +450,8 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
                     frequency = frequency,
                     interval = interval,
                     byMonth = byMonth,
-                    byMonthDay = byMonthDay
+                    byMonthDay = byMonthDay,
+                    until = until
                 )
             }
         }
@@ -425,12 +469,30 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
             else -> null
         }
 
+    private fun parseUntilDate(untilStr: String): LocalDate? {
+        // Parse YYYYMMDD format
+        if (untilStr.length == 8) {
+            val year = untilStr.substring(0, 4).toIntOrNull()
+            val month = untilStr.substring(4, 6).toIntOrNull()
+            val day = untilStr.substring(6, 8).toIntOrNull()
+            if (year != null && month != null && day != null) {
+                return try {
+                    LocalDate.of(year, month, day)
+                } catch (e: Exception) {
+                    null
+                }
+            }
+        }
+        return null
+    }
+
     private data class RecurrenceRule(
         val frequency: Frequency,
         val interval: Int,
         val byDay: Set<DayOfWeek> = emptySet(),
         val byMonth: Set<Int> = emptySet(),
-        val byMonthDay: List<Int> = emptyList()
+        val byMonthDay: List<Int> = emptyList(),
+        val until: LocalDate? = null
     )
 
     private enum class Frequency {

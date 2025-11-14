@@ -2,9 +2,11 @@ package com.example.bghelp.ui.screens.task.main
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,7 +32,6 @@ import com.example.bghelp.ui.components.SchedulableContainer
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.theme.TextSizes
-import com.example.bghelp.utils.isInFuture
 import com.example.bghelp.utils.toTaskTime
 
 @Composable
@@ -42,11 +43,11 @@ fun DayComponent(
 ) {
     val colorScheme = MaterialTheme.colorScheme
     val taskBackgroundColor =
-        if (task.date.isInFuture()) colorScheme.secondary else colorScheme.tertiary
+        if (!task.expired) colorScheme.secondary else colorScheme.tertiary
     val deleteCallback = remember(key1 = task.id) { { onDelete(task) } }
     val toggleCallback = remember(key1 = task.id) { { onToggleExpanded(task.id) } }
 
-    SchedulableContainer(
+    DayContainer(
         modifier = Modifier
             .animateContentSize()
             .clickable(onClick = toggleCallback),
@@ -75,6 +76,21 @@ fun DayComponent(
             }
         }
     }
+}
+
+@Composable
+fun DayContainer(
+    modifier: Modifier = Modifier,
+    backgroundColor: Color? = null,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Column(
+        modifier = modifier
+            .let { if (backgroundColor != null) it.background(backgroundColor) else it }
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .fillMaxWidth(),
+        content = content
+    )
 }
 
 @Composable

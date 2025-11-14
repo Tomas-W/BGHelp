@@ -183,12 +183,6 @@ class TaskViewModel @Inject constructor(
         }
     }
 
-    fun addTask(createTask: CreateTask) {
-        viewModelScope.launch {
-            taskRepository.addTask(createTask)
-        }
-    }
-
     fun deleteTask(task: Task) {
         viewModelScope.launch {
             taskRepository.deleteTask(task)

@@ -13,20 +13,23 @@ object RepeatRuleBuilder {
         monthlyMonths: Set<Int>,
         monthlyDaySelection: RepeatMonthlyDaySelection,
         monthlyDays: Set<Int>,
-        startDate: LocalDate
+        startDate: LocalDate,
+        endDate: LocalDate? = null
     ): String? {
         return when (selection) {
             UserRepeatSelection.OFF -> null
             UserRepeatSelection.WEEKLY -> buildWeeklyRRule(
                 weeklyDays = weeklyDays,
                 weeklyInterval = weeklyInterval,
-                startDate = startDate
+                startDate = startDate,
+                endDate = endDate
             )
             UserRepeatSelection.MONTHLY -> buildMonthlyRRule(
                 selectedMonths = monthlyMonths,
                 monthlyDaySelection = monthlyDaySelection,
                 selectedDays = monthlyDays,
-                startDate = startDate
+                startDate = startDate,
+                endDate = endDate
             )
         }
     }
@@ -34,7 +37,8 @@ object RepeatRuleBuilder {
     private fun buildWeeklyRRule(
         weeklyDays: Set<Int>,
         weeklyInterval: Int,
-        startDate: LocalDate
+        startDate: LocalDate,
+        endDate: LocalDate? = null
     ): String {
         val normalizedDays = weeklyDays.mapNotNull { it.toDayOfWeekOrNull() }
         val effectiveDays = if (normalizedDays.isEmpty()) {
@@ -53,6 +57,9 @@ object RepeatRuleBuilder {
                 append(";INTERVAL=$weeklyInterval")
             }
             append(";BYDAY=$dayTokens")
+            if (endDate != null) {
+                append(";UNTIL=${formatUntilDate(endDate)}")
+            }
         }
     }
 
@@ -60,7 +67,8 @@ object RepeatRuleBuilder {
         selectedMonths: Set<Int>,
         monthlyDaySelection: RepeatMonthlyDaySelection,
         selectedDays: Set<Int>,
-        startDate: LocalDate
+        startDate: LocalDate,
+        endDate: LocalDate? = null
     ): String {
         val months = selectedMonths
             .filter { it in 1..12 }
@@ -91,6 +99,9 @@ object RepeatRuleBuilder {
             if (days.isNotEmpty()) {
                 append(";BYMONTHDAY=${days.joinToString(",")}")
             }
+            if (endDate != null) {
+                append(";UNTIL=${formatUntilDate(endDate)}")
+            }
         }
     }
 
@@ -106,6 +117,11 @@ object RepeatRuleBuilder {
         DayOfWeek.FRIDAY -> "FR"
         DayOfWeek.SATURDAY -> "SA"
         DayOfWeek.SUNDAY -> "SU"
+    }
+
+    private fun formatUntilDate(date: LocalDate): String {
+        // Format as YYYYMMDD for iCal UNTIL parameter
+        return String.format("%04d%02d%02d", date.year, date.monthValue, date.dayOfMonth)
     }
 }
 

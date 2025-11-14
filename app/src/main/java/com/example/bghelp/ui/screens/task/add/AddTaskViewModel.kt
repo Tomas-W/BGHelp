@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.bghelp.data.repository.TaskRepository
 import com.example.bghelp.domain.model.CreateTask
 import com.example.bghelp.domain.model.ReminderKind
+import com.example.bghelp.domain.model.TaskColorOption
 import com.example.bghelp.domain.model.TaskImageAttachment
 import com.example.bghelp.utils.AudioManager
 import com.example.bghelp.utils.RepeatRuleBuilder
@@ -161,6 +162,16 @@ class AddTaskViewModel @Inject constructor(
     private val _saveState = MutableStateFlow<SaveTaskState>(SaveTaskState.Idle)
     val saveState: StateFlow<SaveTaskState> = _saveState.asStateFlow()
 
+    // Snackbar
+    private val _snackbarMessage = MutableStateFlow<String?>(null)
+    val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()
+    fun showSnackbar(message: String) {
+        _snackbarMessage.value = message
+    }
+    fun clearSnackbarMessage() {
+        _snackbarMessage.value = null
+    }
+
     init {
         updateTimeValidationState()
         refreshRepeatRule()
@@ -237,6 +248,7 @@ class AddTaskViewModel @Inject constructor(
             hiddenDateEndValue = _dateEndSelection.value
         }
         updateTimeValidationState()
+        refreshRepeatRule()
     }
     fun setDateEnd(date: LocalDate) {
         _dateEndSelection.value = date
@@ -327,7 +339,8 @@ class AddTaskViewModel @Inject constructor(
 
     // Repeat
     fun toggleRepeatSelection() {
-        _userRepeatSelection.value = _userRepeatSelection.value.toggle()
+        val newValue = _userRepeatSelection.value.toggle()
+        _userRepeatSelection.value = newValue
         refreshRepeatRule()
     }
     fun toggleWeeklySelectedDays(day: Int) {
@@ -396,7 +409,8 @@ class AddTaskViewModel @Inject constructor(
             monthlyMonths = _monthlySelectedMonths.value,
             monthlyDaySelection = _userMonthlyDaySelection.value,
             monthlyDays = _monthlySelectedDays.value,
-            startDate = _dateStartSelection.value
+            startDate = _dateStartSelection.value,
+            endDate = if (_isEndDateVisible.value) _dateEndSelection.value else null
         )
     }
 
@@ -615,17 +629,21 @@ class AddTaskViewModel @Inject constructor(
         val startTime = if (allDay) LocalTime.MIDNIGHT else _timeStartSelection.value
         val startDateTime = LocalDateTime.of(startDate, startTime)
 
+        // For all-day tasks, always set endDate to 23:59 of start date
+        // For regular tasks, only set if end date/time is visible
         val hasEnd = _isEndDateVisible.value || _isEndTimeVisible.value
         val endDate = if (_isEndDateVisible.value) _dateEndSelection.value else null
         val endTime = if (_isEndTimeVisible.value) _timeEndSelection.value else null
+        
         val effectiveEndDate = when {
+            allDay -> startDate // All-day tasks always use start date for end date
             hasEnd -> endDate ?: startDate
             else -> null
         }
         val effectiveEndTime = when {
+            allDay -> LocalTime.of(23, 59) // All-day tasks always end at 23:59
             !hasEnd -> null
             endTime != null -> endTime
-            allDay -> LocalTime.of(23, 59)
             else -> _timeStartSelection.value
         }
         val endDateTime = if (effectiveEndDate != null && effectiveEndTime != null) {
@@ -654,7 +672,11 @@ class AddTaskViewModel @Inject constructor(
             vibrate = with(TaskMapper) { _userVibrateSelection.value.toAlarmMode() },
             soundUri = _selectedAudioFile.value.takeIf { it.isNotBlank() },
             snoozeTime = 0,
-            color = with(TaskMapper) { _selectedColor.value.toDomainColor() },
+            color = if (_userColorSelection.value == UserColorSelection.OFF) {
+                TaskColorOption.DEFAULT
+            } else {
+                with(TaskMapper) { _selectedColor.value.toDomainColor() }
+            },
             image = imageAttachment,
             reminders = reminders,
             locations = with(TaskMapper) { _selectedLocations.value.toDomainLocations() }
