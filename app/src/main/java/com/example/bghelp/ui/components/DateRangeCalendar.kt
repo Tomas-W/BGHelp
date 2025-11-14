@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,7 +30,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants
@@ -189,15 +194,31 @@ private fun CalendarMonthDropdown(
     months: List<Month>,
     onMonthChanged: (YearMonth) -> Unit
 ) {
+    var anchorWidthPx by remember { mutableIntStateOf(0) }
+    var dropdownWidthPx by remember { mutableIntStateOf(0) }
+    val density = LocalDensity.current
+    val horizontalOffset = remember(anchorWidthPx, dropdownWidthPx, density) {
+        if (anchorWidthPx == 0 || dropdownWidthPx == 0) {
+            DpOffset.Zero
+        } else {
+            val diffPx = (anchorWidthPx - dropdownWidthPx) / 2f
+            DpOffset(with(density) { diffPx.toDp() }, 0.dp)
+        }
+    }
+
     Box {
         Text(
             text = currentMonth.format(formatter),
             style = TextStyles.Grey.Bold.L,
-            modifier = Modifier.clickable { onMenuOpenChange(true) }
+            modifier = Modifier
+                .onGloballyPositioned { anchorWidthPx = it.size.width }
+                .clickable { onMenuOpenChange(true) }
         )
         CustomDropdown(
             expanded = isMenuOpen,
             onDismissRequest = { onMenuOpenChange(false) },
+            offset = horizontalOffset,
+            modifier = Modifier.onSizeChanged { dropdownWidthPx = it.width }
         ) {
             months.forEach { month ->
                 val label = YearMonth.of(currentMonth.year, month).format(formatter)
@@ -208,7 +229,7 @@ private fun CalendarMonthDropdown(
                         onMenuOpenChange(false)
                     },
                     textStyle = TextStyles.Default.M,
-                    spacing = Sizes.Icon.L
+                    spacing = Sizes.Icon.S
                 )
             }
         }
@@ -224,15 +245,31 @@ private fun CalendarYearDropdown(
     years: List<Int>,
     onMonthChanged: (YearMonth) -> Unit
 ) {
+    var anchorWidthPx by remember { mutableIntStateOf(0) }
+    var dropdownWidthPx by remember { mutableIntStateOf(0) }
+    val density = LocalDensity.current
+    val horizontalOffset = remember(anchorWidthPx, dropdownWidthPx, density) {
+        if (anchorWidthPx == 0 || dropdownWidthPx == 0) {
+            DpOffset.Zero
+        } else {
+            val diffPx = (anchorWidthPx - dropdownWidthPx) / 2f
+            DpOffset(with(density) { diffPx.toDp() }, 0.dp)
+        }
+    }
+
     Box {
         Text(
             text = currentMonth.format(formatter),
             style = TextStyles.Grey.Bold.L,
-            modifier = Modifier.clickable { onMenuOpenChange(true) }
+            modifier = Modifier
+                .onGloballyPositioned { anchorWidthPx = it.size.width }
+                .clickable { onMenuOpenChange(true) }
         )
         CustomDropdown(
             expanded = isMenuOpen,
             onDismissRequest = { onMenuOpenChange(false) },
+            offset = horizontalOffset,
+            modifier = Modifier.onSizeChanged { dropdownWidthPx = it.width }
         ) {
             years.forEach { year ->
                 val label = YearMonth.of(year, currentMonth.month).format(formatter)
@@ -243,7 +280,7 @@ private fun CalendarYearDropdown(
                         onMenuOpenChange(false)
                     },
                     textStyle = TextStyles.Default.M,
-                    spacing = Sizes.Icon.L
+                    spacing = Sizes.Icon.S
                 )
             }
         }

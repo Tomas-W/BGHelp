@@ -60,7 +60,7 @@ fun ImageSelection(
                         onDismissMenu()
                     },
                     textStyle = deselectedStyle,
-                    spacing = Sizes.Icon.XXL
+                    spacing = Sizes.Icon.M
                 )
                 DropdownItem(
                     label = STR.IMAGE_FROM_CAMERA,
@@ -69,7 +69,7 @@ fun ImageSelection(
                         onDismissMenu()
                     },
                     textStyle = deselectedStyle,
-                    spacing = Sizes.Icon.XXL
+                    spacing = Sizes.Icon.M
                 )
             }
         }

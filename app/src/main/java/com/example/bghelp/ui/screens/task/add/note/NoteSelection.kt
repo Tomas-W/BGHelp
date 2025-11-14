@@ -16,7 +16,6 @@ import com.example.bghelp.ui.components.DropdownItem
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 import com.example.bghelp.ui.screens.task.add.deselectedStyle
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
 
 @Composable
 fun NoteSelection(
@@ -61,8 +60,8 @@ fun NoteSelection(
                     onNoteSelected("")
                     isExpanded = false
                 },
-                textStyle = TextStyles.Default.S,
-                spacing = Sizes.Icon.XXL
+                textStyle = deselectedStyle,
+                spacing = Sizes.Icon.M
             )
             DropdownItem(
                 label = STR.CREATE_NOTE,
@@ -70,8 +69,8 @@ fun NoteSelection(
                     onNoteSelected("CREATE")
                     isExpanded = false
                 },
-                textStyle = TextStyles.Default.S,
-                spacing = Sizes.Icon.XXL
+                textStyle = deselectedStyle,
+                spacing = Sizes.Icon.M
             )
             noteOptions.forEach { option ->
                 DropdownItem(
@@ -80,8 +79,8 @@ fun NoteSelection(
                         onNoteSelected(option)
                         isExpanded = false
                     },
-                    textStyle = TextStyles.Default.S,
-                    spacing = Sizes.Icon.XXL
+                    textStyle = deselectedStyle,
+                    spacing = Sizes.Icon.M
                 )
             }
         }

@@ -92,6 +92,8 @@ object AddTaskStrings {
 
 val selectedStyle = TextStyles.Default.Bold.M
 val deselectedStyle = TextStyles.Default.M
+val highlightedStyle = TextStyles.Main.Bold.M
+
 
 interface SectionMeta {
     val headerText: String
@@ -167,6 +169,7 @@ data class Reminder(
 )
 enum class RemindType { START, END }
 enum class TimeUnit { MINUTES, HOURS, DAYS, WEEKS, MONTHS }
+data class ActiveReminderInput(val type: RemindType, val id: Int)
 // Sound
 enum class UserSoundSelection(
     override val headerText: String,
@@ -269,4 +272,12 @@ enum class UserColorSelection(
     }
 }
 enum class UserColorChoices { DEFAULT, RED, GREEN, YELLOW, CYAN, MAGENTA }
+
+// Save State
+sealed interface SaveTaskState {
+    data object Idle : SaveTaskState
+    data object Saving : SaveTaskState
+    data object Success : SaveTaskState
+    data class Error(val throwable: Throwable) : SaveTaskState
+}
 

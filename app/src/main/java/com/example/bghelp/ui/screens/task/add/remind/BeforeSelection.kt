@@ -50,8 +50,8 @@ import com.example.bghelp.ui.screens.task.add.Reminder
 import com.example.bghelp.ui.screens.task.add.RemindType
 import com.example.bghelp.ui.screens.task.add.deselectedStyle
 import com.example.bghelp.ui.screens.task.add.TimeUnit
+import com.example.bghelp.ui.screens.task.add.highlightedStyle
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
 
 @Composable
 fun BeforeSelection (
@@ -153,7 +153,7 @@ private fun ReminderItem(
 
     Row(
         modifier = Modifier
-            .padding(vertical = 4.dp),
+            .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Input field
@@ -172,7 +172,7 @@ private fun ReminderItem(
             }
         )
 
-        Spacer(modifier = Modifier.width(Sizes.Size.S))
+        Spacer(modifier = Modifier.width(Sizes.Size.L))
 
         // Dropdown
         TimeDropdown(
@@ -185,7 +185,7 @@ private fun ReminderItem(
             }
         )
 
-        Spacer(modifier = Modifier.width(Sizes.Size.M))
+        Spacer(modifier = Modifier.width(Sizes.Size.L))
 
         // Delete icon
         WithRipple {
@@ -303,7 +303,7 @@ private fun TimeInput(
         ) {
             Text(
                 text = value.toString(),
-                style = if (isActive) TextStyles.Main.Bold.S else TextStyles.Default.S
+                style = if (isActive) highlightedStyle else deselectedStyle
             )
         }
     }
@@ -331,9 +331,9 @@ private fun TimeDropdown(
     Box(modifier = modifier) {
         Text(
             text = unitLabels[selectedUnit] ?: "",
-            style = TextStyles.Default.S,
+            style = deselectedStyle,
             modifier = Modifier
-                .width(80.dp)
+                .widthIn(min = 100.dp)
                 .clickable {
                     onDropdownClick()
                     isExpanded = true
@@ -351,8 +351,8 @@ private fun TimeDropdown(
                         onUnitSelected(unit)
                         isExpanded = false
                     },
-                    textStyle = TextStyles.Default.S,
-                    spacing = Sizes.Icon.XXL
+                    textStyle = deselectedStyle,
+                    spacing = Sizes.Icon.M
                 )
             }
         }

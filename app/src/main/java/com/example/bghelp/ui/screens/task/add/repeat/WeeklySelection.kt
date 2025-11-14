@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,14 +22,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.example.bghelp.ui.components.CustomDropdown
-import com.example.bghelp.ui.components.DropdownItem
+import com.example.bghelp.ui.components.WithRipple
+import com.example.bghelp.ui.components.clickableRipple
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.deselectedStyle
+import com.example.bghelp.ui.screens.task.add.highlightedStyle
 import com.example.bghelp.ui.screens.task.add.selectedStyle
 import com.example.bghelp.ui.theme.Sizes
 
@@ -81,67 +93,22 @@ private fun WeekSelection(
     selectedWeek: Int,
     onWeekSelected: (Int) -> Unit
 ) {
-    val weeks = listOf(" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 " , " 9 " , " 10 ")
-    val weekNumbers = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-
-    var isExpanded by remember { mutableStateOf(false) }
-
-    val displayText = weeks[selectedWeek - 1]
-
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            modifier = Modifier
-                .widthIn(min = CONST.REPEAT_LABEL_WIDTH.dp),
             text = "Every",
             style = deselectedStyle
         )
 
         Spacer(modifier = Modifier.width(Sizes.Icon.S))
 
-        Box(
-            modifier = Modifier.wrapContentWidth()
-        ) {
-            Row(
-                modifier = Modifier
-                    .clickable {
-                        isExpanded = true
-                    },
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = displayText,
-                    style = selectedStyle.copy(
-                        textDecoration = TextDecoration.Underline
-                    )
-                )
-            }
-
-            CustomDropdown(
-                expanded = isExpanded,
-                onDismissRequest = { isExpanded = false }
-            ) {
-                weekNumbers.forEachIndexed { index, weekNumber ->
-                    val isSelected = selectedWeek == weekNumber
-                    DropdownItem(
-                        label = weeks[index],
-                        onClick = {
-                            onWeekSelected(weekNumber)
-                            isExpanded = false
-                        },
-                        textStyle = (if (isSelected) {
-                            selectedStyle
-                        } else {
-                            deselectedStyle
-                        }).copy(
-                            textDecoration = TextDecoration.Underline
-                        ),
-                        spacing = Sizes.Icon.XXL
-                    )
-                }
-            }
-        }
+        WeekInput(
+            value = selectedWeek,
+            onValueChange = onWeekSelected,
+            minValue = 1,
+            maxValue = 99
+        )
 
         Spacer(modifier = Modifier.width(Sizes.Icon.S))
 
@@ -149,5 +116,105 @@ private fun WeekSelection(
             text = "weeks",
             style = deselectedStyle
         )
+    }
+}
+
+@Composable
+private fun WeekInput(
+    modifier: Modifier = Modifier,
+    value: Int,
+    onValueChange: (Int) -> Unit,
+    minValue: Int = 1,
+    maxValue: Int = 99
+) = WithRipple {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
+    var inputBuffer by remember { mutableStateOf("") }
+    var isActive by remember { mutableStateOf(false) }
+
+    fun dismissKeyboard() {
+        isActive = false
+        keyboardController?.hide()
+        focusManager.clearFocus()
+    }
+
+    fun clampValue(value: Int): Int = value.coerceIn(minValue, maxValue)
+
+    fun handleInput(raw: String) {
+        val digits = raw.filter { it.isDigit() }.take(2)
+        inputBuffer = digits
+        if (digits.isNotEmpty()) {
+            val num = digits.toIntOrNull()?.let { clampValue(it) }
+            if (num != null) {
+                onValueChange(num)
+            }
+        }
+    }
+
+    BasicTextField(
+        value = inputBuffer,
+        onValueChange = { new ->
+            if (isActive) {
+                handleInput(new)
+            }
+        },
+        modifier = Modifier
+            .width(1.dp)
+            .alpha(0f)
+            .focusRequester(focusRequester)
+            .onFocusChanged { focusState ->
+                if (!focusState.isFocused && isActive) {
+                    isActive = false
+                }
+            },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = { dismissKeyboard() }
+        ),
+        singleLine = true
+    )
+
+    LaunchedEffect(isActive) {
+        if (isActive) {
+            focusRequester.requestFocus()
+            keyboardController?.show()
+            inputBuffer = ""
+        }
+    }
+
+    Row(
+        modifier = modifier
+            .width(50.dp)
+            .clip(RoundedCornerShape(Sizes.Corner.S))
+            .clickable {
+                if (isActive) {
+                    dismissKeyboard()
+                } else {
+                    isActive = true
+                }
+            },
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .clickableRipple(onClick = {
+                    if (isActive) {
+                        dismissKeyboard()
+                    } else {
+                        isActive = true
+                    }
+                }),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = value.toString(),
+                style = if (isActive) highlightedStyle else deselectedStyle
+            )
+        }
     }
 }

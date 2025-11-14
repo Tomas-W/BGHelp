@@ -6,36 +6,26 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bghelp.data.repository.TaskRepository
-import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.CreateTask
 import com.example.bghelp.domain.model.ReminderKind
-import com.example.bghelp.domain.model.ReminderOffsetUnit
-import com.example.bghelp.domain.model.TaskColorOption
 import com.example.bghelp.domain.model.TaskImageAttachment
-import com.example.bghelp.domain.model.TaskImageSourceOption
-import com.example.bghelp.domain.model.TaskLocationEntry
-import com.example.bghelp.domain.model.TaskReminderEntry
 import com.example.bghelp.utils.AudioManager
+import com.example.bghelp.utils.RepeatRuleBuilder
 import com.example.bghelp.utils.TaskImageStorage
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings.NO_IMAGE_SELECTED
+import com.example.bghelp.utils.TaskMapper
+import com.example.bghelp.ui.screens.task.add.ActiveReminderInput
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.YearMonth
-import javax.inject.Inject
 import java.util.Locale
-import java.util.UUID
-import java.io.File
-import java.io.FileOutputStream
+import javax.inject.Inject
 import kotlin.random.Random
 
 @HiltViewModel
@@ -128,7 +118,6 @@ class AddTaskViewModel @Inject constructor(
     val endReminders: StateFlow<List<Reminder>> = _endReminders.asStateFlow()
     // Reminder tracking
     private var nextReminderId = 0
-    data class ActiveReminderInput(val type: RemindType, val id: Int)
     private val _activeReminderInput = MutableStateFlow<ActiveReminderInput?>(null)
     val activeReminderInput: StateFlow<ActiveReminderInput?> = _activeReminderInput.asStateFlow()
     // Sound selection
@@ -399,110 +388,8 @@ class AddTaskViewModel @Inject constructor(
         refreshRepeatRule()
     }
 
-    private fun buildRepeatRRule(
-        selection: UserRepeatSelection,
-        weeklyDays: Set<Int>,
-        weeklyInterval: Int,
-        monthlyMonths: Set<Int>,
-        monthlyDaySelection: RepeatMonthlyDaySelection,
-        monthlyDays: Set<Int>,
-        startDate: LocalDate
-    ): String? {
-        return when (selection) {
-            UserRepeatSelection.OFF -> null
-            UserRepeatSelection.WEEKLY -> buildWeeklyRRule(
-                weeklyDays = weeklyDays,
-                weeklyInterval = weeklyInterval,
-                startDate = startDate
-            )
-            UserRepeatSelection.MONTHLY -> buildMonthlyRRule(
-                selectedMonths = monthlyMonths,
-                monthlyDaySelection = monthlyDaySelection,
-                selectedDays = monthlyDays,
-                startDate = startDate
-            )
-        }
-    }
-
-    private fun buildWeeklyRRule(
-        weeklyDays: Set<Int>,
-        weeklyInterval: Int,
-        startDate: LocalDate
-    ): String {
-        val normalizedDays = weeklyDays.mapNotNull { it.toDayOfWeekOrNull() }
-        val effectiveDays = if (normalizedDays.isEmpty()) {
-            listOf(startDate.dayOfWeek)
-        } else {
-            normalizedDays
-        }
-        val dayTokens = effectiveDays
-            .distinct()
-            .sortedBy { it.value }
-            .joinToString(",") { it.toRRuleToken() }
-
-        return buildString {
-            append("FREQ=WEEKLY")
-            if (weeklyInterval > 1) {
-                append(";INTERVAL=$weeklyInterval")
-            }
-            append(";BYDAY=$dayTokens")
-        }
-    }
-
-    private fun buildMonthlyRRule(
-        selectedMonths: Set<Int>,
-        monthlyDaySelection: RepeatMonthlyDaySelection,
-        selectedDays: Set<Int>,
-        startDate: LocalDate
-    ): String {
-        val months = selectedMonths
-            .filter { it in 1..12 }
-            .distinct()
-            .sorted()
-            .let {
-                when {
-                    it.isEmpty() -> listOf(startDate.monthValue)
-                    it.size == 12 -> emptyList()
-                    else -> it
-                }
-            }
-
-        val days = when (monthlyDaySelection) {
-            RepeatMonthlyDaySelection.ALL -> (1..31).toList()
-            RepeatMonthlyDaySelection.SELECT -> {
-                val normalized = selectedDays.filter { it in 1..31 }.distinct().sorted()
-                if (normalized.isEmpty()) listOf(startDate.dayOfMonth) else normalized
-            }
-            RepeatMonthlyDaySelection.LAST -> listOf(-1)
-        }
-
-        return buildString {
-            append("FREQ=MONTHLY")
-            if (months.isNotEmpty()) {
-                append(";BYMONTH=${months.joinToString(",")}")
-            }
-            if (days.isNotEmpty()) {
-                append(";BYMONTHDAY=${days.joinToString(",")}")
-            }
-        }
-    }
-
-    private fun Int.toDayOfWeekOrNull(): DayOfWeek? = runCatching {
-        DayOfWeek.of(this)
-    }.getOrNull()
-
-    private fun DayOfWeek.toRRuleToken(): String = when (this) {
-        DayOfWeek.MONDAY -> "MO"
-        DayOfWeek.TUESDAY -> "TU"
-        DayOfWeek.WEDNESDAY -> "WE"
-        DayOfWeek.THURSDAY -> "TH"
-        DayOfWeek.FRIDAY -> "FR"
-        DayOfWeek.SATURDAY -> "SA"
-        DayOfWeek.SUNDAY -> "SU"
-    }
-
     private fun refreshRepeatRule() {
-        _repeatRRule.value = buildRepeatRRule(
+        _repeatRRule.value = RepeatRuleBuilder.buildRRule(
             selection = _userRepeatSelection.value,
             weeklyDays = _weeklySelectedDays.value,
             weeklyInterval = _weeklyIntervalWeeks.value,
@@ -753,8 +640,6 @@ class AddTaskViewModel @Inject constructor(
             emptyList()
         }
 
-        val locations = buildLocations()
-
         return CreateTask(
             date = startDateTime,
             endDate = endDateTime,
@@ -765,160 +650,30 @@ class AddTaskViewModel @Inject constructor(
             rrule = _repeatRRule.value,
             expired = false,
             alarmName = _selectedAudioFile.value.takeIf { it.isNotBlank() },
-            sound = _userSoundSelection.value.toAlarmMode(),
-            vibrate = _userVibrateSelection.value.toAlarmMode(),
+            sound = with(TaskMapper) { _userSoundSelection.value.toAlarmMode() },
+            vibrate = with(TaskMapper) { _userVibrateSelection.value.toAlarmMode() },
             soundUri = _selectedAudioFile.value.takeIf { it.isNotBlank() },
             snoozeTime = 0,
-            color = _selectedColor.value.toDomainColor(),
+            color = with(TaskMapper) { _selectedColor.value.toDomainColor() },
             image = imageAttachment,
             reminders = reminders,
-            locations = locations
+            locations = with(TaskMapper) { _selectedLocations.value.toDomainLocations() }
         )
     }
 
-    private fun buildReminders(): List<TaskReminderEntry> {
-        val start = _startReminders.value.mapNotNull { it.toDomain(ReminderKind.START) }
-        val end = _endReminders.value.mapNotNull { it.toDomain(ReminderKind.END) }
+    private fun buildReminders(): List<com.example.bghelp.domain.model.TaskReminderEntry> {
+        val start = with(TaskMapper) { 
+            _startReminders.value.toDomainReminders(ReminderKind.START)
+        }
+        val end = with(TaskMapper) { 
+            _endReminders.value.toDomainReminders(ReminderKind.END)
+        }
         return start + end
-    }
-
-    private fun Reminder.toDomain(type: ReminderKind): TaskReminderEntry? {
-        val unit = timeUnit.toDomainUnit() ?: return null
-        return TaskReminderEntry(
-            type = type,
-            offsetValue = value,
-            offsetUnit = unit
-        )
-    }
-
-    private fun TimeUnit.toDomainUnit(): ReminderOffsetUnit? = when (this) {
-        TimeUnit.MINUTES -> ReminderOffsetUnit.MINUTES
-        TimeUnit.HOURS -> ReminderOffsetUnit.HOURS
-        TimeUnit.DAYS -> ReminderOffsetUnit.DAYS
-        TimeUnit.WEEKS -> ReminderOffsetUnit.WEEKS
-        TimeUnit.MONTHS -> ReminderOffsetUnit.MONTHS
-    }
-
-    private fun UserSoundSelection.toAlarmMode(): AlarmMode = when (this) {
-        UserSoundSelection.OFF -> AlarmMode.OFF
-        UserSoundSelection.ONCE -> AlarmMode.ONCE
-        UserSoundSelection.CONTINUOUS -> AlarmMode.CONTINUOUS
-    }
-
-    private fun UserVibrateSelection.toAlarmMode(): AlarmMode = when (this) {
-        UserVibrateSelection.OFF -> AlarmMode.OFF
-        UserVibrateSelection.ONCE -> AlarmMode.ONCE
-        UserVibrateSelection.CONTINUOUS -> AlarmMode.CONTINUOUS
-    }
-
-    private fun UserColorChoices.toDomainColor(): TaskColorOption = when (this) {
-        UserColorChoices.DEFAULT -> TaskColorOption.DEFAULT
-        UserColorChoices.RED -> TaskColorOption.RED
-        UserColorChoices.GREEN -> TaskColorOption.GREEN
-        UserColorChoices.YELLOW -> TaskColorOption.YELLOW
-        UserColorChoices.CYAN -> TaskColorOption.CYAN
-        UserColorChoices.MAGENTA -> TaskColorOption.MAGENTA
     }
 
     private suspend fun persistSelectedImageIfNeeded(): TaskImageAttachment? {
         if (_userImageSelection.value != UserImageSelection.ON) return null
         val selectedImage = _selectedImage.value ?: return null
-        val source = selectedImage.source.toDomainSource() ?: return null
-        return withContext(Dispatchers.IO) {
-            val directory = TaskImageStorage.taskImageDirectory(appContext)
-            val extension = resolveImageExtension(selectedImage)
-            val fileName = "${UUID.randomUUID()}.$extension"
-            val targetFile = File(directory, fileName)
-
-            try {
-                when {
-                    selectedImage.bitmap != null -> {
-                        FileOutputStream(targetFile).use { stream ->
-                            val format = extension.toCompressFormat()
-                            val success = selectedImage.bitmap.compress(format, 92, stream)
-                            if (!success) {
-                                throw IllegalStateException("Unable to persist image: compression failed.")
-                            }
-                        }
-                    }
-                    selectedImage.uri != null -> {
-                        appContext.contentResolver.openInputStream(selectedImage.uri)?.use { input ->
-                            FileOutputStream(targetFile).use { output ->
-                                input.copyTo(output)
-                            }
-                        } ?: throw IllegalStateException("Unable to open selected image stream.")
-                    }
-                    else -> return@withContext null
-                }
-
-                val storedDisplayName = selectedImage.displayName
-                    .takeUnless { it.isBlank() || it == NO_IMAGE_SELECTED }
-                TaskImageAttachment(
-                    uri = TaskImageStorage.buildRelativePath(targetFile.name),
-                    displayName = storedDisplayName,
-                    source = source
-                )
-            } catch (throwable: Throwable) {
-                if (targetFile.exists()) {
-                    targetFile.delete()
-                }
-                throw throwable
-            }
-        }
-    }
-
-    private fun resolveImageExtension(image: TaskImageData): String {
-        val fromMime = image.uri?.let { uri ->
-            appContext.contentResolver.getType(uri)?.substringAfterLast("/")
-        }
-        val normalizedMime = fromMime?.let(::normalizeExtension)
-        if (normalizedMime != null) return normalizedMime
-
-        val fromName = image.displayName.substringAfterLast(".", "")
-        val normalizedName = normalizeExtension(fromName)
-        if (normalizedName != null) return normalizedName
-
-        return "jpg"
-    }
-
-    private fun normalizeExtension(raw: String?): String? {
-        if (raw.isNullOrBlank()) return null
-        val cleaned = raw.lowercase(Locale.getDefault())
-        return when (cleaned) {
-            "jpeg" -> "jpg"
-            "jpg" -> "jpg"
-            "png" -> "png"
-            "webp" -> "webp"
-            else -> null
-        }
-    }
-
-    private fun String.toCompressFormat(): Bitmap.CompressFormat = when (lowercase(Locale.getDefault())) {
-        "png" -> Bitmap.CompressFormat.PNG
-        "webp" -> Bitmap.CompressFormat.WEBP
-        else -> Bitmap.CompressFormat.JPEG
-    }
-
-    private fun TaskImageSource.toDomainSource(): TaskImageSourceOption? = when (this) {
-        TaskImageSource.GALLERY -> TaskImageSourceOption.GALLERY
-        TaskImageSource.CAMERA -> TaskImageSourceOption.CAMERA
-    }
-
-    private fun buildLocations(): List<TaskLocationEntry> =
-        _selectedLocations.value.mapIndexed { index, location ->
-            TaskLocationEntry(
-                latitude = location.latitude,
-                longitude = location.longitude,
-                address = location.address,
-                name = location.name,
-                order = index
-            )
-        }
-
-    sealed interface SaveTaskState {
-        data object Idle : SaveTaskState
-        data object Saving : SaveTaskState
-        data object Success : SaveTaskState
-        data class Error(val throwable: Throwable) : SaveTaskState
+        return TaskImageStorage.persistTaskImage(appContext, selectedImage)
     }
 }

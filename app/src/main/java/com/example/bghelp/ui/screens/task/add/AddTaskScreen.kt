@@ -41,7 +41,7 @@ fun AddTaskScreen(
     val scrollState = rememberScrollState()
 
     LaunchedEffect(saveState) {
-        if (saveState is AddTaskViewModel.SaveTaskState.Success) {
+        if (saveState is SaveTaskState.Success) {
             navController.popBackStack()
             viewModel.consumeSaveState()
         }
@@ -116,11 +116,11 @@ fun AddTaskScreen(
             ) {
                 Button(
                     onClick = { viewModel.saveTask() },
-                    enabled = saveState != AddTaskViewModel.SaveTaskState.Saving,
+                    enabled = saveState !is SaveTaskState.Saving,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = if (saveState == AddTaskViewModel.SaveTaskState.Saving) {
+                        text = if (saveState is SaveTaskState.Saving) {
                             "Saving..."
                         } else {
                             "Save Task"

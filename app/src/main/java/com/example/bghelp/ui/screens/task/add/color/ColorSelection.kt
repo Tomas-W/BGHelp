@@ -32,7 +32,6 @@ import com.example.bghelp.ui.theme.TaskGreen
 import com.example.bghelp.ui.theme.TaskMagenta
 import com.example.bghelp.ui.theme.TaskRed
 import com.example.bghelp.ui.theme.TaskYellow
-import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.screens.task.add.deselectedStyle
 
 @Composable
@@ -148,7 +147,7 @@ fun ColorDropdownItem(
     ) {
         Text(
             text = label,
-            style = TextStyles.Default.S
+            style = deselectedStyle
         )
     }
 }

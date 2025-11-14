@@ -265,7 +265,7 @@ private fun WeekNavigationWeekDropdown(
                         isMenuOpen = false
                     },
                     textStyle = if (isSelected) TextStyles.Default.Bold.S else TextStyles.Default.M,
-                    spacing = Sizes.Icon.M
+                    spacing = Sizes.Icon.XS
                 )
             }
         }
@@ -317,7 +317,7 @@ private fun WeekNavigationMonthDropdown(
                         onMenuOpenChange(false)
                     },
                     textStyle = if (isSelected) TextStyles.Default.Bold.M else TextStyles.Default.M,
-                    spacing = Sizes.Icon.M
+                    spacing = Sizes.Icon.S
                 )
             }
         }
@@ -369,7 +369,7 @@ private fun WeekNavigationYearDropdown(
                         onMenuOpenChange(false)
                     },
                     textStyle = if (isSelected) TextStyles.Default.Bold.M else TextStyles.Default.M,
-                    spacing = Sizes.Icon.M
+                    spacing = Sizes.Icon.S
                 )
             }
         }

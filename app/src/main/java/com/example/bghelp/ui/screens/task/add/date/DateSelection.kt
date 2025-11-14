@@ -25,8 +25,8 @@ import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 import com.example.bghelp.ui.screens.task.add.DateField
 import com.example.bghelp.ui.screens.task.add.deselectedStyle
+import com.example.bghelp.ui.screens.task.add.highlightedStyle
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.utils.clickableDismissFocus
 import java.time.format.DateTimeFormatter
 
@@ -51,7 +51,7 @@ fun DateSelection(
                     viewModel.toggleCalendarFromDateField(DateField.START)
                 },
             text = dateStartSelection.format(fMonthYearDayShort),
-            style = if (activeDateField == DateField.START) TextStyles.Main.Bold.M else deselectedStyle,
+            style = if (activeDateField == DateField.START) highlightedStyle else deselectedStyle,
         )
 
         Spacer(modifier = Modifier.width(Sizes.Icon.M))
@@ -92,7 +92,7 @@ fun DateSelection(
                     }
                 ),
             text = dateEndSelection?.format(fMonthYearDayShort) ?: dateStartSelection.format(fMonthYearDayShort),
-            style = if (activeDateField == DateField.END) TextStyles.Main.Bold.M else deselectedStyle
+            style = if (activeDateField == DateField.END) highlightedStyle else deselectedStyle
         )
     }
 }
