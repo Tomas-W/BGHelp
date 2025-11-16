@@ -5,16 +5,15 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bghelp.data.repository.ColorRepository
 import com.example.bghelp.data.repository.TaskRepository
-import com.example.bghelp.domain.model.CreateTask
+import com.example.bghelp.domain.model.FeatureColor
 import com.example.bghelp.domain.model.ReminderKind
-import com.example.bghelp.domain.model.TaskColorOption
 import com.example.bghelp.domain.model.TaskImageAttachment
 import com.example.bghelp.utils.AudioManager
 import com.example.bghelp.utils.RepeatRuleBuilder
-import com.example.bghelp.utils.TaskImageStorage
 import com.example.bghelp.utils.TaskMapper
-import com.example.bghelp.ui.screens.task.add.ActiveReminderInput
+import com.example.bghelp.ui.theme.TaskDefault
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,17 +25,18 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.YearMonth
 import java.util.Locale
 import javax.inject.Inject
 import kotlin.random.Random
+import com.example.bghelp.utils.TaskImageStorage
 
 @HiltViewModel
 class AddTaskViewModel @Inject constructor(
     val audioManager: AudioManager,
     private val taskRepository: TaskRepository,
+    private val colorRepository: ColorRepository,
     @ApplicationContext private val appContext: Context
 ) : ViewModel() {
     
@@ -153,13 +153,20 @@ class AddTaskViewModel @Inject constructor(
     // Color
     private val _userColorSelection = MutableStateFlow(UserColorSelection.OFF)
     val userColorSelection: StateFlow<UserColorSelection> = _userColorSelection.asStateFlow()
-    private val _selectedColor = MutableStateFlow(UserColorChoices.DEFAULT)
-    val selectedColor: StateFlow<UserColorChoices> = _selectedColor.asStateFlow()
+    private val _selectedColorId = MutableStateFlow<Int?>(null)
+    val selectedColorId: StateFlow<Int?> = _selectedColorId.asStateFlow()
+    val allColors: StateFlow<List<FeatureColor>> = colorRepository.getAllColors()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = emptyList()
+        )
 
     // Keyboard dismiss tracking
     private val _keyboardDismissKey = MutableStateFlow(0)
     val keyboardDismissKey: StateFlow<Int> = _keyboardDismissKey.asStateFlow()
 
+    // Saving a task
     private val _saveState = MutableStateFlow<SaveTaskState>(SaveTaskState.Idle)
     val saveState: StateFlow<SaveTaskState> = _saveState.asStateFlow()
 
@@ -175,7 +182,7 @@ class AddTaskViewModel @Inject constructor(
 
     // Validation - Separate StateFlows for each category
     val isTitleValid: StateFlow<Boolean> = _titleText.map { title ->
-        validateTitle(title) == null
+        AddTaskValidator.validateTitle(title) == null
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -190,7 +197,7 @@ class AddTaskViewModel @Inject constructor(
         _isEndDateVisible,
         _timeEndSelection,
         _isEndTimeVisible
-    ) { values: Array<*> ->
+    ) { values: Array<Any?> ->
         val dateSelection = values[0] as UserDateSelection
         val startDate = values[1] as LocalDate
         val startTime = values[2] as LocalTime
@@ -198,8 +205,7 @@ class AddTaskViewModel @Inject constructor(
         val isEndDateVisible = values[4] as Boolean
         val endTime = values[5] as LocalTime?
         val isEndTimeVisible = values[6] as Boolean
-        
-        validateDateTime(
+        AddTaskValidator.validateDateTime(
             dateSelection = dateSelection,
             startDate = startDate,
             startTime = startTime,
@@ -220,11 +226,11 @@ class AddTaskViewModel @Inject constructor(
         _userMonthlyDaySelection,
         _monthlySelectedDays
     ) { repeatSelection, weeklyDays, monthlyDaySelection, monthlyDays ->
-        validateRepeat(
-            repeatSelection = repeatSelection as UserRepeatSelection,
-            weeklyDays = weeklyDays as Set<Int>,
-            monthlyDaySelection = monthlyDaySelection as RepeatMonthlyDaySelection,
-            monthlyDays = monthlyDays as Set<Int>
+        AddTaskValidator.validateRepeat(
+            repeatSelection = repeatSelection,
+            weeklyDays = weeklyDays,
+            monthlyDaySelection = monthlyDaySelection,
+            monthlyDays = monthlyDays
         ) == null
     }.stateIn(
         scope = viewModelScope,
@@ -243,19 +249,20 @@ class AddTaskViewModel @Inject constructor(
         _isEndDateVisible,
         _timeEndSelection,
         _isEndTimeVisible
-    ) { values: Array<*> ->
+    ) { values: Array<Any?> ->
         val remindSelection = values[0] as UserRemindSelection
         val dateSelection = values[1] as UserDateSelection
         val startDate = values[2] as LocalDate
         val startTime = values[3] as LocalTime
+        @Suppress("UNCHECKED_CAST")
         val startReminders = values[4] as List<Reminder>
+        @Suppress("UNCHECKED_CAST")
         val endReminders = values[5] as List<Reminder>
         val endDate = values[6] as LocalDate?
         val isEndDateVisible = values[7] as Boolean
         val endTime = values[8] as LocalTime?
         val isEndTimeVisible = values[9] as Boolean
-        
-        validateReminders(
+        AddTaskValidator.validateReminders(
             remindSelection = remindSelection,
             dateSelection = dateSelection,
             startDate = startDate,
@@ -274,7 +281,7 @@ class AddTaskViewModel @Inject constructor(
     )
     
     // Combined validation
-    val isValid: StateFlow<Boolean> = combine(
+    val isNewTaskValid: StateFlow<Boolean> = combine(
         isTitleValid,
         isDateTimeValid,
         isRepeatValid,
@@ -319,7 +326,7 @@ class AddTaskViewModel @Inject constructor(
     fun setDateStart(date: LocalDate) {
         _dateStartSelection.value = date
         if (_isEndDateVisible.value && _dateEndSelection.value != null) {
-            val endDate = _dateEndSelection.value!!
+            val endDate = _dateEndSelection.value
             if (date.isAfter(endDate)) {
                 _dateEndSelection.value = date
                 hiddenDateEndValue = date
@@ -489,7 +496,7 @@ class AddTaskViewModel @Inject constructor(
         _allMonthDaysSelected.value = false
         refreshRepeatRule()
     }
-
+    // RRULE
     private fun refreshRepeatRule() {
         _repeatRRule.value = RepeatRuleBuilder.buildRRule(
             selection = _userRepeatSelection.value,
@@ -536,10 +543,10 @@ class AddTaskViewModel @Inject constructor(
             }
         }
     }
-    fun updateReminder(type: RemindType, reminderId: Int, value: Int? = null, timeUnit: TimeUnit? = null) {
+    fun updateReminder(reminderType: RemindType, reminderId: Int, value: Int? = null, timeUnit: TimeUnit? = null) {
         val validatedValue = value?.coerceIn(AddTaskConstants.MIN_REMINDER, AddTaskConstants.MAX_REMINDER)
 
-        when (type) {
+        when (reminderType) {
             RemindType.START -> {
                 _startReminders.value = _startReminders.value.map { reminder ->
                     if (reminder.id == reminderId) {
@@ -584,9 +591,6 @@ class AddTaskViewModel @Inject constructor(
     }
     fun toggleNoteSelection() {
         _userNoteSelection.value = _userNoteSelection.value.toggle()
-        if (_userNoteSelection.value == UserNoteSelection.OFF) {
-            _selectedNote.value = ""
-        }
     }
     fun setSelectedNote(note: String) {
         _selectedNote.value = note
@@ -599,8 +603,8 @@ class AddTaskViewModel @Inject constructor(
     fun toggleColorSelection() {
         _userColorSelection.value = _userColorSelection.value.toggle()
     }
-    fun setSelectedColorChoice(color: UserColorChoices) {
-        _selectedColor.value = color
+    fun setSelectedColorId(colorId: Int) {
+        _selectedColorId.value = colorId
     }
 
     // Location
@@ -721,10 +725,58 @@ class AddTaskViewModel @Inject constructor(
         _saveState.value = SaveTaskState.Saving
         viewModelScope.launch {
             try {
-                val imageAttachment = persistSelectedImageIfNeeded()
-                val task = buildCreateTask(imageAttachment)
-                taskRepository.addTask(task)
-                _saveState.value = SaveTaskState.Success
+                val imageAttachment = TaskImageStorage.persistIfNeeded(
+                    context = appContext,
+                    isOn = _userImageSelection.value == UserImageSelection.ON,
+                    selected = _selectedImage.value
+                )
+                val allDay = _userDateSelection.value == UserDateSelection.ON
+                val startDate = _dateStartSelection.value
+                val startTime = if (allDay) LocalTime.MIDNIGHT else _timeStartSelection.value
+                val endDateVisible = _isEndDateVisible.value
+                val endTimeVisible = _isEndTimeVisible.value
+                val endDate = if (endDateVisible) _dateEndSelection.value else null
+                val endTime = if (endTimeVisible) _timeEndSelection.value else null
+                val assembleResult = AddTaskAssembler.buildOrError(
+                    title = _titleText.value,
+                    dateSelection = _userDateSelection.value,
+                    startDate = startDate,
+                    startTime = startTime,
+                    repeatSelection = _userRepeatSelection.value,
+                    weeklyDays = _weeklySelectedDays.value,
+                    monthlyDaySelection = _userMonthlyDaySelection.value,
+                    monthlyDays = _monthlySelectedDays.value,
+                    remindSelection = _userRemindSelection.value,
+                    startReminders = _startReminders.value,
+                    endReminders = _endReminders.value,
+                    endDate = endDate,
+                    isEndDateVisible = endDateVisible,
+                    endTime = endTime,
+                    isEndTimeVisible = endTimeVisible,
+                    rrule = _repeatRRule.value,
+                    alarmName = _selectedAudioFile.value.takeIf { it.isNotBlank() },
+                    soundMode = with(TaskMapper) { _userSoundSelection.value.toAlarmMode() },
+                    vibrateMode = with(TaskMapper) { _userVibrateSelection.value.toAlarmMode() },
+                    soundUri = _selectedAudioFile.value.takeIf { it.isNotBlank() },
+                    color = getSelectedTaskColor(),
+                    image = imageAttachment,
+                    description = _infoText.value.takeIf { it.isNotBlank() },
+                    note = if (_userNoteSelection.value == UserNoteSelection.ON)
+                        _selectedNote.value.takeIf { it.isNotBlank() } else null,
+                    locations = _selectedLocations.value
+                )
+
+                when (assembleResult) {
+                    is AddTaskAssembler.BuildResult.Error -> {
+                        showSnackbar(assembleResult.message)
+                        _saveState.value = SaveTaskState.Idle
+                        return@launch
+                    }
+                    is AddTaskAssembler.BuildResult.Success -> {
+                        taskRepository.addTask(assembleResult.task)
+                        _saveState.value = SaveTaskState.Success
+                    }
+                }
             } catch (t: Throwable) {
                 _saveState.value = SaveTaskState.Error(t)
             }
@@ -792,7 +844,7 @@ class AddTaskViewModel @Inject constructor(
 
         // Color
         _userColorSelection.value = UserColorSelection.OFF
-        _selectedColor.value = UserColorChoices.DEFAULT
+        _selectedColorId.value = null
 
         // Save state
         _saveState.value = SaveTaskState.Idle
@@ -825,11 +877,11 @@ class AddTaskViewModel @Inject constructor(
         // 4. Reminder validation
         
         // 1. Title validation
-        val titleError = validateTitle(title)
+        val titleError = AddTaskValidator.validateTitle(title)
         if (titleError != null) return titleError
         
         // 2. Date/Time validation
-        val dateTimeError = validateDateTime(
+        val dateTimeError = AddTaskValidator.validateDateTime(
             dateSelection = dateSelection,
             startDate = startDate,
             startTime = startTime,
@@ -841,7 +893,7 @@ class AddTaskViewModel @Inject constructor(
         if (dateTimeError != null) return dateTimeError
         
         // 3. Repeat validation
-        val repeatError = validateRepeat(
+        val repeatError = AddTaskValidator.validateRepeat(
             repeatSelection = repeatSelection,
             weeklyDays = weeklyDays,
             monthlyDaySelection = monthlyDaySelection,
@@ -850,7 +902,7 @@ class AddTaskViewModel @Inject constructor(
         if (repeatError != null) return repeatError
         
         // 4. Reminder validation
-        val reminderError = validateReminders(
+        val reminderError = AddTaskValidator.validateReminders(
             remindSelection = remindSelection,
             dateSelection = dateSelection,
             startDate = startDate,
@@ -867,226 +919,6 @@ class AddTaskViewModel @Inject constructor(
         return null // Valid
     }
     
-    private fun validateTitle(title: String): String? {
-        if (title.isBlank()) {
-            return AddTaskStrings.VALIDATION_TITLE_EMPTY
-        }
-        return null
-    }
-    
-    private fun validateDateTime(
-        dateSelection: UserDateSelection,
-        startDate: LocalDate,
-        startTime: LocalTime,
-        endDate: LocalDate?,
-        isEndDateVisible: Boolean,
-        endTime: LocalTime?,
-        isEndTimeVisible: Boolean
-    ): String? {
-        val allDay = dateSelection == UserDateSelection.ON
-        val today = LocalDate.now()
-        
-        if (allDay) {
-            // For all-day tasks, check if date is today or in the future
-            // Since it's a whole day, we allow today even if it's 1 minute before day end
-            if (startDate.isBefore(today)) {
-                return AddTaskStrings.VALIDATION_START_TIME_PAST
-            }
-        } else {
-            // For regular tasks, check if start datetime is in the future
-            val startDateTime = LocalDateTime.of(startDate, startTime)
-            val now = LocalDateTime.now()
-            
-            if (startDateTime.isBefore(now)) {
-                return AddTaskStrings.VALIDATION_START_TIME_PAST
-            }
-        }
-        
-        // Validate end time is after start time (only if end time is visible)
-        if (isEndTimeVisible && endTime != null) {
-            val effectiveEndDate = if (isEndDateVisible && endDate != null) {
-                endDate
-            } else {
-                startDate
-            }
-            val startDateTime = if (allDay) {
-                LocalDateTime.of(startDate, LocalTime.MIDNIGHT)
-            } else {
-                LocalDateTime.of(startDate, startTime)
-            }
-            val endDateTime = if (allDay) {
-                LocalDateTime.of(effectiveEndDate, LocalTime.of(23, 59))
-            } else {
-                LocalDateTime.of(effectiveEndDate, endTime)
-            }
-            
-            if (endDateTime.isBefore(startDateTime) || endDateTime.isEqual(startDateTime)) {
-                return AddTaskStrings.VALIDATION_END_TIME_BEFORE_START
-            }
-        }
-        
-        return null
-    }
-    
-    private fun validateRepeat(
-        repeatSelection: UserRepeatSelection,
-        weeklyDays: Set<Int>,
-        monthlyDaySelection: RepeatMonthlyDaySelection,
-        monthlyDays: Set<Int>
-    ): String? {
-        // Weekly repeat validation
-        if (repeatSelection == UserRepeatSelection.WEEKLY) {
-            val normalizedDays = weeklyDays.mapNotNull { day ->
-                runCatching { java.time.DayOfWeek.of(day) }.getOrNull()
-            }
-            if (normalizedDays.isEmpty()) {
-                return AddTaskStrings.VALIDATION_REPEAT_MIN_DAYS
-            }
-        }
-        
-        // Monthly repeat validation
-        if (repeatSelection == UserRepeatSelection.MONTHLY) {
-            if (monthlyDaySelection == RepeatMonthlyDaySelection.SELECT) {
-                val normalizedDays = monthlyDays.filter { it in 1..31 }
-                if (normalizedDays.isEmpty()) {
-                    return AddTaskStrings.VALIDATION_REPEAT_MIN_DAYS
-                }
-            }
-        }
-        
-        return null
-    }
-    
-    private fun validateReminders(
-        remindSelection: UserRemindSelection,
-        dateSelection: UserDateSelection,
-        startDate: LocalDate,
-        startTime: LocalTime,
-        startReminders: List<Reminder>,
-        endReminders: List<Reminder>,
-        endDate: LocalDate?,
-        isEndDateVisible: Boolean,
-        endTime: LocalTime?,
-        isEndTimeVisible: Boolean
-    ): String? {
-        // Only validate if reminders are enabled
-        if (remindSelection != UserRemindSelection.ON) {
-            return null
-        }
-        
-        val allDay = dateSelection == UserDateSelection.ON
-        val startDateTime = if (allDay) {
-            LocalDateTime.of(startDate, LocalTime.MIDNIGHT)
-        } else {
-            LocalDateTime.of(startDate, startTime)
-        }
-        val now = LocalDateTime.now()
-        
-        // Check start reminders
-        for (reminder in startReminders) {
-            val reminderTime = calculateReminderTime(startDateTime, reminder)
-            if (reminderTime.isBefore(now)) {
-                return AddTaskStrings.VALIDATION_REMINDERS_PAST
-            }
-        }
-        
-        // Check end reminders (only if end date/time exists)
-        val endDateTime = if (isEndDateVisible || isEndTimeVisible) {
-            val effectiveEndDate = endDate ?: startDate
-            val effectiveEndTime = if (allDay) {
-                LocalTime.of(23, 59)
-            } else {
-                endTime ?: startTime
-            }
-            LocalDateTime.of(effectiveEndDate, effectiveEndTime)
-        } else {
-            null
-        }
-        
-        if (endDateTime != null) {
-            for (reminder in endReminders) {
-                val reminderTime = calculateReminderTime(endDateTime, reminder)
-                if (reminderTime.isBefore(now)) {
-                    return AddTaskStrings.VALIDATION_REMINDERS_PAST
-                }
-            }
-        }
-        
-        return null
-    }
-    
-    private fun calculateReminderTime(taskTime: LocalDateTime, reminder: Reminder): LocalDateTime {
-        return when (reminder.timeUnit) {
-            TimeUnit.MINUTES -> taskTime.minusMinutes(reminder.value.toLong())
-            TimeUnit.HOURS -> taskTime.minusHours(reminder.value.toLong())
-            TimeUnit.DAYS -> taskTime.minusDays(reminder.value.toLong())
-            TimeUnit.WEEKS -> taskTime.minusWeeks(reminder.value.toLong())
-            TimeUnit.MONTHS -> taskTime.minusMonths(reminder.value.toLong())
-        }
-    }
-
-    private fun buildCreateTask(
-        imageAttachment: TaskImageAttachment?
-    ): CreateTask {
-        val allDay = _userDateSelection.value == UserDateSelection.ON
-        val startDate = _dateStartSelection.value
-        val startTime = if (allDay) LocalTime.MIDNIGHT else _timeStartSelection.value
-        val startDateTime = LocalDateTime.of(startDate, startTime)
-
-        // For all-day tasks, always set endDate to 23:59 of start date
-        // For regular tasks, only set if end date/time is visible
-        val hasEnd = _isEndDateVisible.value || _isEndTimeVisible.value
-        val endDate = if (_isEndDateVisible.value) _dateEndSelection.value else null
-        val endTime = if (_isEndTimeVisible.value) _timeEndSelection.value else null
-        
-        val effectiveEndDate = when {
-            allDay -> startDate // All-day tasks always use start date for end date
-            hasEnd -> endDate ?: startDate
-            else -> null
-        }
-        val effectiveEndTime = when {
-            allDay -> LocalTime.of(23, 59) // All-day tasks always end at 23:59
-            !hasEnd -> null
-            endTime != null -> endTime
-            else -> _timeStartSelection.value
-        }
-        val endDateTime = if (effectiveEndDate != null && effectiveEndTime != null) {
-            LocalDateTime.of(effectiveEndDate, effectiveEndTime)
-        } else {
-            null
-        }
-
-        val reminders = if (_userRemindSelection.value == UserRemindSelection.ON) {
-            buildReminders()
-        } else {
-            emptyList()
-        }
-
-        return CreateTask(
-            date = startDateTime,
-            endDate = endDateTime,
-            allDay = allDay,
-            title = _titleText.value,
-            description = _infoText.value.takeIf { it.isNotBlank() },
-            note = _selectedNote.value.takeIf { it.isNotBlank() },
-            rrule = _repeatRRule.value,
-            expired = false,
-            alarmName = _selectedAudioFile.value.takeIf { it.isNotBlank() },
-            sound = with(TaskMapper) { _userSoundSelection.value.toAlarmMode() },
-            vibrate = with(TaskMapper) { _userVibrateSelection.value.toAlarmMode() },
-            soundUri = _selectedAudioFile.value.takeIf { it.isNotBlank() },
-            snoozeTime = 0,
-            color = if (_userColorSelection.value == UserColorSelection.OFF) {
-                TaskColorOption.DEFAULT
-            } else {
-                with(TaskMapper) { _selectedColor.value.toDomainColor() }
-            },
-            image = imageAttachment,
-            reminders = reminders,
-            locations = with(TaskMapper) { _selectedLocations.value.toDomainLocations() }
-        )
-    }
-
     private fun buildReminders(): List<com.example.bghelp.domain.model.TaskReminderEntry> {
         val start = with(TaskMapper) { 
             _startReminders.value.toDomainReminders(ReminderKind.START)
@@ -1100,6 +932,27 @@ class AddTaskViewModel @Inject constructor(
             emptyList()
         }
         return start + end
+    }
+
+    private suspend fun getSelectedTaskColor(): FeatureColor {
+        val colorId = if (_userColorSelection.value == UserColorSelection.OFF) {
+            // Default to first color (should be "Default" with id = 1)
+            1
+        } else {
+            _selectedColorId.value ?: 1
+        }
+        
+        // Use cached colors from StateFlow instead of querying database
+        val colors = allColors.value
+        return colors.find { it.id == colorId }
+            ?: FeatureColor(
+                id = 1,
+                name = "Default",
+                red = (TaskDefault.red * 255).toInt(),
+                green = (TaskDefault.green * 255).toInt(),
+                blue = (TaskDefault.blue * 255).toInt(),
+                alpha = TaskDefault.alpha
+            )
     }
 
     private suspend fun persistSelectedImageIfNeeded(): TaskImageAttachment? {

@@ -1,4 +1,4 @@
-package com.example.bghelp.data.local
+package com.example.bghelp.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

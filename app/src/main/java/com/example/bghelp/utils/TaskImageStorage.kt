@@ -19,6 +19,16 @@ import java.util.UUID
 object TaskImageStorage {
     private const val TASK_IMAGE_DIRECTORY = "tasks"
 
+    suspend fun persistIfNeeded(
+        context: Context,
+        isOn: Boolean,
+        selected: TaskImageData?
+    ): TaskImageAttachment? {
+        if (!isOn) return null
+        val image = selected ?: return null
+        return persistTaskImage(context, image)
+    }
+
     fun imageRoot(context: Context): File {
         val externalRoot = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         val root = externalRoot ?: File(context.filesDir, Environment.DIRECTORY_PICTURES)

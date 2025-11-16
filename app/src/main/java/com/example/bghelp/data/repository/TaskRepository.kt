@@ -1,24 +1,22 @@
 package com.example.bghelp.data.repository
 
-import com.example.bghelp.data.local.TaskDao
-import com.example.bghelp.data.local.TaskEntity
-import com.example.bghelp.data.local.TaskLocationEntity
-import com.example.bghelp.data.local.TaskReminderEntity
-import com.example.bghelp.data.local.TaskWithRelations
+import com.example.bghelp.data.local.dao.TaskDao
+import com.example.bghelp.data.local.entity.TaskEntity
+import com.example.bghelp.data.local.entity.TaskLocationEntity
+import com.example.bghelp.data.local.entity.TaskReminderEntity
+import com.example.bghelp.data.local.relations.TaskWithRelations
 import com.example.bghelp.domain.model.CreateTask
 import com.example.bghelp.domain.model.Task
+import com.example.bghelp.domain.model.FeatureColor
 import com.example.bghelp.domain.model.TaskImageAttachment
+import com.example.bghelp.domain.constants.ColorSeeds
+import com.example.bghelp.domain.service.RecurrenceCalculator
 import com.example.bghelp.domain.model.TaskLocationEntry
 import com.example.bghelp.domain.model.TaskReminderEntry
-import java.time.DayOfWeek
-import java.time.Duration
+import com.example.bghelp.ui.theme.TaskDefault
 import java.time.Instant
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.YearMonth
-import java.time.temporal.ChronoUnit
-import java.time.temporal.TemporalAdjusters
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -28,14 +26,12 @@ interface TaskRepository {
     suspend fun updateTask(task: Task)
     suspend fun deleteTask(task: Task)
     fun getTaskById(id: Int): Flow<Task?>
-    fun getAllTasks(): Flow<List<Task>>
     fun getTasksByDateRange(startDate: Long, endDate: Long): Flow<List<Task>>
-    fun getNextTask(currentTime: Long): Flow<Task?>
 }
 
 class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
     override suspend fun addTask(createTask: CreateTask) {
-        val persistence = createTask.toPersistence()
+        val persistence = createTask.toPersistenceBundle()
         taskDao.addTask(
             task = persistence.task,
             reminders = persistence.reminders,
@@ -44,7 +40,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
     }
 
     override suspend fun updateTask(task: Task) {
-        val persistence = task.toPersistence()
+        val persistence = task.toPersistenceBundle()
         taskDao.updateTask(
             task = persistence.task,
             reminders = persistence.reminders,
@@ -53,25 +49,11 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
     }
 
     override suspend fun deleteTask(task: Task) {
-        taskDao.deleteTask(task.toEntityOnly())
+        taskDao.deleteTask(task.toEntity())
     }
 
     override fun getTaskById(id: Int): Flow<Task?> =
         taskDao.getTaskById(id).map { it?.toDomain() }
-
-    override fun getAllTasks(): Flow<List<Task>> =
-        taskDao.getAllTasks().map { entities ->
-            entities.map { it.toDomain() }
-                .filter { task ->
-                    // If it's a recurring task, check if its date matches the pattern
-                    if (task.rrule != null) {
-                        val rule = parseRRule(task.rrule) ?: return@filter true
-                        occursOnDate(task, rule, task.date.toLocalDate())
-                    } else {
-                        true // Non-recurring tasks always included
-                    }
-                }
-        }
 
     override fun getTasksByDateRange(startDate: Long, endDate: Long): Flow<List<Task>> {
         val zone = ZoneId.systemDefault()
@@ -90,8 +72,8 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
                 .filter { task ->
                     // If it's a recurring task, check if its date matches the pattern
                     if (task.rrule != null) {
-                        val rule = parseRRule(task.rrule) ?: return@filter true
-                        occursOnDate(task, rule, task.date.toLocalDate())
+                        val rule = RecurrenceCalculator.parseRRule(task.rrule) ?: return@filter true
+                        RecurrenceCalculator.occursOnDate(task, rule, task.date.toLocalDate())
                     } else {
                         true // Non-recurring tasks always included
                     }
@@ -101,7 +83,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
             val additional = recurringTasks.flatMap { relation ->
                 val task = relation.toDomain()
                 val rule = task.rrule ?: return@flatMap emptyList<Task>()
-                val occurrences = generateOccurrences(task, rule, windowStart, windowEndExclusive)
+                val occurrences = RecurrenceCalculator.generateOccurrences(task, rule, windowStart, windowEndExclusive)
                 occurrences.filter { occurrence ->
                     (occurrence.id to occurrence.date) !in baseOccurrences
                 }
@@ -110,9 +92,6 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
             (baseDomain + additional).sortedBy { it.date }
         }
     }
-
-    override fun getNextTask(currentTime: Long): Flow<Task?> =
-        taskDao.getNextTask(currentTime).map { it?.toDomain() }
 
     // Entity → Domain
     private fun TaskWithRelations.toDomain(): Task {
@@ -140,6 +119,17 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
             startDateTime.isBefore(now)
         }
 
+        val taskColor = color?.let {
+            FeatureColor(
+                id = it.id,
+                name = it.name,
+                red = it.red,
+                green = it.green,
+                blue = it.blue,
+                alpha = it.alpha
+            )
+        } ?: ColorSeeds.FallbackTaskColor
+
         return Task(
             id = task.id,
             date = startDateTime,
@@ -155,7 +145,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
             note = task.note,
             rrule = task.rrule,
             soundUri = task.soundUri,
-            color = task.color,
+            color = taskColor,
             image = task.toDomainImage(),
             reminders = reminders.map { it.toDomain() },
             locations = locations
@@ -179,7 +169,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
     }
 
     // Domain → Entity for updates (task row only)
-    private fun Task.toEntityOnly(updatedAtMillis: Long = System.currentTimeMillis()): TaskEntity =
+    private fun Task.toEntity(updatedAtMillis: Long = System.currentTimeMillis()): TaskEntity =
         TaskEntity(
             id = id,
             title = title,
@@ -195,7 +185,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
             vibrate = vibrate,
             soundUri = soundUri,
             snoozeMinutes = snoozeTime,
-            color = color,
+            colorId = color.id,
             imageUri = image?.uri,
             imageName = image?.displayName,
             imageSource = image?.source,
@@ -204,9 +194,9 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
         )
 
     // Domain → Persistence bundle
-    private fun Task.toPersistence(): TaskPersistenceModel {
+    private fun Task.toPersistenceBundle(): TaskPersistenceModel {
         val updatedAtMillis = System.currentTimeMillis()
-        val entity = toEntityOnly(updatedAtMillis)
+        val entity = toEntity(updatedAtMillis)
         val reminderEntities = reminders.map { it.toEntity() }
         val locationEntities = locations.map { it.toEntity() }
         return TaskPersistenceModel(
@@ -216,7 +206,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
         )
     }
 
-    private fun CreateTask.toPersistence(): TaskPersistenceModel {
+    private fun CreateTask.toPersistenceBundle(): TaskPersistenceModel {
         val now = System.currentTimeMillis()
         val entity = TaskEntity(
             id = 0,
@@ -233,7 +223,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
             vibrate = vibrate,
             soundUri = soundUri,
             snoozeMinutes = snoozeTime,
-            color = color,
+            colorId = color.id,
             imageUri = image?.uri,
             imageName = image?.displayName,
             imageSource = image?.source,
@@ -289,215 +279,6 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
 
     private fun LocalDateTime.toEpochMillis(): Long =
         this.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-
-    private fun generateOccurrences(
-        task: Task,
-        ruleString: String,
-        windowStart: LocalDateTime,
-        windowEndExclusive: LocalDateTime
-    ): List<Task> {
-        val rule = parseRRule(ruleString) ?: return emptyList()
-        val occurrences = mutableListOf<Task>()
-        val lastDate = windowEndExclusive.minusNanos(1).toLocalDate()
-        var currentDate = windowStart.toLocalDate()
-
-        while (!currentDate.isAfter(lastDate)) {
-            if (occursOnDate(task, rule, currentDate)) {
-                val occurrenceStart = LocalDateTime.of(currentDate, task.date.toLocalTime())
-                if (!occurrenceStart.isBefore(windowStart) && occurrenceStart.isBefore(windowEndExclusive)) {
-                    occurrences.add(task.createOccurrence(occurrenceStart))
-                }
-            }
-            currentDate = currentDate.plusDays(1)
-        }
-
-        return occurrences
-    }
-
-    private fun occursOnDate(task: Task, rule: RecurrenceRule, date: LocalDate): Boolean {
-        // Check if date is after UNTIL date
-        if (rule.until != null && date.isAfter(rule.until)) {
-            return false
-        }
-        
-        return when (rule.frequency) {
-            Frequency.WEEKLY -> occursWeekly(task, rule, date)
-            Frequency.MONTHLY -> occursMonthly(task, rule, date)
-        }
-    }
-
-    private fun occursWeekly(task: Task, rule: RecurrenceRule, date: LocalDate): Boolean {
-        val baseDate = task.date.toLocalDate()
-        if (date.isBefore(baseDate)) return false
-
-        // Filter out tasks with no days selected (empty byDay means user deselected all days)
-        if (rule.byDay.isEmpty()) {
-            return false
-        }
-
-        if (date.dayOfWeek !in rule.byDay) return false
-
-        val daysBetween = ChronoUnit.DAYS.between(baseDate, date)
-        if (daysBetween < 0) return false
-
-        val weeksBetween = daysBetween / 7
-        return weeksBetween % rule.interval == 0L
-    }
-
-    private fun occursMonthly(task: Task, rule: RecurrenceRule, date: LocalDate): Boolean {
-        val baseDate = task.date.toLocalDate()
-        if (date.isBefore(baseDate)) return false
-
-        val monthsBetween = ChronoUnit.MONTHS.between(
-            YearMonth.from(baseDate),
-            YearMonth.from(date)
-        )
-        if (monthsBetween < 0) return false
-        if (monthsBetween % rule.interval != 0L) return false
-
-        if (rule.byMonth.isNotEmpty() && date.monthValue !in rule.byMonth) return false
-
-        // Filter out tasks with no days selected (empty byMonthDay means user deselected all days)
-        if (rule.byMonthDay.isEmpty()) {
-            return false
-        }
-
-        val matchesDay = rule.byMonthDay.any { day ->
-            when {
-                day == -1 -> date == date.with(TemporalAdjusters.lastDayOfMonth())
-                day > 0 -> date.dayOfMonth == day
-                else -> false
-            }
-        }
-
-        return matchesDay
-    }
-
-    private fun Task.createOccurrence(start: LocalDateTime): Task {
-        val duration = endDate?.let { Duration.between(date, it) }
-        val newEnd = duration?.let { start.plus(it) }
-        val now = LocalDateTime.now()
-        val isExpired = if (allDay && newEnd != null) {
-            newEnd.isBefore(now)
-        } else {
-            start.isBefore(now)
-        }
-        return copy(
-            date = start,
-            endDate = newEnd,
-            expired = isExpired
-        )
-    }
-
-    private fun parseRRule(rrule: String): RecurrenceRule? {
-        if (rrule.isBlank()) return null
-
-        val components = rrule.split(";")
-        val values = buildMap {
-            components.forEach { component ->
-                val separatorIndex = component.indexOf('=')
-                if (separatorIndex > 0) {
-                    val key = component.substring(0, separatorIndex).uppercase()
-                    val value = component.substring(separatorIndex + 1)
-                    put(key, value)
-                }
-            }
-        }
-
-        val frequency = when (values["FREQ"]?.uppercase()) {
-            "WEEKLY" -> Frequency.WEEKLY
-            "MONTHLY" -> Frequency.MONTHLY
-            else -> return null
-        }
-
-        val interval = values["INTERVAL"]?.toIntOrNull()?.coerceAtLeast(1) ?: 1
-        
-        val until = values["UNTIL"]?.let { untilStr ->
-            parseUntilDate(untilStr)
-        }
-
-        return when (frequency) {
-            Frequency.WEEKLY -> {
-                val byDay = values["BYDAY"]
-                    ?.split(",")
-                    ?.mapNotNull { parseDayOfWeek(it) }
-                    ?.toSet()
-                    ?: emptySet()
-                RecurrenceRule(
-                    frequency = frequency,
-                    interval = interval,
-                    byDay = byDay,
-                    until = until
-                )
-            }
-
-            Frequency.MONTHLY -> {
-                val byMonth = values["BYMONTH"]
-                    ?.takeIf { it.isNotBlank() }
-                    ?.split(",")
-                    ?.mapNotNull { it.toIntOrNull() }
-                    ?.toSet()
-                    ?: emptySet()
-
-                val byMonthDay = values["BYMONTHDAY"]
-                    ?.takeIf { it.isNotBlank() }
-                    ?.split(",")
-                    ?.mapNotNull { it.toIntOrNull() }
-                    ?: emptyList()
-
-                RecurrenceRule(
-                    frequency = frequency,
-                    interval = interval,
-                    byMonth = byMonth,
-                    byMonthDay = byMonthDay,
-                    until = until
-                )
-            }
-        }
-    }
-
-    private fun parseDayOfWeek(token: String): DayOfWeek? =
-        when (token.uppercase()) {
-            "MO" -> DayOfWeek.MONDAY
-            "TU" -> DayOfWeek.TUESDAY
-            "WE" -> DayOfWeek.WEDNESDAY
-            "TH" -> DayOfWeek.THURSDAY
-            "FR" -> DayOfWeek.FRIDAY
-            "SA" -> DayOfWeek.SATURDAY
-            "SU" -> DayOfWeek.SUNDAY
-            else -> null
-        }
-
-    private fun parseUntilDate(untilStr: String): LocalDate? {
-        // Parse YYYYMMDD format
-        if (untilStr.length == 8) {
-            val year = untilStr.substring(0, 4).toIntOrNull()
-            val month = untilStr.substring(4, 6).toIntOrNull()
-            val day = untilStr.substring(6, 8).toIntOrNull()
-            if (year != null && month != null && day != null) {
-                return try {
-                    LocalDate.of(year, month, day)
-                } catch (e: Exception) {
-                    null
-                }
-            }
-        }
-        return null
-    }
-
-    private data class RecurrenceRule(
-        val frequency: Frequency,
-        val interval: Int,
-        val byDay: Set<DayOfWeek> = emptySet(),
-        val byMonth: Set<Int> = emptySet(),
-        val byMonthDay: List<Int> = emptyList(),
-        val until: LocalDate? = null
-    )
-
-    private enum class Frequency {
-        WEEKLY,
-        MONTHLY
-    }
 
     private data class TaskPersistenceModel(
         val task: TaskEntity,

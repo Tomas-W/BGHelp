@@ -208,14 +208,6 @@ class TaskViewModel @Inject constructor(
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = emptyList()
             )
-
-    val getAllTasks: StateFlow<List<Task>> =
-        taskRepository.getAllTasks()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = emptyList()
-            )
 }
 
 data class WeekDisplay(

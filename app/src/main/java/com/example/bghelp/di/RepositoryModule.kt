@@ -1,8 +1,11 @@
 package com.example.bghelp.di
 
-import com.example.bghelp.data.local.ItemDao
-import com.example.bghelp.data.local.TargetDao
-import com.example.bghelp.data.local.TaskDao
+import com.example.bghelp.data.local.dao.ColorDao
+import com.example.bghelp.data.local.dao.ItemDao
+import com.example.bghelp.data.local.dao.TargetDao
+import com.example.bghelp.data.local.dao.TaskDao
+import com.example.bghelp.data.repository.ColorRepository
+import com.example.bghelp.data.repository.ColorRepositoryImpl
 import com.example.bghelp.data.repository.ItemRepository
 import com.example.bghelp.data.repository.ItemRepositoryImpl
 import com.example.bghelp.data.repository.TargetRepository
@@ -34,5 +37,11 @@ object RepositoryModule {
     @Singleton
     fun provideItemRepository(itemDao: ItemDao): ItemRepository {
         return ItemRepositoryImpl(itemDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideColorRepository(colorDao: ColorDao): ColorRepository {
+        return ColorRepositoryImpl(colorDao)
     }
 }

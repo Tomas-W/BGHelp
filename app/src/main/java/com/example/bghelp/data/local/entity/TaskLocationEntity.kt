@@ -1,4 +1,4 @@
-package com.example.bghelp.data.local
+package com.example.bghelp.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -11,14 +11,14 @@ import com.example.bghelp.constants.DatabaseConstants as DB
     foreignKeys = [
         ForeignKey(
             entity = TaskEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["taskId"],
+            parentColumns = [TaskEntity.COL_ID],
+            childColumns = [TaskLocationEntity.COL_TASK_ID],
             onDelete = ForeignKey.CASCADE,
             onUpdate = ForeignKey.CASCADE
         )
     ],
     indices = [
-        Index(value = ["taskId"])
+        Index(value = [TaskLocationEntity.COL_TASK_ID])
     ]
 )
 data class TaskLocationEntity(
@@ -30,5 +30,9 @@ data class TaskLocationEntity(
     val address: String,
     val name: String,
     val orderIndex: Int
-)
+) {
+    companion object {
+        const val COL_TASK_ID = "taskId"
+    }
+}
 

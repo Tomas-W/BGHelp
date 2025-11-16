@@ -5,7 +5,6 @@ import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.Coordinate
 import com.example.bghelp.domain.model.ReminderKind
 import com.example.bghelp.domain.model.ReminderOffsetUnit
-import com.example.bghelp.domain.model.TaskColorOption
 import com.example.bghelp.domain.model.TaskImageSourceOption
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -19,27 +18,6 @@ class Converters {
 
     @TypeConverter
     fun toAlarmMode(value: String): AlarmMode = AlarmMode.fromValue(value)
-
-    // Coordinates
-    @TypeConverter
-    fun fromCoordinatesList(coords: List<Coordinate>): String {
-        return gson.toJson(coords)
-    }
-
-    @TypeConverter
-    fun toCoordinatesList(json: String): List<Coordinate> {
-        val type = object : TypeToken<List<Coordinate>>() {}.type
-        return gson.fromJson(json, type)
-    }
-
-    // Task color
-    @TypeConverter
-    fun fromTaskColor(color: TaskColorOption): String = color.name
-
-    @TypeConverter
-    fun toTaskColor(value: String): TaskColorOption = runCatching {
-        TaskColorOption.valueOf(value)
-    }.getOrElse { TaskColorOption.DEFAULT }
 
     // Reminder type
     @TypeConverter
@@ -58,6 +36,18 @@ class Converters {
     fun toReminderOffsetUnit(value: String): ReminderOffsetUnit = runCatching {
         ReminderOffsetUnit.valueOf(value)
     }.getOrElse { ReminderOffsetUnit.MINUTES }
+
+    // Coordinates
+    @TypeConverter
+    fun fromCoordinatesList(coords: List<Coordinate>): String {
+        return gson.toJson(coords)
+    }
+
+    @TypeConverter
+    fun toCoordinatesList(json: String): List<Coordinate> {
+        val type = object : TypeToken<List<Coordinate>>() {}.type
+        return gson.fromJson(json, type)
+    }
 
     // Task image source
     @TypeConverter

@@ -35,3 +35,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+// TODO: Deleting a Color -> Check if color is in use before running delete
+// TODO                      Prompt for replacement color when so
+// TODO                      Update all effected Tasks
+// TODO                      Delete color

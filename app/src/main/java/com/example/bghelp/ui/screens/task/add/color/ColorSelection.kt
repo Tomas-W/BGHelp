@@ -21,71 +21,49 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.bghelp.domain.model.FeatureColor
 import com.example.bghelp.ui.components.CustomDropdown
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
-import com.example.bghelp.ui.screens.task.add.UserColorChoices
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TaskCyan
 import com.example.bghelp.ui.theme.TaskDefault
-import com.example.bghelp.ui.theme.TaskGreen
-import com.example.bghelp.ui.theme.TaskMagenta
-import com.example.bghelp.ui.theme.TaskRed
-import com.example.bghelp.ui.theme.TaskYellow
 import com.example.bghelp.ui.screens.task.add.deselectedStyle
 
 @Composable
 fun ColorSelection(
     viewModel: AddTaskViewModel
 ) {
-    val selectedColor by viewModel.selectedColor.collectAsState()
+    val selectedColorId by viewModel.selectedColorId.collectAsState()
+    val allColors by viewModel.allColors.collectAsState()
 
     ColorDropdown(
-        selectedColor = selectedColor,
-        onColorSelected = { color ->
-            viewModel.setSelectedColorChoice(color)
+        colors = allColors,
+        selectedColorId = selectedColorId,
+        onColorSelected = { colorId ->
+            viewModel.setSelectedColorId(colorId)
         }
     )
 }
 
 @Composable
 fun ColorDropdown(
-    selectedColor: UserColorChoices,
-    onColorSelected: (UserColorChoices) -> Unit,
+    colors: List<FeatureColor>,
+    selectedColorId: Int?,
+    onColorSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
     onDropdownClick: () -> Unit = {}
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
-    val colorChoices = remember {
-        enumValues<UserColorChoices>().toList()
-    }
-    val colorStringMap = remember {
-        mapOf(
-            UserColorChoices.DEFAULT to STR.DEFAULT,
-            UserColorChoices.RED to STR.RED,
-            UserColorChoices.GREEN to STR.GREEN,
-            UserColorChoices.YELLOW to STR.YELLOW,
-            UserColorChoices.CYAN to STR.CYAN,
-            UserColorChoices.MAGENTA to STR.MAGENTA
-        )
-    }
-    val colorMap = remember {
-        mapOf(
-            UserColorChoices.DEFAULT to TaskDefault,
-            UserColorChoices.RED to TaskRed,
-            UserColorChoices.GREEN to TaskGreen,
-            UserColorChoices.YELLOW to TaskYellow,
-            UserColorChoices.CYAN to TaskCyan,
-            UserColorChoices.MAGENTA to TaskMagenta
-        )
+    val selectedColor = remember(selectedColorId, colors) {
+        colors.find { it.id == selectedColorId } ?: colors.firstOrNull()
     }
 
-    val displayText = remember(selectedColor, colorStringMap) {
-        colorStringMap[selectedColor] ?: STR.SELECT_COLOR
+    val displayText = remember(selectedColor) {
+        selectedColor?.name ?: STR.SELECT_COLOR
     }
-    val displayColor = remember(selectedColor, colorMap) {
-        colorMap[selectedColor] ?: TaskDefault
+    val displayColor = remember(selectedColor) {
+        selectedColor?.toComposeColor() ?: TaskDefault
     }
 
     Box(
@@ -116,12 +94,12 @@ fun ColorDropdown(
             expanded = isExpanded,
             onDismissRequest = { isExpanded = false }
         ) {
-            colorChoices.forEach { color ->
+            colors.forEach { color ->
                 ColorDropdownItem(
-                    label = colorStringMap[color] ?: color.name,
-                    color = colorMap[color] ?: TaskDefault,
+                    label = color.name,
+                    color = color.toComposeColor(),
                     onClick = {
-                        onColorSelected(color)
+                        onColorSelected(color.id)
                         isExpanded = false
                     }
                 )

@@ -1,14 +1,16 @@
-package com.example.bghelp.data.local
+package com.example.bghelp.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Embedded
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Relation
 import androidx.room.Transaction
 import androidx.room.Update
+import com.example.bghelp.data.local.relations.TaskWithRelations
+import com.example.bghelp.data.local.entity.TaskEntity
+import com.example.bghelp.data.local.entity.TaskLocationEntity
+import com.example.bghelp.data.local.entity.TaskReminderEntity
 import com.example.bghelp.constants.DatabaseConstants as DB
 import kotlinx.coroutines.flow.Flow
 
@@ -122,16 +124,4 @@ abstract class TaskDao {
     abstract fun getNextTask(currentTime: Long) : Flow<TaskWithRelations?>
 }
 
-data class TaskWithRelations(
-    @Embedded val task: TaskEntity,
-    @Relation(
-        parentColumn = "id",
-        entityColumn = "taskId"
-    )
-    val reminders: List<TaskReminderEntity>,
-    @Relation(
-        parentColumn = "id",
-        entityColumn = "taskId"
-    )
-    val locations: List<TaskLocationEntity>
-)
+

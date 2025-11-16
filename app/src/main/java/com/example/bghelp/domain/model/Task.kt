@@ -3,14 +3,6 @@ package com.example.bghelp.domain.model
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-enum class TaskColorOption {
-    DEFAULT,
-    RED,
-    GREEN,
-    YELLOW,
-    CYAN,
-    MAGENTA
-}
 
 enum class TaskImageSourceOption {
     GALLERY,
@@ -66,7 +58,7 @@ data class CreateTask(
     val vibrate: AlarmMode = AlarmMode.OFF,
     val soundUri: String? = null,
     val snoozeTime: Int = 0,
-    val color: TaskColorOption = TaskColorOption.DEFAULT,
+    val color: FeatureColor,
     val image: TaskImageAttachment? = null,
     val reminders: List<TaskReminderEntry> = emptyList(),
     val locations: List<TaskLocationEntry> = emptyList()
@@ -87,14 +79,10 @@ data class Task(
     val note: String? = null,
     val rrule: String? = null,
     val soundUri: String? = null,
-    val color: TaskColorOption = TaskColorOption.DEFAULT,
+    val color: FeatureColor,
     val image: TaskImageAttachment? = null,
     val reminders: List<TaskReminderEntry> = emptyList(),
     val locations: List<TaskLocationEntry> = emptyList(),
     val createdAt: LocalDateTime = LocalDateTime.now(ZoneId.systemDefault()),
     val updatedAt: LocalDateTime = LocalDateTime.now(ZoneId.systemDefault())
-) {
-    
-    val hasAlarm: Boolean
-        get() = sound != AlarmMode.OFF || vibrate != AlarmMode.OFF
-}
+)

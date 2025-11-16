@@ -41,9 +41,11 @@ fun DayComponent(
     onToggleExpanded: (Int) -> Unit,
     onDelete: (Task) -> Unit
 ) {
-    val colorScheme = MaterialTheme.colorScheme
-    val taskBackgroundColor =
-        if (!task.expired) colorScheme.secondary else colorScheme.tertiary
+    val taskBackgroundColor = if (!task.expired) {
+        task.color.toComposeColor()
+    } else {
+        MaterialTheme.colorScheme.tertiary
+    }
     val deleteCallback = remember(key1 = task.id) { { onDelete(task) } }
     val toggleCallback = remember(key1 = task.id) { { onToggleExpanded(task.id) } }
 
@@ -60,6 +62,7 @@ fun DayComponent(
             TimeInfo(task = task)
             AlarmIcons(task = task, onDelete = deleteCallback)
         }
+
         TitleAndDescription(
             title = task.title,
             description = task.description,

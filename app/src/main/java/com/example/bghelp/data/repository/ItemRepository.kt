@@ -1,7 +1,7 @@
 package com.example.bghelp.data.repository
 
-import com.example.bghelp.data.local.ItemDao
-import com.example.bghelp.data.local.ItemEntity
+import com.example.bghelp.data.local.dao.ItemDao
+import com.example.bghelp.data.local.entity.ItemEntity
 import com.example.bghelp.domain.model.CreateItem
 import com.example.bghelp.domain.model.Item
 import kotlinx.coroutines.flow.Flow

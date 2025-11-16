@@ -1,7 +1,7 @@
 package com.example.bghelp.data.repository
 
-import com.example.bghelp.data.local.TargetDao
-import com.example.bghelp.data.local.TargetEntity
+import com.example.bghelp.data.local.dao.TargetDao
+import com.example.bghelp.data.local.entity.TargetEntity
 import com.example.bghelp.domain.model.CreateTarget
 import com.example.bghelp.domain.model.Target
 import java.time.Instant

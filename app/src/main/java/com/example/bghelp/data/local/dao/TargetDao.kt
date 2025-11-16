@@ -1,10 +1,11 @@
-package com.example.bghelp.data.local
+package com.example.bghelp.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.example.bghelp.data.local.entity.TargetEntity
 import com.example.bghelp.constants.DatabaseConstants as DB
 import kotlinx.coroutines.flow.Flow
 

@@ -41,7 +41,7 @@ fun AddTaskScreen(
     viewModel: AddTaskViewModel
 ) {
     val saveState by viewModel.saveState.collectAsState()
-    val isValid by viewModel.isValid.collectAsState()
+    val isValid by viewModel.isNewTaskValid.collectAsState()
     val scrollState = rememberScrollState()
 
     LaunchedEffect(saveState) {

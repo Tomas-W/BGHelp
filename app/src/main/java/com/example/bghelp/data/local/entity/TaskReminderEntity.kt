@@ -1,4 +1,4 @@
-package com.example.bghelp.data.local
+package com.example.bghelp.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -13,14 +13,14 @@ import com.example.bghelp.domain.model.ReminderOffsetUnit
     foreignKeys = [
         ForeignKey(
             entity = TaskEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["taskId"],
+            parentColumns = [TaskEntity.COL_ID],
+            childColumns = [TaskReminderEntity.COL_TASK_ID],
             onDelete = ForeignKey.CASCADE,
             onUpdate = ForeignKey.CASCADE
         )
     ],
     indices = [
-        Index(value = ["taskId"])
+        Index(value = [TaskReminderEntity.COL_TASK_ID])
     ]
 )
 data class TaskReminderEntity(
@@ -30,5 +30,9 @@ data class TaskReminderEntity(
     val type: ReminderKind,
     val offsetValue: Int,
     val offsetUnit: ReminderOffsetUnit
-)
+) {
+    companion object {
+        const val COL_TASK_ID = "taskId"
+    }
+}
 
