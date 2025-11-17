@@ -107,6 +107,9 @@ dependencies {
     implementation(libs.places)
     implementation(libs.coroutines.play.services)
 
+    // Color picker (skydoves/colorpicker-compose)
+    implementation(libs.colorpicker.compose)
+
     // Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

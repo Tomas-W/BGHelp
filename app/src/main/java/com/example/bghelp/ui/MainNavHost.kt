@@ -22,8 +22,8 @@ import com.example.bghelp.ui.screens.note.NoteScreen
 import com.example.bghelp.ui.screens.note.NoteWallpaperScreen
 import com.example.bghelp.ui.screens.items.ItemScreen
 import com.example.bghelp.ui.screens.items.ItemWallpaperScreen
-import com.example.bghelp.ui.screens.options.CreateAlarmScreen
-import com.example.bghelp.ui.screens.options.SettingsScreen
+import com.example.bghelp.ui.screens.createalarm.CreateAlarmScreen
+import com.example.bghelp.ui.screens.settings.SettingsScreen
 import com.example.bghelp.ui.screens.task.add.AddTaskScreen
 import com.example.bghelp.ui.screens.task.main.TaskScreen
 import com.example.bghelp.ui.screens.task.TaskWallpaperScreen
@@ -38,6 +38,7 @@ import com.example.bghelp.ui.screens.items.AddItemScreen
 import com.example.bghelp.ui.screens.items.AddItemViewModel
 import com.example.bghelp.ui.screens.target.AddTargetViewModel
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
+import com.example.bghelp.ui.screens.colorpicker.ColorPickerScreen
 
 private const val OVERLAY_GRAPH_ROUTE = "overlay_graph"
 
@@ -159,6 +160,10 @@ fun OverlayNavHost(
 
         noTransitionComposable(route = Screen.Options.CreateAlarm.route) { _ ->
             CreateAlarmScreen()
+        }
+
+        noTransitionComposable(route = Screen.Options.ColorPicker.route) { _ ->
+            ColorPickerScreen(navController = navController)
         }
 
         noTransitionComposable(

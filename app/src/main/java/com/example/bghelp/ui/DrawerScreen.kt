@@ -69,6 +69,7 @@ private fun DrawerItem(
     val iconRes = when (screen) {
         Screen.Options.Settings -> if (selected) R.drawable.settings_filled else R.drawable.settings_outlined
         Screen.Options.CreateAlarm -> if (selected) R.drawable.create_alarm_filled else R.drawable.create_alarm_outlined
+        Screen.Options.ColorPicker -> if (selected) R.drawable.create_color_filled else R.drawable.create_color_outlined
     }
     
     val colors = NavigationDrawerItemDefaults.colors(

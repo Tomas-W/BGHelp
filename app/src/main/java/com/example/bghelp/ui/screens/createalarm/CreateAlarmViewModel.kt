@@ -1,4 +1,4 @@
-package com.example.bghelp.ui.screens.options
+package com.example.bghelp.ui.screens.createalarm
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,4 +25,3 @@ class CreateAlarmViewModel @Inject constructor() : ViewModel() {
         _selectedTime.value = time
     }
 }
-

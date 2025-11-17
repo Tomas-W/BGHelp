@@ -36,6 +36,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// TODO: Note creation -> Note is still a string
+
 // TODO: Deleting a Color -> Check if color is in use before running delete
 // TODO                      Prompt for replacement color when so
 // TODO                      Update all effected Tasks

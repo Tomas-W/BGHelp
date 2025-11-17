@@ -1,5 +1,6 @@
 package com.example.bghelp.domain.model
 
+import com.example.bghelp.domain.constants.ColorSeeds
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -86,3 +87,49 @@ data class Task(
     val createdAt: LocalDateTime = LocalDateTime.now(ZoneId.systemDefault()),
     val updatedAt: LocalDateTime = LocalDateTime.now(ZoneId.systemDefault())
 )
+
+data class ExampleTask(
+    val id: Int = 0,
+    val date: LocalDateTime = LocalDateTime.now(ZoneId.systemDefault()),
+    val title: String = "This is an example title",
+    val description: String? = "This is example info. \n- Example 1\n- Example 2\n- Example 3",
+    val expired: Boolean = false,
+    val alarmName: String? = "Alarm name",
+    val sound: AlarmMode = AlarmMode.ONCE,
+    val vibrate: AlarmMode = AlarmMode.CONTINUOUS,
+    val snoozeTime: Int = 15,
+    val endDate: LocalDateTime? = LocalDateTime.now(ZoneId.systemDefault()).plusDays(1),
+    val allDay: Boolean = false,
+    val note: String? = "Note A",
+    val rrule: String? = null,
+    val soundUri: String? = null,
+    val color: FeatureColor = ColorSeeds.FallbackTaskColor,
+    val image: TaskImageAttachment? = null,
+    val reminders: List<TaskReminderEntry> = emptyList(),
+    val locations: List<TaskLocationEntry> = emptyList(),
+    val createdAt: LocalDateTime = LocalDateTime.now(ZoneId.systemDefault()),
+    val updatedAt: LocalDateTime = LocalDateTime.now(ZoneId.systemDefault())
+) {
+    fun toTask(): Task = Task(
+        id = id,
+        date = date,
+        title = title,
+        description = description,
+        expired = expired,
+        alarmName = alarmName,
+        sound = sound,
+        vibrate = vibrate,
+        snoozeTime = snoozeTime,
+        endDate = endDate,
+        allDay = allDay,
+        note = note,
+        rrule = rrule,
+        soundUri = soundUri,
+        color = color,
+        image = image,
+        reminders = reminders,
+        locations = locations,
+        createdAt = createdAt,
+        updatedAt = updatedAt
+    )
+}

@@ -1,4 +1,4 @@
-package com.example.bghelp.ui.screens.options
+package com.example.bghelp.ui.screens.createalarm
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.bghelp.R
 import com.example.bghelp.ui.components.MainContentContainer
+import com.example.bghelp.ui.screens.createalarm.CreateAlarmViewModel
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import com.vanpra.composematerialdialogs.MaterialDialog

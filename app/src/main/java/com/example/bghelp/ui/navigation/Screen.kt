@@ -46,6 +46,7 @@ sealed class Screen(
     sealed class Options(title: String, route: String) : Screen(title, route) {
         object Settings : Options("Settings", "options/settings")
         object CreateAlarm : Options("Create Alarm", "options/create_alarm")
+        object ColorPicker : Options("Create color", "options/color_picker")
     }
     
     // Stand alone screens
@@ -79,6 +80,7 @@ sealed class Screen(
                 Notes.Wallpaper.route -> Notes.Wallpaper
                 Options.Settings.route -> Options.Settings
                 Options.CreateAlarm.route -> Options.CreateAlarm
+                Options.ColorPicker.route -> Options.ColorPicker
                 LocationPicker.route -> LocationPicker
                 else -> when {
                     route?.startsWith(LocationPicker.route) == true -> LocationPicker
@@ -153,10 +155,12 @@ sealed class Screen(
         val optionsScreens = listOf(
             Options.Settings,
             Options.CreateAlarm,
+            Options.ColorPicker,
         )
 
         val noBottomNavScreens = listOf(
-            LocationPicker
+            LocationPicker,
+            Options.ColorPicker
         )
 
         val featureMains = listOf(

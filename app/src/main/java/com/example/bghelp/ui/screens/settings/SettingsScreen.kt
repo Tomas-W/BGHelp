@@ -1,4 +1,4 @@
-package com.example.bghelp.ui.screens.options
+package com.example.bghelp.ui.screens.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

@@ -72,7 +72,7 @@ class ColorRepositoryImpl(private val colorDao: ColorDao) : ColorRepository {
             red = red,
             green = green,
             blue = blue,
-            alpha = 0.12f,
+            alpha = alpha,
             isDefault = isDefault
         )
 }
