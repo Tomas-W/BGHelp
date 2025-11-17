@@ -60,8 +60,8 @@ sealed class Screen(
     companion object {
         fun getScreenByRoute(route: String?): Screen {
             return when (route) {
-                Home.Main.route -> Home.Main
-                Home.Wallpaper.route -> Home.Wallpaper
+                // Home.Main.route -> Home.Main
+                // Home.Wallpaper.route -> Home.Wallpaper
                 Tasks.Main.route -> Tasks.Main
                 Tasks.Add.route -> Tasks.Add
                 Tasks.Calendar.route -> Tasks.Calendar
@@ -123,7 +123,6 @@ sealed class Screen(
         )
 
         val bottomNavScreens = listOf(
-            Home.Main,
             Tasks.Main,
             Targets.Main,
             Items.Main,

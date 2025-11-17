@@ -48,6 +48,13 @@ private fun getIconResource(screen: Screen, currentRoute: String?): Int {
 }
 
 @Composable
+private fun getOptionsIconResource(isSelected: Boolean): Int {
+    return remember(isSelected) {
+        if (isSelected) R.drawable.options_active else R.drawable.options_inactive
+    }
+}
+
+@Composable
 private fun RowScope.NavigationItem(
     screen: Screen,
     currentRoute: String?,
@@ -55,7 +62,6 @@ private fun RowScope.NavigationItem(
     onClick: () -> Unit
 ) {
     val iconRes = getIconResource(screen, currentRoute)
-    val navigationTopInset = 6.dp
     
     NavigationBarItem(
         selected = isSelected,
@@ -98,6 +104,8 @@ fun BottomNavigationBar(
     isOptionsActive: Boolean = false,
     overlayRoute: String? = null,
     onRequestNavigateTo: ((String) -> Unit)? = null,
+    onOptionsClick: (() -> Unit)? = null,
+    isDrawerShown: Boolean = false,
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     // Track the last known bottom route for highlighting
@@ -115,6 +123,7 @@ fun BottomNavigationBar(
         normalizedOverlayRoute in Screen.optionsScreens.map { it.route }
 
     val currentRoute = when {
+        isDrawerShown -> lastKnownBottomRoute
         isOptionsRoute -> null
         isOptionsActive -> lastKnownBottomRoute
         else -> bottomRoute
@@ -138,20 +147,16 @@ fun BottomNavigationBar(
 
     val navigationBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val totalHeight = remember(navigationBarHeight) { navigationBarHeight + UI.BOTTOM_BAR_HEIGHT.dp }
+    val normalizedOverlayRouteForOptions = overlayRoute?.takeUnless { it == "empty" }
+    val isOptionsRouteActive = isDrawerShown || (normalizedOverlayRouteForOptions != null &&
+        normalizedOverlayRouteForOptions in Screen.optionsScreens.map { it.route })
+    
     NavigationBar(
         modifier = modifier
             .fillMaxWidth()
             .height(totalHeight),
         windowInsets = WindowInsets(bottom = navigationBarHeight, top = 6.dp),
     ) {
-        // Home
-        NavigationItem(
-            screen = Screen.Home.Main,
-            currentRoute = currentRoute,
-            isSelected = currentRoute in Screen.homeScreens,
-            onClick = { navigateTo(Screen.Home.Main.route) }
-        )
-
         // Tasks
         NavigationItem(
             screen = Screen.Tasks.Main,
@@ -182,6 +187,41 @@ fun BottomNavigationBar(
             currentRoute = currentRoute,
             isSelected = currentRoute in Screen.noteScreens,
             onClick = { navigateTo(Screen.Notes.Main.route) }
+        )
+
+        // Options
+        val optionsIconRes = getOptionsIconResource(isOptionsRouteActive)
+        NavigationBarItem(
+            selected = isOptionsRouteActive,
+            onClick = { onOptionsClick?.invoke() ?: Unit },
+            icon = { 
+                Image(
+                    painter = painterResource(optionsIconRes),
+                    contentDescription = "Options",
+                    modifier = Modifier.size(Sizes.Icon.L),
+                    colorFilter = ColorFilter.tint(
+                        if (isOptionsRouteActive) MaterialTheme.colorScheme.onSurface
+                         else MaterialTheme.colorScheme.onTertiary
+                    )
+                )
+            },
+            label = { 
+                Text(
+                    text = "Options",
+                    color = if (isOptionsRouteActive) MaterialTheme.colorScheme.onSurface
+                            else MaterialTheme.colorScheme.onTertiary,
+                    fontWeight = if (isOptionsRouteActive) FontWeight.Bold else FontWeight.Normal,
+                )
+            },
+            colors = NavigationBarItemColors(
+                selectedIconColor = MaterialTheme.colorScheme.onBackground,
+                selectedTextColor = MaterialTheme.colorScheme.onBackground,
+                unselectedIconColor = MaterialTheme.colorScheme.onTertiary,
+                unselectedTextColor = MaterialTheme.colorScheme.onTertiary,
+                selectedIndicatorColor = MaterialTheme.colorScheme.secondary,
+                disabledIconColor = MaterialTheme.colorScheme.onTertiary,
+                disabledTextColor = MaterialTheme.colorScheme.onTertiary
+            )
         )
     }
 }
