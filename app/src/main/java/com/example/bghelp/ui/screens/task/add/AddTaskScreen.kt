@@ -66,6 +66,8 @@ fun AddTaskScreen(
                     .weight(1f, fill = true)
                     .verticalScroll(scrollState)
             ) {
+                ResetForm(viewModel = viewModel)
+
                 Title(viewModel = viewModel)
 
                 AddTaskDivider()
@@ -120,7 +122,6 @@ fun AddTaskScreen(
                 CancelButton(
                     text = "Cancel",
                     onClick = {
-                        viewModel.resetAllData()
                         navController.popBackStack()
                     },
                     modifier = Modifier.weight(1f)

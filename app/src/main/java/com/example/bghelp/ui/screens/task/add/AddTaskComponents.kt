@@ -1,5 +1,7 @@
 package com.example.bghelp.ui.screens.task.add
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -7,7 +9,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -80,4 +85,38 @@ fun SubContainer(
     ) {
         content()
     }
+}
+
+@Composable
+fun ResetForm(
+    viewModel: AddTaskViewModel
+) {
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(end = 8.dp),
+        horizontalArrangement = Arrangement.End,
+    ) {
+        Row(
+            modifier = Modifier
+                .clickable { viewModel.resetAllData() },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(modifier = Modifier.width(6.dp))
+            Icon(
+                modifier = Modifier
+                    .size(Sizes.Icon.S),
+                imageVector = Icons.Default.Clear,
+                contentDescription = "Clear form inputs"
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = "Reset all",
+                style = MaterialTheme.typography.labelLarge
+            )
+        }
+
+    }
+
 }
