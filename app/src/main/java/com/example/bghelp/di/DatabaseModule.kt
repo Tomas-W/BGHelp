@@ -8,7 +8,9 @@ import com.example.bghelp.data.local.dao.ColorDao
 import com.example.bghelp.data.local.dao.ItemDao
 import com.example.bghelp.data.local.dao.TargetDao
 import com.example.bghelp.data.local.dao.TaskDao
+import com.example.bghelp.data.repository.TaskRepositoryImpl
 import com.example.bghelp.utils.initializeDefaultColors
+import com.example.bghelp.utils.initializeDefaultTasks
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,6 +40,9 @@ object DatabaseModule {
         // This runs during DI setup, so blocking is acceptable
         runBlocking(Dispatchers.IO) {
             initializeDefaultColors(database.colorDao())
+            // Initialize tasks after colors are available
+            val taskRepository = TaskRepositoryImpl(database.taskDao())
+            initializeDefaultTasks(taskRepository, database.colorDao())
         }
         
         return database
