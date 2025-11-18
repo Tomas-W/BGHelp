@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,7 +26,8 @@ fun MainContentContainer(
 ) {
     Column(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .then(if (modifier == Modifier) Modifier.fillMaxHeight() else Modifier)
             .padding(start = 16.dp, end = 16.dp, top = 16.dp),
         verticalArrangement = if (spacing > 0) Arrangement.spacedBy(spacing.dp) else Arrangement.spacedBy(0.dp),
         content = content

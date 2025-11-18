@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -64,7 +63,7 @@ private inline fun NavGraphBuilder.noTransitionComposable(
 fun BottomNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    onWeekNavExpansionChanged: ((Boolean, Dp) -> Unit)? = null
+    overlayNavController: NavHostController? = null
 ) {
     NavHost(
         navController = navController,
@@ -72,7 +71,7 @@ fun BottomNavHost(
         modifier = modifier
     ) {
         noTransitionComposable(route = Screen.Tasks.Main.route) { _ ->
-            TaskScreen(onWeekNavExpansionChanged = onWeekNavExpansionChanged)
+            TaskScreen(overlayNavController = overlayNavController)
         }
         noTransitionComposable(route = Screen.Targets.Main.route) { _ ->
             TargetScreen()
@@ -210,15 +209,14 @@ fun MainNavHost(
     modifier: Modifier = Modifier,
     bottomNavController: NavHostController,
     overlayNavController: NavHostController,
-    isOptionsActive: Boolean,
-    onWeekNavExpansionChanged: ((Boolean, Dp) -> Unit)? = null
+    isOptionsActive: Boolean
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         // Bottom navigation content (base layer)
         if (!isOptionsActive) {
             BottomNavHost(
                 navController = bottomNavController,
-                onWeekNavExpansionChanged = onWeekNavExpansionChanged,
+                overlayNavController = overlayNavController,
                 modifier = Modifier.fillMaxSize()
             )
         }

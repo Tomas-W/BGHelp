@@ -1,16 +1,16 @@
 package com.example.bghelp.ui.components
 
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -59,72 +59,87 @@ fun CollapsibleWeekNavigation(
 ) {
     var isExpanded by rememberSaveable { mutableStateOf(true) }
     var weekNavContentHeightPx by remember { mutableIntStateOf(0) }
+    var toggleButtonHeightPx by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
 
-    // When collapsed, move down by content height (so only arrow shows)
-    val offsetY by animateDpAsState(
-        targetValue = if (isExpanded) 0.dp else with(density) { weekNavContentHeightPx.toDp() },
-        animationSpec = tween(300),
-        label = "WeekNav Offset"
-    )
-
-    // Report expansion state and height changes
-    LaunchedEffect(isExpanded, weekNavContentHeightPx) {
-        val heightDp = with(density) { weekNavContentHeightPx.toDp() }
-        onExpansionChanged?.invoke(isExpanded, heightDp)
+    // Report expansion state and height changes immediately when state changes
+    // This ensures FAB animation starts in sync with week nav animation
+    LaunchedEffect(isExpanded) {
+        val totalHeight = if (isExpanded) {
+            with(density) { (weekNavContentHeightPx + toggleButtonHeightPx).toDp() }
+        } else {
+            with(density) { toggleButtonHeightPx.toDp() }
+        }
+        onExpansionChanged?.invoke(isExpanded, totalHeight)
+    }
+    
+    // Also report when heights change (for initial measurement and content size changes)
+    LaunchedEffect(weekNavContentHeightPx, toggleButtonHeightPx) {
+        val totalHeight = if (isExpanded) {
+            with(density) { (weekNavContentHeightPx + toggleButtonHeightPx).toDp() }
+        } else {
+            with(density) { toggleButtonHeightPx.toDp() }
+        }
+        onExpansionChanged?.invoke(isExpanded, totalHeight)
     }
 
-    Box(
-        modifier = modifier.fillMaxSize()
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.background)
+            .topBorder(
+                strokeWidth = 2.dp,
+                color = if (isExpanded) MaterialTheme.colorScheme.outline else Color.Transparent
+            )
+            .bottomBorder(
+                strokeWidth = 2.dp,
+                color = MaterialTheme.colorScheme.outline
+            )
     ) {
-        // Column that slides up/down
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .align(Alignment.BottomStart)
-                .offset(y = offsetY)
-                .background(color = MaterialTheme.colorScheme.background)
-                .topBorder(
-                    strokeWidth = 2.dp,
-                    color = if (isExpanded) MaterialTheme.colorScheme.outline else Color.Transparent
-                )
-                .bottomBorder(
-                    strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.outline
-                )
-        ) {
-            // Arrow to toggle expansion
-            WithRipple {
-                Row(
+        // Arrow to toggle expansion (always visible)
+        WithRipple {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onSizeChanged { toggleButtonHeightPx = it.height }
+                    .bottomBorder(
+                        strokeWidth = 2.dp,
+                        color = if (!isExpanded) MaterialTheme.colorScheme.outline else Color.Transparent
+                    ),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .bottomBorder(
-                            strokeWidth = 2.dp,
-                            color = if (!isExpanded) MaterialTheme.colorScheme.outline else Color.Transparent
-                        ),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                        .width(3 * Sizes.Icon.L)
+                        .height(Sizes.Icon.L)
+                        .clickableRipple(onClick = { isExpanded = !isExpanded }),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .width(3 * Sizes.Icon.L)
-                            .height(Sizes.Icon.L)
-                            .clickableRipple(onClick = { isExpanded = !isExpanded }),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(
-                                id = if (isExpanded) R.drawable.navigation_arrow_down else R.drawable.navigation_arrow_up
-                            ),
-                            contentDescription = if (isExpanded) "Hide week navigation" else "Show week navigation",
-                            modifier = Modifier.size(Sizes.Icon.L),
-                            tint = MaterialTheme.colorScheme.onTertiary
-                        )
-                    }
+                    Icon(
+                        painter = painterResource(
+                            id = if (isExpanded) R.drawable.navigation_arrow_down else R.drawable.navigation_arrow_up
+                        ),
+                        contentDescription = if (isExpanded) "Hide week navigation" else "Show week navigation",
+                        modifier = Modifier.size(Sizes.Icon.L),
+                        tint = MaterialTheme.colorScheme.onTertiary
+                    )
                 }
             }
+        }
 
+        // Week navigation content (animated visibility)
+        AnimatedVisibility(
+            visible = isExpanded,
+            enter = expandVertically(
+                animationSpec = tween(300),
+                expandFrom = androidx.compose.ui.Alignment.Top
+            ),
+            exit = shrinkVertically(
+                animationSpec = tween(300),
+                shrinkTowards = androidx.compose.ui.Alignment.Top
+            )
+        ) {
             Box(
                 modifier = Modifier.onSizeChanged { weekNavContentHeightPx = it.height }
             ) {
