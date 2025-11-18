@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
@@ -26,7 +27,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -47,7 +50,9 @@ fun DayComponent(
     task: Task,
     isExpanded: Boolean,
     onToggleExpanded: (Int) -> Unit,
-    onDelete: (Task) -> Unit
+    onDelete: (Task) -> Unit,
+    isFirst: Boolean = false,
+    isLast: Boolean = false
 ) {
     val taskBackgroundColor = if (!task.expired) {
         task.color.toComposeColor()
@@ -56,12 +61,25 @@ fun DayComponent(
     }
     val deleteCallback = remember(key1 = task.id) { { onDelete(task) } }
     val toggleCallback = remember(key1 = task.id) { { onToggleExpanded(task.id) } }
+    
+    val cornerRadius = remember {
+        Sizes.Corner.S
+    }
+    val shape = remember(isFirst, isLast, cornerRadius) {
+        when {
+            isFirst && isLast -> RoundedCornerShape(cornerRadius)
+            isFirst -> RoundedCornerShape(topEnd = cornerRadius)
+            isLast -> RoundedCornerShape(bottomStart = cornerRadius, bottomEnd = cornerRadius)
+            else -> null
+        }
+    }
 
     DayContainer(
         modifier = modifier
             .animateContentSize()
             .clickable(onClick = toggleCallback),
-        backgroundColor = taskBackgroundColor
+        backgroundColor = taskBackgroundColor,
+        shape = shape
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -87,16 +105,19 @@ fun DayComponent(
             }
         }
     }
+    if (isLast) Spacer(modifier = Modifier.height(6.dp))
 }
 
 @Composable
 fun DayContainer(
     modifier: Modifier = Modifier,
     backgroundColor: Color? = null,
+    shape: Shape? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
         modifier = modifier
+            .let { if (shape != null) it.clip(shape) else it }
             .let { if (backgroundColor != null) it.background(backgroundColor) else it }
             .padding(horizontal = 16.dp, vertical = 12.dp)
             .fillMaxWidth(),
