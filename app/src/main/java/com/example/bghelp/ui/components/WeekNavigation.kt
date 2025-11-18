@@ -1,6 +1,7 @@
 package com.example.bghelp.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -56,8 +57,7 @@ fun WeekNavigation(
     onWeekSelected: (Int) -> Unit
 ) {
     val today = remember { LocalDate.now() }
-    val selectedDayColor = MaterialTheme.colorScheme.secondary
-    val todayDayColor = MaterialTheme.colorScheme.primary
+    val todayDayColor = MaterialTheme.colorScheme.secondary
     val monthFormatter = remember { DateTimeFormatter.ofPattern("MMMM") }
     val yearFormatter = remember { DateTimeFormatter.ofPattern("yyyy") }
     var isMonthMenuOpen by remember { mutableStateOf(false) }
@@ -121,13 +121,10 @@ fun WeekNavigation(
             weekDays.forEach { day ->
                 val isToday = day == today
                 val isSelected = selectedDate?.let { it == day } == true
-                // Set selected color
+                // Set selected outline
                 val dayModifier = Modifier
                     .size(Sizes.Icon.XXXL)
-                    .clip(RoundedCornerShape(Sizes.Corner.S))
-                    .background(
-                        color = if (isSelected) selectedDayColor else Color.Transparent
-                    )
+                    .let { if (isSelected) it.clip(CircleShape).border(2.dp, Color.Black, CircleShape) else it }
                     .clickableRipple(onClick = { onDaySelected(day) })
 
                 Box(
@@ -145,7 +142,7 @@ fun WeekNavigation(
                         ) {
                             Text(
                                 text = "${day.dayOfMonth}",
-                                style = TextStyles.White.Bold.M,)
+                                style = TextStyles.Default.Bold.M,)
                         }
                     } else {
                         Text(
