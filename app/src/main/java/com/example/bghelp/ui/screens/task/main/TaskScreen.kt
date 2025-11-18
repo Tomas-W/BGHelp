@@ -2,6 +2,7 @@ package com.example.bghelp.ui.screens.task.main
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,15 +23,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.CreateTask
 import com.example.bghelp.domain.model.Task
+import com.example.bghelp.ui.components.CollapsibleWeekNavigation
 import com.example.bghelp.ui.components.LazyColumnContainer
 import com.example.bghelp.ui.components.MainContentContainer
 import com.example.bghelp.ui.components.MainHeader
-import com.example.bghelp.ui.components.WeekNavigation
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.utils.toDayHeader
 import com.example.bghelp.utils.toTaskTime
@@ -38,7 +40,10 @@ import java.time.LocalDateTime
 
 @SuppressLint("FrequentlyChangingValue", "FrequentlyChangedStateReadInComposition")
 @Composable
-fun TaskScreen(taskViewModel: TaskViewModel = hiltViewModel()) {
+fun TaskScreen(
+    taskViewModel: TaskViewModel = hiltViewModel(),
+    onWeekNavExpansionChanged: ((Boolean, Dp) -> Unit)? = null
+) {
     // Task items
     val selectedTasks by taskViewModel.tasksInRange.collectAsState(initial = emptyList())
     val selectedDate by taskViewModel.selectedDate.collectAsState()
@@ -69,26 +74,12 @@ fun TaskScreen(taskViewModel: TaskViewModel = hiltViewModel()) {
             listState.firstVisibleItemScrollOffset
         )
     }
-
+    // Track deletion
     var taskPendingDeletion by remember { mutableStateOf<Task?>(null) }
 
-    Column(
+    Box(
         modifier = Modifier.fillMaxSize()
-        ) {
-        WeekNavigation(
-            currentYearMonth = navYearMonth,
-            weekNumber = navWeekDisplay.number,
-            weekYear = navWeekDisplay.year,
-            availableWeeks = navWeekNumbers,
-            weekDays = navWeekDays,
-            selectedDate = navSelectedDate,
-            onPreviousWeek = { taskViewModel.goToPreviousWeek() },
-            onNextWeek = { taskViewModel.goToNextWeek() },
-            onDaySelected = taskViewModel::goToDay,
-            onMonthSelected = taskViewModel::goToMonth,
-            onYearSelected = taskViewModel::goToYear,
-            onWeekSelected = taskViewModel::goToWeek
-        )
+    ) {
         MainContentContainer {
             MainHeader(selectedDate.toDayHeader())
 
@@ -113,8 +104,26 @@ fun TaskScreen(taskViewModel: TaskViewModel = hiltViewModel()) {
                 }
             }
         }
+
+        // Collapsible week navigation at bottom
+        CollapsibleWeekNavigation(
+            currentYearMonth = navYearMonth,
+            weekNumber = navWeekDisplay.number,
+            availableWeeks = navWeekNumbers,
+            weekDays = navWeekDays,
+            selectedDate = navSelectedDate,
+            onPreviousWeek = { taskViewModel.goToPreviousWeek() },
+            onNextWeek = { taskViewModel.goToNextWeek() },
+            onDaySelected = taskViewModel::goToDay,
+            onMonthSelected = taskViewModel::goToMonth,
+            onYearSelected = taskViewModel::goToYear,
+            onWeekSelected = taskViewModel::goToWeek,
+            onExpansionChanged = onWeekNavExpansionChanged,
+            modifier = Modifier.fillMaxSize()
+        )
     }
 
+    // Delete Task modal
     DeleteTaskDialog(
         task = taskPendingDeletion,
         onDismiss = { taskPendingDeletion = null },

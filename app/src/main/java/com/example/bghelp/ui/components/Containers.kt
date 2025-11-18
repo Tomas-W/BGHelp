@@ -26,7 +26,7 @@ fun MainContentContainer(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
         verticalArrangement = if (spacing > 0) Arrangement.spacedBy(spacing.dp) else Arrangement.spacedBy(0.dp),
         content = content
     )

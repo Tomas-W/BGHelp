@@ -3,11 +3,12 @@ package com.example.bghelp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.SideEffect
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.LaunchedEffect
 import androidx.core.view.WindowCompat
 import com.example.bghelp.ui.MainScreen
+import com.example.bghelp.ui.components.SystemBars
 import com.example.bghelp.ui.theme.BGHelpTheme
-import com.example.bghelp.ui.theme.BackgroundGrey
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -19,17 +20,8 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            val systemUiController = rememberSystemUiController()
-            
-            SideEffect {
-                // set NavigationBar color - StatusBar set by TopBar
-                systemUiController.setNavigationBarColor(
-                    color = BackgroundGrey,
-                    darkIcons = true
-                )
-            }
-            
             BGHelpTheme {
+                SystemBars() // Adjusts styling based on color mode
                 MainScreen()
             }
         }

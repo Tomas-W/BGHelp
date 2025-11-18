@@ -89,11 +89,6 @@ sealed class Screen(
             }
         }
 
-        val homeScreens = listOf(
-            Home.Main.route,
-            Home.Wallpaper.route
-        )
-
         val taskScreens = listOf(
             Tasks.Main.route,
             Tasks.Add.route,
@@ -160,6 +155,10 @@ sealed class Screen(
         val noBottomNavScreens = listOf(
             LocationPicker,
             Options.ColorPicker
+        )
+
+        val weekNavigationScreens = listOf(
+            Tasks.Main
         )
 
         val featureMains = listOf(

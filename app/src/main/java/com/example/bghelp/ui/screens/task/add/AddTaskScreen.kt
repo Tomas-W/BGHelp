@@ -66,8 +66,6 @@ fun AddTaskScreen(
                     .weight(1f, fill = true)
                     .verticalScroll(scrollState)
             ) {
-                AddTaskSpacerLarge()
-
                 Title(viewModel = viewModel)
 
                 AddTaskDivider()

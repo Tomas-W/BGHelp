@@ -45,7 +45,6 @@ import java.time.format.DateTimeFormatter
 fun WeekNavigation(
     currentYearMonth: YearMonth,
     weekNumber: Int,
-    weekYear: Int,
     availableWeeks: List<Int>,
     weekDays: List<LocalDate>,
     selectedDate: LocalDate?,
@@ -57,9 +56,8 @@ fun WeekNavigation(
     onWeekSelected: (Int) -> Unit
 ) {
     val today = remember { LocalDate.now() }
-    val colorScheme = MaterialTheme.colorScheme
-    val selectedDayColor = colorScheme.secondary
-    val todayDayColor = colorScheme.primary
+    val selectedDayColor = MaterialTheme.colorScheme.secondary
+    val todayDayColor = MaterialTheme.colorScheme.primary
     val monthFormatter = remember { DateTimeFormatter.ofPattern("MMMM") }
     val yearFormatter = remember { DateTimeFormatter.ofPattern("yyyy") }
     var isMonthMenuOpen by remember { mutableStateOf(false) }
@@ -70,13 +68,9 @@ fun WeekNavigation(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(
-                horizontal = Sizes.Icon.XL,
-                vertical = 12.dp
-            ),
+            .padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Top row - Month Year     < week >
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -84,6 +78,7 @@ fun WeekNavigation(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                // Month dropdown
                 WeekNavigationMonthDropdown(
                     currentYearMonth = currentYearMonth,
                     formatter = monthFormatter,
@@ -95,6 +90,7 @@ fun WeekNavigation(
 
                 Spacer(modifier = Modifier.width(Sizes.Icon.S))
 
+                // Year dropdown
                 WeekNavigationYearDropdown(
                     currentYearMonth = currentYearMonth,
                     formatter = yearFormatter,
@@ -115,7 +111,6 @@ fun WeekNavigation(
             )
         }
 
-        // Bottom row - Days
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -184,6 +179,7 @@ fun NavigationRow(
             iconDescription = "Previous week"
         )
 
+        // Week dropdown
         WeekNavigationWeekDropdown(
             weekNumber = weekNumber,
             availableWeeks = availableWeeks,
@@ -232,6 +228,7 @@ private fun WeekNavigationWeekDropdown(
     var anchorWidthPx by remember { mutableIntStateOf(0) }
     var dropdownWidthPx by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
+    // To center dropdown
     val horizontalOffset = remember(anchorWidthPx, dropdownWidthPx, density) {
         if (anchorWidthPx == 0 || dropdownWidthPx == 0) {
             DpOffset.Zero
@@ -284,6 +281,7 @@ private fun WeekNavigationMonthDropdown(
     var anchorWidthPx by remember { mutableIntStateOf(0) }
     var dropdownWidthPx by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
+    // To center dropdown
     val horizontalOffset = remember(anchorWidthPx, dropdownWidthPx, density) {
         if (anchorWidthPx == 0 || dropdownWidthPx == 0) {
             DpOffset.Zero
@@ -336,6 +334,7 @@ private fun WeekNavigationYearDropdown(
     var anchorWidthPx by remember { mutableIntStateOf(0) }
     var dropdownWidthPx by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
+    // To center dropdown
     val horizontalOffset = remember(anchorWidthPx, dropdownWidthPx, density) {
         if (anchorWidthPx == 0 || dropdownWidthPx == 0) {
             DpOffset.Zero

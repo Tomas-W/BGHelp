@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -16,7 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.bghelp.ui.screens.note.AddNoteModal
+import com.example.bghelp.ui.screens.note.AddNoteScreen
 import com.example.bghelp.ui.screens.note.AddNoteViewModel
 import com.example.bghelp.ui.screens.note.NoteScreen
 import com.example.bghelp.ui.screens.note.NoteWallpaperScreen
@@ -38,7 +39,7 @@ import com.example.bghelp.ui.screens.items.AddItemScreen
 import com.example.bghelp.ui.screens.items.AddItemViewModel
 import com.example.bghelp.ui.screens.target.AddTargetViewModel
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
-import com.example.bghelp.ui.screens.colorpicker.ColorPickerScreen
+import com.example.bghelp.ui.screens.colorpicker.CreateColorScreen
 
 private const val OVERLAY_GRAPH_ROUTE = "overlay_graph"
 
@@ -61,19 +62,17 @@ private inline fun NavGraphBuilder.noTransitionComposable(
 
 @Composable
 fun BottomNavHost(
+    modifier: Modifier = Modifier,
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    onWeekNavExpansionChanged: ((Boolean, Dp) -> Unit)? = null
 ) {
     NavHost(
         navController = navController,
         startDestination = Screen.Tasks.Main.route,
         modifier = modifier
     ) {
-        noTransitionComposable(route = Screen.Home.Main.route) { _ ->
-            HomeScreen()
-        }
         noTransitionComposable(route = Screen.Tasks.Main.route) { _ ->
-            TaskScreen()
+            TaskScreen(onWeekNavExpansionChanged = onWeekNavExpansionChanged)
         }
         noTransitionComposable(route = Screen.Targets.Main.route) { _ ->
             TargetScreen()
@@ -89,8 +88,8 @@ fun BottomNavHost(
 
 @Composable
 fun OverlayNavHost(
-    navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavHostController
 ) {
     NavHost(
         navController = navController,
@@ -102,7 +101,9 @@ fun OverlayNavHost(
             /* Empty placeholder */
         }
 
-        // Add screens (full screens)
+        // Main features Screens live in the BottomNavHost
+
+        // AddTaskScreen
         noTransitionComposable(route = Screen.Tasks.Add.route) { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(OVERLAY_GRAPH_ROUTE)
@@ -113,7 +114,7 @@ fun OverlayNavHost(
                 viewModel = viewModel
             )
         }
-
+        // AddTargetScreen
         noTransitionComposable(route = Screen.Targets.Add.route) { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(OVERLAY_GRAPH_ROUTE)
@@ -124,7 +125,7 @@ fun OverlayNavHost(
                 onTargetCreated = { navController.popBackStack() }
             )
         }
-
+        // AddItemScreen
         noTransitionComposable(route = Screen.Items.Add.route) { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(OVERLAY_GRAPH_ROUTE)
@@ -135,19 +136,19 @@ fun OverlayNavHost(
                 onItemCreated = { navController.popBackStack() }
             )
         }
-
+        // AddNoteScreen
         noTransitionComposable(route = Screen.Notes.Add.route) { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(OVERLAY_GRAPH_ROUTE)
             }
             val viewModel: AddNoteViewModel = hiltViewModel(parentEntry)
-            AddNoteModal(
+            AddNoteScreen(
                 viewModel = viewModel,
                 onNoteCreated = { navController.popBackStack() }
             )
         }
 
-        // Options screens
+        // SettingsScreen
         noTransitionComposable(route = Screen.Options.Settings.route) { _ ->
             SettingsScreen(
                 onNavigateToCreateAlarm = {
@@ -157,15 +158,16 @@ fun OverlayNavHost(
                 }
             )
         }
-
+        // CreateAlarmScreen
         noTransitionComposable(route = Screen.Options.CreateAlarm.route) { _ ->
             CreateAlarmScreen()
         }
-
+        // CreateColorScreen
         noTransitionComposable(route = Screen.Options.ColorPicker.route) { _ ->
-            ColorPickerScreen(navController = navController)
+            CreateColorScreen(navController = navController)
         }
 
+        // LocationPickerScreen
         noTransitionComposable(
             route = Screen.LocationPicker.ROUTE_WITH_ARGS,
             arguments = listOf(
@@ -184,7 +186,7 @@ fun OverlayNavHost(
             )
         }
 
-        // Wallpaper screens for each feature
+        // Wallpaper screens
         noTransitionComposable(route = Screen.Home.Wallpaper.route) { _ ->
             HomeWallpaperScreen()
         }
@@ -205,16 +207,18 @@ fun OverlayNavHost(
 
 @Composable
 fun MainNavHost(
+    modifier: Modifier = Modifier,
     bottomNavController: NavHostController,
     overlayNavController: NavHostController,
     isOptionsActive: Boolean,
-    modifier: Modifier = Modifier
+    onWeekNavExpansionChanged: ((Boolean, Dp) -> Unit)? = null
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         // Bottom navigation content (base layer)
         if (!isOptionsActive) {
             BottomNavHost(
                 navController = bottomNavController,
+                onWeekNavExpansionChanged = onWeekNavExpansionChanged,
                 modifier = Modifier.fillMaxSize()
             )
         }

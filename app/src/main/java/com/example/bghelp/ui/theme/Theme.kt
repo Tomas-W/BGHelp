@@ -8,6 +8,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 
+// Dark theme used when system/app theme requests it (currently we always force light)
 private val DarkColorScheme = darkColorScheme(
     primary = MainBlue,
     secondary = SecondaryBlue,
@@ -16,38 +17,45 @@ private val DarkColorScheme = darkColorScheme(
     surface = BackgroundGrey
 )
 
+// Light theme – base palette for every composable unless you override colors locally.
+// Buttons/FABs/active icons consume primary, cards/sheets use surface, and text components
+// pick the matching on* color (onPrimary/onSurface/onBackground) through MaterialTheme.
 private val LightColorScheme = lightColorScheme(
-    primary = MainBlue, // Main brand color for buttons, FABs, active states
-    onPrimary = TextWhite, // Text/icons on primary colored elements
-    // primaryContainer = MainBlue.copy(alpha = 0.1f), // Subtle primary backgrounds
-    // onPrimaryContainer = MainBlue, // Text on primary container backgrounds
-    secondary = SecondaryBlue, // Secondary brand color for accent elements
-    onSecondary = TextBlack, // Text/icons on secondary colored elements
-//    secondaryContainer = ButtonGrey, // Subtle secondary backgrounds
-    // onSecondaryContainer = SecondaryBlue, // Text on secondary container backgrounds
-    tertiary = SecondaryGrey, // Third brand color for additional accents
-    onTertiary = TextGrey, // Text/icons on tertiary colored elements
-    // tertiaryContainer = SecondaryGrey.copy(alpha = 0.1f), // Subtle tertiary backgrounds
-    // onTertiaryContainer = SecondaryGrey, // Text on tertiary container backgrounds
-    error = ErrorRed, // Error state color
-    // onError = Color.White, // Text/icons on error colored elements
-    // errorContainer = Color(220, 53, 69).copy(alpha = 0.1f), // Subtle error backgrounds
-    // onErrorContainer = Color(220, 53, 69), // Text on error container backgrounds
-    background = BackgroundGrey, // Main app background color
-    onBackground = TextBlack, // Default text color on background
-    surface = BackgroundGrey, // Card, sheet, and dialog background color
-    onSurface = TextBlack, // Text on cards, sheets, dialogs, disabled elements
-    // surfaceVariant = BackgroundGrey.copy(alpha = 0.8f), // Alternative surface backgrounds
-    // onSurfaceVariant = Color(65, 65, 65), // Text on surface variant backgrounds
-    surfaceContainer = BackgroundGrey, // Navigation bar and container background color
-    // surfaceContainerHigh = BottomNavColor.copy(alpha = 0.9f), // High elevation containers
-    // surfaceContainerHighest = BottomNavColor.copy(alpha = 0.8f), // Highest elevation containers
-    outline = SecondaryGrey, // Border/outline color
-    // outlineVariant = Color(210, 210, 210).copy(alpha = 0.5f), // Alternative outline
-    // inverseSurface = Color.Black, // Inverse surface backgrounds
-    // inverseOnSurface = Color.White, // Text on inverse surface backgrounds
-     inversePrimary = TextWhite, // Primary color in inverse contexts
-     scrim = TertiaryGrey // Overlay/backdrop color
+    // Buttons, FABs, active icons, focused indicators
+    primary = MainBlue,
+    // Text/icons displayed on primary surfaces (e.g., FAB icon)
+    onPrimary = TextWhite,
+
+    // Secondary accents: chips, toggles, secondary buttons
+    secondary = SecondaryBlue,
+    onSecondary = TextBlack,
+
+    // Tertiary accents: subtle dividers, secondary icons/text
+    tertiary = SecondaryGrey,
+    onTertiary = TextGrey,
+
+    // Error states (text in TextField errors, error buttons)
+    error = ErrorRed,
+
+    // Screen backgrounds and default text color
+    background = BackgroundGrey,
+    onBackground = TextBlack,
+
+    // Cards, sheets, dialogs, navigation drawers
+    surface = BackgroundGrey,
+    onSurface = TextBlack,
+
+    // Container shades for navigation bars, bottom sheets
+    surfaceContainer = BackgroundGrey,
+
+    // Borders/dividers
+    outline = SecondaryGrey,
+
+    // Used when UI inverts colors (pull-to-refresh, etc.)
+    inversePrimary = TextWhite,
+
+    // Overlays/backdrops (modal scrims)
+    scrim = TertiaryGrey
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

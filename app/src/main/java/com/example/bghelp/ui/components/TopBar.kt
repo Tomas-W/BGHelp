@@ -2,13 +2,10 @@ package com.example.bghelp.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -17,15 +14,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
-import com.example.bghelp.constants.UiConstants as UI
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
+import com.example.bghelp.ui.utils.bottomBorder
 
 @Composable
 fun TopBar(
@@ -35,57 +30,42 @@ fun TopBar(
     onBackClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {}
 ) {
-    val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
-    val statusBarHeight = statusBarPadding.calculateTopPadding()
-    val totalHeight = remember(statusBarHeight) { statusBarHeight + UI.TOP_BAR_HEIGHT.dp }
-
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(totalHeight)
-            .background(MaterialTheme.colorScheme.primary)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .height(UI.TOP_BAR_HEIGHT.dp)
-                .padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (showWallpaperIcon) {
-                IconButton(onClick = onScreenshotClick) {
-                    Image(
-                        painter = painterResource(id = R.drawable.screenshot),
-                        contentDescription = "Go to wallpaper screen",
-                        modifier = Modifier.size(Sizes.Icon.L)
-                    )
-                }
-            } else {
-                IconButton(onClick = onBackClick) {
-                    Image(
-                        painter = painterResource(id = R.drawable.back),
-                        contentDescription = "Go to previous screen",
-                        modifier = Modifier.size(Sizes.Icon.L)
-                    )
-                }
-            }
-
-            Text(
-                text = title,
-                style = TextStyles.White.Bold.L,
-                modifier = Modifier.padding(start = 12.dp)
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .background(MaterialTheme.colorScheme.background)
+            .bottomBorder(
+                strokeWidth = 2.dp,
+                color = MaterialTheme.colorScheme.outline
             )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            IconButton(onClick = onSettingsClick) {
+            .padding(horizontal = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (showWallpaperIcon) {
+            IconButton(onClick = onScreenshotClick) {
                 Image(
-                    painter = painterResource(R.drawable.options_inactive),
-                    contentDescription = "Go to options screen",
-                    modifier = Modifier.size(Sizes.Icon.XL)
+                    painter = painterResource(id = R.drawable.wallpaper),
+                    contentDescription = "Go to wallpaper screen",
+                    modifier = Modifier.size(Sizes.Icon.L)
+                )
+            }
+        } else {
+            IconButton(onClick = onBackClick) {
+                Image(
+                    painter = painterResource(id = R.drawable.back),
+                    contentDescription = "Go to previous screen",
+                    modifier = Modifier.size(Sizes.Icon.L)
                 )
             }
         }
+
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(start = 12.dp)
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
     }
 }

@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ColorPickerViewModel @Inject constructor(
+class CreateColorViewModel @Inject constructor(
     private val colorRepository: ColorRepository
 ) : ViewModel() {
     private val _selectedColor = MutableStateFlow(Color(0xFF2196F3))

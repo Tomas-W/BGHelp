@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -154,8 +155,12 @@ fun BottomNavigationBar(
     NavigationBar(
         modifier = modifier
             .fillMaxWidth()
-            .height(totalHeight),
-        windowInsets = WindowInsets(bottom = navigationBarHeight, top = 6.dp),
+            .height(totalHeight)
+            .padding(horizontal = 12.dp),
+        windowInsets = WindowInsets(
+            bottom = navigationBarHeight,
+            top = 12.dp
+        )
     ) {
         // Tasks
         NavigationItem(

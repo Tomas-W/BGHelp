@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun AddNoteModal(
+fun AddNoteScreen(
     viewModel: AddNoteViewModel,
     onNoteCreated: () -> Unit,
     modifier: Modifier = Modifier
