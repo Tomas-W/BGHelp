@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
@@ -85,16 +86,30 @@ fun TaskScreen(
     // Track deletion
     var taskPendingDeletion by remember { mutableStateOf<Task?>(null) }
     
-    // Track week nav height for FAB positioning
-    var weekNavHeight by remember { mutableStateOf(0.dp) }
+    // WeekNav height
+    val weekNavHeight by taskViewModel.weekNavHeight.collectAsState()
+    var isFirstComposition by remember { mutableStateOf(true) }
+    
     val animatedWeekNavHeight by animateDpAsState(
         targetValue = weekNavHeight,
-        animationSpec = tween(300),
-        label = "WeekNav Height"
+        animationSpec = if (isFirstComposition && weekNavHeight > 0.dp) {
+            // No animation on first composition
+            tween(0)
+        } else {
+            // Animate when state changes
+            tween(300)
+        },
+        label = "FAB Offset"
     )
-    // Callback to track week nav height
+    
+    // Mark first composition as complete
+    LaunchedEffect(Unit) {
+        isFirstComposition = false
+    }
+    
+    // Callback to update WeekNav height
     val onWeekNavExpansionChanged: (Boolean, Dp) -> Unit = { _, height ->
-        weekNavHeight = height
+        taskViewModel.updateWeekNavHeight(height)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -168,6 +183,7 @@ fun TaskScreen(
                         }
                     },
                     containerColor = MainBlue,
+                    shape = CircleShape,
                     modifier = Modifier.offset(y = -animatedWeekNavHeight)
                 ) {
                     Icon(

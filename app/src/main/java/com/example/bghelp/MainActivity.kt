@@ -34,3 +34,21 @@ class MainActivity : ComponentActivity() {
 // TODO                      Prompt for replacement color when so
 // TODO                      Update all effected Tasks
 // TODO                      Delete color
+
+// TODO: Custom snackbars ( info, warning, error )
+
+// TODO: WeekNav replace dropdowns with calendar option? or switch between?
+
+// TODO: Let calendar take params for highlighting
+
+// TODO: Swipe to navigate days with tasks
+
+// TODO: When Reminder and AllDay set only reminders for first and last date, not for individual\
+
+// TODO: Implement strings.xml
+
+// TODO: Implement last of month logic for Repeat
+
+// TODO: Loading indicators
+
+// TODO: Undo addtask form reset for 5 sec?

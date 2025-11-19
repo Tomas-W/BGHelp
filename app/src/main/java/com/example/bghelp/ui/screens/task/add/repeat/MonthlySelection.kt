@@ -130,7 +130,7 @@ private fun DaySelection(
             Text(
                 modifier = Modifier
                     .clickable { viewModel.toggleMonthlyDaySelection(RepeatMonthlyDaySelection.ALL)},
-                text = "All days",
+                text = STR.ALL_DAYS,
                 style = if (monthlyDaySelection == RepeatMonthlyDaySelection.ALL) selectedStyle else deselectedStyle
             )
 
@@ -139,14 +139,14 @@ private fun DaySelection(
                     .clickable {
                         viewModel.toggleMonthlyDaySelection(RepeatMonthlyDaySelection.SELECT)
                                },
-                text = "Select days",
+                text = STR.SELECT_DAYS,
                 style = if (monthlyDaySelection == RepeatMonthlyDaySelection.SELECT) selectedStyle else deselectedStyle
             )
 
             Text(
                 modifier = Modifier
                     .clickable { viewModel.toggleMonthlyDaySelection(RepeatMonthlyDaySelection.LAST)},
-                text = "Last of month",
+                text = STR.LAST_OF_MONTH,
                 style = if (monthlyDaySelection == RepeatMonthlyDaySelection.LAST) selectedStyle else deselectedStyle
             )
         }
@@ -185,14 +185,14 @@ private fun DaySelection(
                 Text(
                     modifier = Modifier
                         .clickable { viewModel.selectAllMonthlySelectedDays() },
-                    text = "Select all",
+                    text = STR.SELECT_ALL,
                     style = deselectedStyle
                 )
 
                 Text(
                     modifier = Modifier
                         .clickable { viewModel.deselectAllMonthlySelectedDays() },
-                    text = "Deselect all",
+                    text = STR.DESELECT_ALL,
                     style = deselectedStyle
                 )
 

@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.example.bghelp.R
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 import com.example.bghelp.ui.screens.task.add.TaskLocation
 import com.example.bghelp.ui.screens.task.add.deselectedStyle
 import com.example.bghelp.ui.screens.task.add.selectedStyle
@@ -34,7 +35,7 @@ fun LocationSelection(
         Text(
             modifier = Modifier
                 .clickable { onAddLocation() },
-            text = "Add location",
+            text = STR.ADD_LOCATION,
             style = deselectedStyle
         )
 
@@ -63,7 +64,7 @@ private fun LocationSummary(
                 .weight(1f)
         ) {
             Text(
-                text = location.name.ifBlank { "unnamed" },
+                text = location.name.ifBlank { STR.UNNAMED_LOCATION },
                 style = selectedStyle
             )
 
@@ -83,7 +84,7 @@ private fun LocationSummary(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.delete),
-                    contentDescription = "Delete address"
+                    contentDescription = STR.REMOVE_LOCATION
                 )
             }
         }

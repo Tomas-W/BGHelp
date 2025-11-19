@@ -1,4 +1,5 @@
 package com.example.bghelp.ui.screens.task.add
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,7 +35,6 @@ import com.example.bghelp.ui.screens.task.add.note.Note
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.utils.dismissKeyboardOnTap
 
-
 @Composable
 fun AddTaskScreen(
     navController: NavController,
@@ -45,9 +45,16 @@ fun AddTaskScreen(
     val scrollState = rememberScrollState()
 
     LaunchedEffect(saveState) {
-        if (saveState is SaveTaskState.Success) {
-            navController.popBackStack()
-            viewModel.consumeSaveState()
+        when (saveState) {
+            is SaveTaskState.Success -> {
+                navController.popBackStack()
+                viewModel.consumeSaveState()
+            }
+            is SaveTaskState.Error -> {
+                viewModel.showSnackbar(AddTaskStrings.ERROR_SAVE_FAILED)
+                viewModel.consumeSaveState()
+            }
+            else -> {}
         }
     }
 
@@ -120,7 +127,7 @@ fun AddTaskScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 CancelButton(
-                    text = "Cancel",
+                    text = AddTaskStrings.CANCEL,
                     onClick = {
                         navController.popBackStack()
                     },
@@ -128,9 +135,9 @@ fun AddTaskScreen(
                 )
                 ConfirmButton(
                     text = if (saveState is SaveTaskState.Saving) {
-                        "Saving..."
+                        AddTaskStrings.SAVING
                     } else {
-                        "Save Task"
+                        AddTaskStrings.SAVE_TASK
                     },
                     onClick = { viewModel.saveTask() },
                     modifier = Modifier.weight(1f),

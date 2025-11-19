@@ -18,6 +18,7 @@ import java.util.UUID
 
 object TaskImageStorage {
     private const val TASK_IMAGE_DIRECTORY = "tasks"
+    private const val TEMP_IMAGE_DIRECTORY = "temp"
 
     suspend fun persistIfNeeded(
         context: Context,
@@ -27,6 +28,56 @@ object TaskImageStorage {
         if (!isOn) return null
         val image = selected ?: return null
         return persistTaskImage(context, image)
+    }
+
+    // Temporary save image before saving the Task
+    suspend fun saveTemporaryImage(
+        context: Context,
+        bitmap: Bitmap,
+        displayName: String
+    ): Uri = withContext(Dispatchers.IO) {
+        val tempDir = tempImageDirectory(context)
+        val extension = resolveExtensionFromDisplayName(displayName)
+        val fileName = "${UUID.randomUUID()}.$extension"
+        val tempFile = File(tempDir, fileName)
+
+        FileOutputStream(tempFile).use { stream ->
+            val format = extension.toCompressFormat()
+            val success = bitmap.compress(format, 92, stream)
+            if (!success) {
+                // Clean up partial file before throwing
+                tempFile.delete()
+                throw IllegalStateException("Unable to save temporary image: compression failed.")
+            }
+        }
+
+        // Create URI
+        Uri.fromFile(tempFile)
+    }
+
+    private fun tempImageDirectory(context: Context): File {
+        val directory = File(imageRoot(context), TEMP_IMAGE_DIRECTORY)
+        if (!directory.exists()) {
+            directory.mkdirs()
+        }
+        return directory
+    }
+
+    fun cleanupTemporaryImages(context: Context) {
+        val tempDir = File(imageRoot(context), TEMP_IMAGE_DIRECTORY)
+        if (tempDir.exists()) {
+            tempDir.listFiles()?.forEach { it.delete() }
+        }
+    }
+
+    fun isTemporaryUri(uri: Uri): Boolean {
+        return uri.scheme == "file" && uri.path?.contains(TEMP_IMAGE_DIRECTORY) == true
+    }
+
+    private fun resolveExtensionFromDisplayName(displayName: String): String {
+        val fromName = displayName.substringAfterLast(".", "")
+        val normalizedName = normalizeExtension(fromName)
+        return normalizedName ?: "jpg"
     }
 
     fun imageRoot(context: Context): File {
@@ -72,21 +123,28 @@ object TaskImageStorage {
 
             try {
                 when {
-                    imageData.bitmap != null -> {
-                        FileOutputStream(targetFile).use { stream ->
-                            val format = extension.toCompressFormat()
-                            val success = imageData.bitmap.compress(format, 92, stream)
-                            if (!success) {
-                                throw IllegalStateException("Unable to persist image: compression failed.")
-                            }
-                        }
-                    }
+                    // URI (gallery or temporary camera file)
                     imageData.uri != null -> {
-                        context.contentResolver.openInputStream(imageData.uri)?.use { input ->
-                            FileOutputStream(targetFile).use { output ->
-                                input.copyTo(output)
-                            }
-                        } ?: throw IllegalStateException("Unable to open selected image stream.")
+                        val sourceFile = if (isTemporaryUri(imageData.uri)) {
+                            // Temporary file: move it to permanent location
+                            File(imageData.uri.path ?: throw IllegalStateException("Invalid temporary file URI"))
+                        } else {
+                            // Gallery URI: copy it
+                            null
+                        }
+
+                        if (sourceFile != null && sourceFile.exists()) {
+                            // Move temporary file to permanent location
+                            sourceFile.copyTo(targetFile, overwrite = true)
+                            sourceFile.delete() // Clean up temporary file
+                        } else {
+                            // Copy from URI stream (gallery)
+                            context.contentResolver.openInputStream(imageData.uri)?.use { input ->
+                                FileOutputStream(targetFile).use { output ->
+                                    input.copyTo(output)
+                                }
+                            } ?: throw IllegalStateException("Unable to open selected image stream.")
+                        }
                     }
                     else -> return@withContext null
                 }

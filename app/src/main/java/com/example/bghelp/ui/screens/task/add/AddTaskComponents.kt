@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.times
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.utils.clickableDismissFocus
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 
 @Composable
 fun <T> Header(
@@ -108,15 +109,13 @@ fun ResetForm(
                 modifier = Modifier
                     .size(Sizes.Icon.S),
                 imageVector = Icons.Default.Clear,
-                contentDescription = "Clear form inputs"
+                contentDescription = AddTaskStrings.CLEAR_FORM
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-                text = "Reset all",
+                text = AddTaskStrings.RESET_ALL,
                 style = MaterialTheme.typography.labelLarge
             )
         }
-
     }
-
 }

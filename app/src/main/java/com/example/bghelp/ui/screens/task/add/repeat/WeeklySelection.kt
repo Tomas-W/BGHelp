@@ -36,6 +36,7 @@ import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableRipple
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.deselectedStyle
 import com.example.bghelp.ui.screens.task.add.highlightedStyle
@@ -97,7 +98,7 @@ private fun WeekSelection(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Every",
+            text = AddTaskStrings.EVERY,
             style = deselectedStyle
         )
 
@@ -113,7 +114,7 @@ private fun WeekSelection(
         Spacer(modifier = Modifier.width(Sizes.Icon.S))
 
         Text(
-            text = "weeks",
+            text = AddTaskStrings.REPEAT_WEEKS,
             style = deselectedStyle
         )
     }

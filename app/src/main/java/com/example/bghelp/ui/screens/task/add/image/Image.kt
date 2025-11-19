@@ -3,6 +3,7 @@ package com.example.bghelp.ui.screens.task.add.image
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
@@ -89,7 +90,7 @@ fun Image(
         val imageData = selectedImageData
         value = when {
             imageData == null -> null
-            imageData.bitmap != null -> imageData.bitmap.asImageBitmap()
+            // URI (gallery or temporary camera file)
             imageData.uri != null -> loadImageBitmap(context, imageData.uri)
             else -> null
         }
@@ -138,15 +139,35 @@ private suspend fun loadImageBitmap(
     uri: Uri
 ): ImageBitmap? = withContext(Dispatchers.IO) {
     try {
-        val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val source = ImageDecoder.createSource(context.contentResolver, uri)
-            ImageDecoder.decodeBitmap(source)
-        } else {
-            @Suppress("DEPRECATION")
-            MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+        val bitmap = when {
+            // Handle file:// URIs (temporary camera files)
+            uri.scheme == "file" -> {
+                val file = java.io.File(uri.path ?: return@withContext null)
+                if (!file.exists()) return@withContext null
+                
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    val source = ImageDecoder.createSource(file)
+                    ImageDecoder.decodeBitmap(source)
+                } else {
+                    @Suppress("DEPRECATION")
+                    android.graphics.BitmapFactory.decodeFile(file.absolutePath)
+                }
+            }
+            // Handle content:// URIs (gallery)
+            else -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    val source = ImageDecoder.createSource(context.contentResolver, uri)
+                    ImageDecoder.decodeBitmap(source)
+                } else {
+                    @Suppress("DEPRECATION")
+                    MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+                }
+            }
         }
         bitmap?.asImageBitmap()
     } catch (ioException: IOException) {
+        null
+    } catch (e: Exception) {
         null
     }
 }
