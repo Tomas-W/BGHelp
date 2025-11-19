@@ -9,21 +9,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.utils.clickableDismissFocus
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 
 @Composable
 fun <T> Header(
@@ -89,8 +87,11 @@ fun SubContainer(
 }
 
 @Composable
-fun ResetForm(
-    viewModel: AddTaskViewModel
+fun FormResetComponent(
+    label: String,
+    imageVector: ImageVector,
+    onClick: () -> Unit,
+    contentDescription: String
 ) {
 
     Row(
@@ -101,19 +102,22 @@ fun ResetForm(
     ) {
         Row(
             modifier = Modifier
-                .clickable { viewModel.resetAllData() },
+                .clickable { onClick() },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.width(6.dp))
+
             Icon(
                 modifier = Modifier
                     .size(Sizes.Icon.S),
-                imageVector = Icons.Default.Clear,
-                contentDescription = AddTaskStrings.CLEAR_FORM
+                imageVector = imageVector,
+                contentDescription = contentDescription
             )
+
             Spacer(modifier = Modifier.width(6.dp))
+
             Text(
-                text = AddTaskStrings.RESET_ALL,
+                text = label,
                 style = MaterialTheme.typography.labelLarge
             )
         }

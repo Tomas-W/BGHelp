@@ -121,13 +121,15 @@ object AddTaskStrings {
     const val PREVIOUS_MONTH = "Previous month"
     const val NEXT_MONTH = "Next month"
     const val HIDE_CALENDAR = "Hide calendar"
-    const val CLEAR_FORM = "Clear form"
+    const val RESET_FORM_DESC = "Reset form"
+    const val UNDO_RESET_FORM_DESC = "Undo reset"
     
     // Actions
     const val CANCEL = "Cancel"
     const val SAVING = "Saving..."
     const val SAVE_TASK = "Save Task"
-    const val RESET_ALL = "Reset all"
+    const val RESET_FORM = "Reset form"
+    const val UNDO_RESET_FORM = "Undo reset"
     
     // Validation errors
     const val VALIDATION_TITLE_EMPTY = "Title cannot be empty"

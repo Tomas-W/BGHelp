@@ -10,6 +10,7 @@ import com.example.bghelp.data.repository.TaskRepository
 import com.example.bghelp.domain.model.FeatureColor
 import com.example.bghelp.utils.AudioManager
 import com.example.bghelp.utils.RepeatRuleBuilder
+import com.example.bghelp.utils.TaskImageStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -549,12 +550,52 @@ class AddTaskViewModel @Inject constructor(
     // SAVE TASK
 
     // RESET DISMISS CLEAR
-    fun resetAllData() {
-        // Clean up temporary images before resetting
-        com.example.bghelp.utils.TaskImageStorage.cleanupTemporaryImages(appContext)
+    private val _showUndoResetForm = MutableStateFlow(false)
+    val showUndoResetForm: StateFlow<Boolean> = _showUndoResetForm.asStateFlow()
+    
+    private data class FormStateSnapshot(
+        val formState: AddTaskFormState,
+        val nextReminderId: Int,
+        val hiddenDateEndValue: LocalDate?,
+        val hiddenTimeEndValue: LocalTime?
+    )
+    
+    private var savedStateSnapshot: FormStateSnapshot? = null
+
+    fun resetForm() {
+        // Save current state before resetting (including image URI)
+        savedStateSnapshot = FormStateSnapshot(
+            formState = formState.value,
+            nextReminderId = nextReminderId,
+            hiddenDateEndValue = hiddenDateEndValue,
+            hiddenTimeEndValue = hiddenTimeEndValue
+        )
+        
         formStateHolder.reset()
         resetUIState()
         refreshRepeatRule()
+        _showUndoResetForm.value = true
+    }
+
+    fun undoResetForm() {
+        savedStateSnapshot?.let { snapshot ->
+            formStateHolder.restore(snapshot.formState)
+            nextReminderId = snapshot.nextReminderId
+            hiddenDateEndValue = snapshot.hiddenDateEndValue
+            hiddenTimeEndValue = snapshot.hiddenTimeEndValue
+            refreshRepeatRule()
+            _showUndoResetForm.value = false
+            savedStateSnapshot = null
+        }
+    }
+
+    fun hideUndoResetForm() {
+        _showUndoResetForm.value = false
+    }
+
+    fun cleanUpResetState() {
+        savedStateSnapshot = null
+        TaskImageStorage.cleanupTemporaryImages(appContext)
     }
 
     private fun resetUIState() {

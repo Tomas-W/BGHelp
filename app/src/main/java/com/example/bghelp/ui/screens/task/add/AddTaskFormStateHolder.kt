@@ -380,5 +380,9 @@ class AddTaskFormStateHolder(
     fun reset() {
         _formState.value = AddTaskFormState.default()
     }
+    
+    fun restore(state: AddTaskFormState) {
+        _formState.value = state
+    }
 }
 

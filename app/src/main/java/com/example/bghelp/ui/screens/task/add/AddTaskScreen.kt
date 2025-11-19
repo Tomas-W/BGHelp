@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.HorizontalDivider
 import com.example.bghelp.ui.components.CancelButton
 import com.example.bghelp.ui.components.ConfirmButton
@@ -18,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -73,7 +76,32 @@ fun AddTaskScreen(
                     .weight(1f, fill = true)
                     .verticalScroll(scrollState)
             ) {
-                ResetForm(viewModel = viewModel)
+                val showUndoReset by viewModel.showUndoResetForm.collectAsState()
+                
+                LaunchedEffect(showUndoReset) {
+                    if (showUndoReset) {
+                        delay(5000)
+                        viewModel.hideUndoResetForm()
+                        viewModel.cleanUpResetState()
+                    }
+                }
+
+                // Reset / Undo reset
+                if (showUndoReset) {
+                    FormResetComponent(
+                        label = AddTaskStrings.UNDO_RESET_FORM,
+                        imageVector = Icons.Default.Refresh,
+                        onClick = { viewModel.undoResetForm() },
+                        contentDescription = AddTaskStrings.UNDO_RESET_FORM_DESC
+                    )
+                } else {
+                    FormResetComponent(
+                        label = AddTaskStrings.RESET_FORM,
+                        imageVector = Icons.Default.Refresh,
+                        onClick = { viewModel.resetForm() },
+                        contentDescription = AddTaskStrings.UNDO_RESET_FORM_DESC
+                    )
+                }
 
                 Title(viewModel = viewModel)
 
