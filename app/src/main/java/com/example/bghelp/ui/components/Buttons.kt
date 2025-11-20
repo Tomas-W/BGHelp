@@ -15,9 +15,9 @@ import com.example.bghelp.ui.theme.TextSizes
 
 @Composable
 fun CancelButton(
+    modifier: Modifier = Modifier,
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
     OutlinedButton(

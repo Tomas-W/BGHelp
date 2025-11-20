@@ -1,11 +1,19 @@
 package com.example.bghelp.ui.screens.task.add
 
+import com.example.bghelp.domain.model.AlarmMode
+import com.example.bghelp.domain.model.ReminderKind
+import com.example.bghelp.domain.model.ReminderOffsetUnit
+import com.example.bghelp.domain.model.Task
+import com.example.bghelp.domain.service.RecurrenceCalculator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.time.LocalDate
 import java.time.LocalTime
+import android.net.Uri
+import androidx.core.net.toUri
+import com.example.bghelp.domain.model.TaskImageSourceOption
 
 class AddTaskFormStateHolder(
     private val onRepeatRuleChanged: () -> Unit
@@ -348,7 +356,7 @@ class AddTaskFormStateHolder(
         }
     }
     
-    fun setImageFromGallery(uri: android.net.Uri, displayName: String?) {
+    fun setImageFromGallery(uri: Uri, displayName: String?) {
         val label = displayName?.takeIf { it.isNotBlank() } ?: AddTaskStrings.NO_IMAGE_SELECTED
         _formState.update { state ->
             state.copy(
@@ -362,7 +370,7 @@ class AddTaskFormStateHolder(
         }
     }
 
-    fun setImageFromCamera(uri: android.net.Uri, displayName: String) {
+    fun setImageFromCamera(uri: Uri, displayName: String) {
         _formState.update { state ->
             state.copy(
                 selectedImage = TaskImageData(
@@ -401,6 +409,164 @@ class AddTaskFormStateHolder(
     
     fun restore(state: AddTaskFormState) {
         _formState.value = state
+    }
+    
+    fun loadFromTask(task: Task) {
+        val date = task.date.toLocalDate()
+        val time = task.date.toLocalTime()
+        val endDate = task.endDate?.toLocalDate()
+        val endTime = task.endDate?.toLocalTime()
+        
+        val dateSelection = if (task.allDay) UserDateSelection.ON else UserDateSelection.OFF
+        val isEndDateVisible = endDate != null
+        val isEndTimeVisible = endTime != null
+        
+        val repeatSelection = parseRepeatSelection(task.rrule)
+        val (weeklyDays, weeklyInterval) = parseWeeklyRepeat(task.rrule)
+        val (monthlyMonths, monthlyDaySelection, monthlyDays) = parseMonthlyRepeat(task.rrule)
+        
+        val remindSelection = if (task.reminders.isNotEmpty()) UserRemindSelection.ON else UserRemindSelection.OFF
+        val startReminders = task.reminders
+            .filter { it.type == ReminderKind.START }
+            .mapIndexed { index, entry ->
+                Reminder(
+                    id = index,
+                    value = entry.offsetValue,
+                    timeUnit = entry.offsetUnit.toTimeUnit()
+                )
+            }
+        val endReminders = task.reminders
+            .filter { it.type == ReminderKind.END }
+            .mapIndexed { index, entry ->
+                Reminder(
+                    id = index,
+                    value = entry.offsetValue,
+                    timeUnit = entry.offsetUnit.toTimeUnit()
+                )
+            }
+        
+        val soundSelection = task.sound.toUserSoundSelection()
+        val vibrateSelection = task.vibrate.toUserVibrateSelection()
+        
+        val noteSelection = if (task.note != null && task.note.isNotBlank()) UserNoteSelection.ON else UserNoteSelection.OFF
+        
+        val locationSelection = if (task.locations.isNotEmpty()) UserLocationSelection.ON else UserLocationSelection.OFF
+        val selectedLocations = task.locations.map { entry ->
+            TaskLocation(
+                latitude = entry.latitude,
+                longitude = entry.longitude,
+                address = entry.address,
+                name = entry.name
+            )
+        }
+        
+        val imageSelection = if (task.image != null) UserImageSelection.ON else UserImageSelection.OFF
+        val selectedImage = task.image?.let { image ->
+            TaskImageData(
+                displayName = image.displayName ?: AddTaskStrings.NO_IMAGE_SELECTED,
+                uri = image.uri?.toUri(),
+                bitmap = null,
+                source = when (image.source) {
+                    TaskImageSourceOption.GALLERY -> TaskImageSource.GALLERY
+                    TaskImageSourceOption.CAMERA -> TaskImageSource.CAMERA
+                }
+            )
+        }
+        
+        val colorSelection = if (task.color.id != 1) UserColorSelection.ON else UserColorSelection.OFF
+        
+        _formState.value = AddTaskFormState(
+            title = task.title,
+            info = task.description ?: "",
+            dateSelection = dateSelection,
+            startDate = date,
+            endDate = endDate,
+            isEndDateVisible = isEndDateVisible,
+            startTime = time,
+            endTime = endTime,
+            isEndTimeVisible = isEndTimeVisible,
+            repeatSelection = repeatSelection,
+            weeklySelectedDays = weeklyDays,
+            weeklyIntervalWeeks = weeklyInterval,
+            monthlySelectedMonths = monthlyMonths,
+            monthlyDaySelection = monthlyDaySelection,
+            monthlySelectedDays = monthlyDays,
+            repeatRRule = task.rrule,
+            remindSelection = remindSelection,
+            startReminders = startReminders,
+            endReminders = endReminders,
+            soundSelection = soundSelection,
+            selectedAudioFile = task.soundUri ?: "",
+            vibrateSelection = vibrateSelection,
+            snoozeValue1 = task.snoozeValue1,
+            snoozeUnit1 = task.snoozeUnit1.toTimeUnit(),
+            snoozeValue2 = task.snoozeValue2,
+            snoozeUnit2 = task.snoozeUnit2.toTimeUnit(),
+            noteSelection = noteSelection,
+            note = task.note ?: "",
+            locationSelection = locationSelection,
+            selectedLocations = selectedLocations,
+            imageSelection = imageSelection,
+            selectedImage = selectedImage,
+            colorSelection = colorSelection,
+            selectedColorId = task.color.id
+        )
+        onRepeatRuleChanged()
+    }
+    
+    private fun parseRepeatSelection(rrule: String?): UserRepeatSelection {
+        if (rrule.isNullOrBlank()) return UserRepeatSelection.OFF
+        val rule = RecurrenceCalculator.parseRRule(rrule) ?: return UserRepeatSelection.OFF
+        return when (rule.frequency) {
+            RecurrenceCalculator.Frequency.WEEKLY -> UserRepeatSelection.WEEKLY
+            RecurrenceCalculator.Frequency.MONTHLY -> UserRepeatSelection.MONTHLY
+        }
+    }
+    
+    private fun parseWeeklyRepeat(rrule: String?): Pair<Set<Int>, Int> {
+        if (rrule.isNullOrBlank()) return setOf(1, 2, 3, 4, 5, 6, 7) to 1
+        val rule = RecurrenceCalculator.parseRRule(rrule) ?: return setOf(1, 2, 3, 4, 5, 6, 7) to 1
+        if (rule.frequency != RecurrenceCalculator.Frequency.WEEKLY) return setOf(1, 2, 3, 4, 5, 6, 7) to 1
+        
+        val days = rule.byDay.map { it.value }.toSet()
+        return (days.ifEmpty { setOf(1, 2, 3, 4, 5, 6, 7) }) to rule.interval
+    }
+    
+    private fun parseMonthlyRepeat(rrule: String?): Triple<Set<Int>, RepeatMonthlyDaySelection, Set<Int>> {
+        if (rrule.isNullOrBlank()) return Triple((1..12).toSet(), RepeatMonthlyDaySelection.ALL, (1..31).toSet())
+        val rule = RecurrenceCalculator.parseRRule(rrule) ?: return Triple((1..12).toSet(), RepeatMonthlyDaySelection.ALL, (1..31).toSet())
+        if (rule.frequency != RecurrenceCalculator.Frequency.MONTHLY) return Triple((1..12).toSet(), RepeatMonthlyDaySelection.ALL, (1..31).toSet())
+        
+        val months = rule.byMonth.ifEmpty { (1..12).toSet() }
+        val days = rule.byMonthDay.toSet()
+        val daySelection = when {
+            days.contains(-1) -> RepeatMonthlyDaySelection.LAST
+            days.isEmpty() || days.containsAll((1..31).toSet()) -> RepeatMonthlyDaySelection.ALL
+            else -> RepeatMonthlyDaySelection.SELECT
+        }
+        val selectedDays = if (daySelection == RepeatMonthlyDaySelection.ALL) (1..31).toSet() else days.filter { it > 0 }.toSet()
+        
+        return Triple(months, daySelection, selectedDays)
+    }
+    
+    private fun AlarmMode.toUserSoundSelection(): UserSoundSelection = when (this) {
+        AlarmMode.OFF -> UserSoundSelection.OFF
+        AlarmMode.ONCE -> UserSoundSelection.ONCE
+        AlarmMode.CONTINUOUS -> UserSoundSelection.CONTINUOUS
+    }
+    
+    private fun AlarmMode.toUserVibrateSelection(): UserVibrateSelection = when (this) {
+        AlarmMode.OFF -> UserVibrateSelection.OFF
+        AlarmMode.ONCE -> UserVibrateSelection.ONCE
+        AlarmMode.CONTINUOUS -> UserVibrateSelection.CONTINUOUS
+    }
+    
+    private fun ReminderOffsetUnit.toTimeUnit(): TimeUnit = when (this) {
+        ReminderOffsetUnit.MINUTES -> TimeUnit.MINUTES
+        ReminderOffsetUnit.HOURS -> TimeUnit.HOURS
+        ReminderOffsetUnit.DAYS -> TimeUnit.DAYS
+        ReminderOffsetUnit.WEEKS -> TimeUnit.WEEKS
+        ReminderOffsetUnit.MONTHS -> TimeUnit.MONTHS
     }
 }
 

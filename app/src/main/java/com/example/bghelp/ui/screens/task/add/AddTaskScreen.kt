@@ -41,11 +41,22 @@ import com.example.bghelp.ui.utils.dismissKeyboardOnTap
 @Composable
 fun AddTaskScreen(
     navController: NavController,
-    viewModel: AddTaskViewModel
+    viewModel: AddTaskViewModel,
+    taskId: Int? = null
 ) {
     val saveState by viewModel.saveState.collectAsState()
     val isValid by viewModel.isNewTaskValid.collectAsState()
+    val isEditing by viewModel.isEditing.collectAsState()
     val scrollState = rememberScrollState()
+    
+    // Load task for editing if taskId is provided
+    LaunchedEffect(taskId) {
+        taskId?.let { id ->
+            if (id > 0) {
+                viewModel.loadTaskForEditingById(id)
+            }
+        }
+    }
 
     LaunchedEffect(saveState) {
         when (saveState) {
@@ -162,10 +173,10 @@ fun AddTaskScreen(
                     modifier = Modifier.weight(1f)
                 )
                 ConfirmButton(
-                    text = if (saveState is SaveTaskState.Saving) {
-                        AddTaskStrings.SAVING
-                    } else {
-                        AddTaskStrings.SAVE_TASK
+                    text = when {
+                        saveState is SaveTaskState.Saving -> AddTaskStrings.SAVING
+                        isEditing -> AddTaskStrings.EDIT_TASK
+                        else -> AddTaskStrings.SAVE_TASK
                     },
                     onClick = { viewModel.saveTask() },
                     modifier = Modifier.weight(1f),
@@ -174,7 +185,7 @@ fun AddTaskScreen(
             }
         }
 
-        // Snackbar positioned at bottom
+        // Snackbar
         Box(
             modifier = Modifier
                 .fillMaxSize()

@@ -3,13 +3,10 @@ package com.example.bghelp.ui.screens.task.main
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
@@ -17,12 +14,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,11 +36,11 @@ import com.example.bghelp.ui.components.CollapsibleDateSelector
 import com.example.bghelp.ui.components.LazyColumnContainer
 import com.example.bghelp.ui.components.MainContentContainer
 import com.example.bghelp.ui.components.MainHeader
+import com.example.bghelp.ui.components.OptionsModal
 import com.example.bghelp.ui.navigation.Screen
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 import com.example.bghelp.ui.theme.MainBlue
-import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.utils.toDayHeader
-import com.example.bghelp.utils.toTaskTime
 
 @SuppressLint("FrequentlyChangingValue", "FrequentlyChangedStateReadInComposition")
 @Composable
@@ -81,8 +76,9 @@ fun TaskScreen(
             listState.firstVisibleItemScrollOffset
         )
     }
-    // Track deletion
+    // Track deletion and editing
     var taskPendingDeletion by remember { mutableStateOf<Task?>(null) }
+    var taskPendingEdit by remember { mutableStateOf<Task?>(null) }
     
     // WeekNav height
     val weekNavHeight by taskViewModel.weekNavHeight.collectAsState()
@@ -136,6 +132,7 @@ fun TaskScreen(
                                 isExpanded = expandedTaskIds.contains(task.id),
                                 onToggleExpanded = taskViewModel::toggleTaskExpanded,
                                 onDelete = { taskPendingDeletion = it },
+                                onLongPress = { taskPendingDeletion = it },
                                 isFirst = isFirst,
                                 isLast = isLast
                             )
@@ -196,63 +193,42 @@ fun TaskScreen(
     }
 
     // Delete Task modal
-    DeleteTaskDialog(
-        task = taskPendingDeletion,
-        onDismiss = { taskPendingDeletion = null },
-        onConfirm = {
+    OptionsModal(
+        isVisible = taskPendingDeletion != null,
+        onDismissRequest = { taskPendingDeletion = null },
+        content = {
+            taskPendingDeletion?.let { task ->
+                TaskPreviewComponent(task = task)
+            }
+        },
+        cancelLabel = "Delete",
+        cancelOption = {
             taskPendingDeletion?.let { taskViewModel.deleteTask(it) }
             taskPendingDeletion = null
+        },
+        confirmLabel = "Edit",
+        confirmOption = {
+            taskPendingDeletion?.let { task ->
+                taskPendingEdit = task
+                taskPendingDeletion = null
+            }
         }
     )
+    
+    // Navigate to edit task
+    LaunchedEffect(taskPendingEdit) {
+        taskPendingEdit?.let { task ->
+            if (overlayNavController != null) {
+                overlayNavController.navigate("${Screen.Tasks.Add.route}?taskId=${task.id}") {
+                    launchSingleTop = true
+                }
+                taskPendingEdit = null
+            }
+        }
+    }
 }
 
 @Composable
 fun EmptyTask() {
     Text("No tasks for this day")
-}
-
-@Composable
-private fun DeleteTaskDialog(
-    task: Task?,
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit
-) {
-    if (task == null) return
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text("Confirm")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        },
-        title = {
-            Text("Are you sure you want to delete this task?")
-        },
-        text = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = task.title,
-                    style = TextStyles.Default.Bold.M
-                )
-                task.description?.let { description ->
-                    Text(
-                        text = description,
-                        style = TextStyles.Default.M
-                    )
-                }
-                Text(
-                    text = task.date.toTaskTime(),
-                    style = TextStyles.Grey.S
-                )
-            }
-        }
-    )
 }

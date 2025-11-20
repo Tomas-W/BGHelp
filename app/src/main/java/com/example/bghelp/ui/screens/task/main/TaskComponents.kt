@@ -4,6 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -27,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
 import com.example.bghelp.domain.model.AlarmMode
@@ -44,6 +46,7 @@ fun DayComponent(
     isExpanded: Boolean,
     onToggleExpanded: (Int) -> Unit,
     onDelete: (Task) -> Unit,
+    onLongPress: ((Task) -> Unit)? = null,
     isFirst: Boolean = false,
     isLast: Boolean = false
 ) {
@@ -54,6 +57,13 @@ fun DayComponent(
     }
     val deleteCallback = remember(key1 = task.id) { { onDelete(task) } }
     val toggleCallback = remember(key1 = task.id) { { onToggleExpanded(task.id) } }
+    val longPressCallback = remember(key1 = task.id) { 
+        if (onLongPress != null) {
+            { onLongPress!!.invoke(task) }
+        } else {
+            null
+        }
+    }
     
     val cornerRadius = remember {
         Sizes.Corner.S
@@ -70,7 +80,14 @@ fun DayComponent(
     DayContainer(
         modifier = modifier
             .animateContentSize()
-            .clickable(onClick = toggleCallback),
+            .let { mod ->
+                longPressCallback?.let { longPress ->
+                    mod.combinedClickable(
+                        onClick = toggleCallback,
+                        onLongClick = longPress
+                    )
+                } ?: mod.clickable(onClick = toggleCallback)
+            },
         backgroundColor = taskBackgroundColor,
         shape = shape
     ) {
@@ -144,7 +161,7 @@ private fun TitleAndDescription(
     Column {
         Text(
             text = title,
-            style = TextStyles.Default.M,
+            style = TextStyles.Default.M
         )
         if (isExpanded && description != null) {
             Text(
@@ -217,5 +234,43 @@ private fun DeleteIcon(onDelete: () -> Unit) {
         contentDescription = "Delete",
         modifier = Modifier.clickable(onClick = onDelete)
     )
+}
+
+@Composable
+fun TaskPreviewComponent(task: Task) {
+    val taskBackgroundColor = if (!task.expired) {
+        task.color.toComposeColor()
+    } else {
+        MaterialTheme.colorScheme.tertiary
+    }
+    
+    DayContainer(
+        modifier = Modifier.fillMaxWidth(),
+        backgroundColor = taskBackgroundColor,
+        shape = RoundedCornerShape(Sizes.Corner.S)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            TimeInfo(task = task)
+            AlarmIconsPreview(task = task)
+        }
+        
+        TitleAndDescription(
+            title = task.title,
+            description = task.description,
+            isExpanded = false
+        )
+    }
+}
+
+@Composable
+private fun AlarmIconsPreview(task: Task) {
+    Row {
+        SoundIcon(soundMode = task.sound)
+        Spacer(modifier = Modifier.width(16.dp))
+        VibrateIcon(vibrateMode = task.vibrate)
+    }
 }
 

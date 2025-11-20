@@ -135,6 +135,7 @@ object AddTaskStrings {
     const val CANCEL = "Cancel"
     const val SAVING = "Saving..."
     const val SAVE_TASK = "Save Task"
+    const val EDIT_TASK = "Edit Task"
     const val RESET_FORM = "Reset form"
     const val UNDO_RESET_FORM = "Undo reset"
     
@@ -328,7 +329,6 @@ enum class UserColorSelection(
         ON -> OFF
     }
 }
-enum class UserColorChoices { DEFAULT, RED, GREEN, YELLOW, CYAN, MAGENTA }
 
 // Save State
 sealed interface SaveTaskState {

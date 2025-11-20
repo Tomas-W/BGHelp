@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
@@ -498,7 +499,7 @@ class AddTaskViewModel @Inject constructor(
         // Save temporary image
         viewModelScope.launch {
             try {
-                val tempUri = com.example.bghelp.utils.TaskImageStorage.saveTemporaryImage(
+                val tempUri = TaskImageStorage.saveTemporaryImage(
                     context = appContext,
                     bitmap = bitmap,
                     displayName = displayName
@@ -541,16 +542,36 @@ class AddTaskViewModel @Inject constructor(
     // COLOR
 
     // SAVE TASK
+    fun loadTaskForEditingById(taskId: Int) {
+        viewModelScope.launch {
+            taskRepository.getTaskById(taskId)
+                .first()
+                ?.let { task ->
+                    _editingTaskId.value = task.id
+                    formStateHolder.loadFromTask(task)
+                    _currentMonth.value = YearMonth.from(task.date)
+                }
+        }
+    }
+
     fun saveTask() {
         if (_saveState.value == SaveTaskState.Saving) return
 
         _saveState.value = SaveTaskState.Saving
         viewModelScope.launch {
-            val result = saveTaskHandler.saveTask(formState.value, validationState)
+            val taskId = _editingTaskId.value
+            val result = if (taskId != null) {
+                saveTaskHandler.updateTask(taskId, formState.value, validationState)
+            } else {
+                saveTaskHandler.saveTask(formState.value, validationState)
+            }
 
             when (result) {
                 is SaveTaskResult.Success -> {
                     _saveState.value = SaveTaskState.Success
+                    if (taskId != null) {
+                        _editingTaskId.value = null
+                    }
                 }
 
                 is SaveTaskResult.ValidationError -> {
@@ -573,6 +594,11 @@ class AddTaskViewModel @Inject constructor(
 
     private val _saveState = MutableStateFlow<SaveTaskState>(SaveTaskState.Idle)
     val saveState: StateFlow<SaveTaskState> = _saveState.asStateFlow()
+    
+    private val _editingTaskId = MutableStateFlow<Int?>(null)
+    val editingTaskId: StateFlow<Int?> = _editingTaskId.asStateFlow()
+    val isEditing: StateFlow<Boolean> = _editingTaskId.map { it != null }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
     // SAVE TASK
 
     // RESET DISMISS CLEAR

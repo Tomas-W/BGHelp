@@ -103,14 +103,24 @@ fun OverlayNavHost(
         // Main features Screens live in the BottomNavHost
 
         // AddTaskScreen
-        noTransitionComposable(route = Screen.Tasks.Add.route) { backStackEntry ->
+        noTransitionComposable(
+            route = "${Screen.Tasks.Add.route}?taskId={taskId}",
+            arguments = listOf(
+                navArgument("taskId") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+        ) { backStackEntry ->
+            val taskId = backStackEntry.arguments?.getInt("taskId") ?: -1
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(OVERLAY_GRAPH_ROUTE)
             }
             val viewModel: AddTaskViewModel = hiltViewModel(parentEntry)
             AddTaskScreen(
                 navController = navController,
-                viewModel = viewModel
+                viewModel = viewModel,
+                taskId = if (taskId > 0) taskId else null
             )
         }
         // AddTargetScreen
