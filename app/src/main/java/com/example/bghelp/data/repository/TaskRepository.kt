@@ -13,7 +13,6 @@ import com.example.bghelp.domain.constants.ColorSeeds
 import com.example.bghelp.domain.service.RecurrenceCalculator
 import com.example.bghelp.domain.model.TaskLocationEntry
 import com.example.bghelp.domain.model.TaskReminderEntry
-import com.example.bghelp.ui.theme.TaskDefault
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -139,7 +138,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
             alarmName = task.alarmName,
             sound = task.sound,
             vibrate = task.vibrate,
-            snoozeTime = task.snoozeMinutes,
+            snoozeSeconds = task.snoozeSeconds,
             snoozeValue1 = task.snoozeValue1,
             snoozeUnit1 = task.snoozeUnit1,
             snoozeValue2 = task.snoozeValue2,
@@ -188,7 +187,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
             sound = sound,
             vibrate = vibrate,
             soundUri = soundUri,
-            snoozeMinutes = snoozeTime,
+            snoozeSeconds = snoozeSeconds,
             snoozeValue1 = snoozeValue1,
             snoozeUnit1 = snoozeUnit1,
             snoozeValue2 = snoozeValue2,
@@ -219,9 +218,9 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
         val entity = TaskEntity(
             id = 0,
             title = title,
-            info = description,
+            info = info,
             note = note,
-            startEpoch = date.toEpochMillis(),
+            startEpoch = startDate.toEpochMillis(),
             endEpoch = endDate?.toEpochMillis(),
             allDay = allDay,
             rrule = rrule,
@@ -230,7 +229,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
             sound = sound,
             vibrate = vibrate,
             soundUri = soundUri,
-            snoozeMinutes = snoozeTime,
+            snoozeSeconds = snoozeSeconds,
             snoozeValue1 = snoozeValue1,
             snoozeUnit1 = snoozeUnit1,
             snoozeValue2 = snoozeValue2,

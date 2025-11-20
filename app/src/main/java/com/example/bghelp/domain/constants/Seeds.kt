@@ -48,11 +48,11 @@ object TaskSeeds {
     private val noteOptions = listOf("Note A", "Note B", "Note C", "Note D", "Note E")
 
     private fun randomLoremWords(count: Int): String {
-        return (1..count).map { loremWords.random() }.joinToString(" ")
+        return (1..count).joinToString(" ") { loremWords.random() }
     }
 
     private fun randomLoremWordsOnePerLine(count: Int): String {
-        return (1..count).map { loremWords.random() }.joinToString("\n")
+        return (1..count).joinToString("\n") { loremWords.random() }
     }
 
     private fun randomLoremWordsWithNewlines(wordCount: Int, newlineCount: Int): String {
@@ -66,7 +66,7 @@ object TaskSeeds {
     private fun randomAlarmName(): String? = alarmNames.random()
 
     private fun randomAlarmMode(): AlarmMode = AlarmMode.entries.random()
-    private fun randomSnoozeTime(): Int = listOf(5, 10, 15, 30).random()
+    private fun randomSnoozeSeconds(): Int = (1000..106400).random()
     private fun randomSnoozeValue1(): Int = listOf(5, 10, 15, 30).random()
     private fun randomSnoozeUnit1(): ReminderOffsetUnit = ReminderOffsetUnit.MINUTES
     private fun randomSnoozeValue2(): Int = listOf(1, 2, 3).random()
@@ -86,14 +86,14 @@ object TaskSeeds {
         return listOf(
             // Task 1: date in an hour, 4 words title, 75 lines description, endDate 2 hours after date
             CreateTask(
-                date = task1Date,
+                startDate = task1Date,
                 title = randomLoremWords(4),
-                description = randomLoremWordsOnePerLine(75),
+                info = randomLoremWordsOnePerLine(75),
                 expired = false,
                 alarmName = randomAlarmName(),
                 sound = randomAlarmMode(),
                 vibrate = randomAlarmMode(),
-                snoozeTime = randomSnoozeTime(),
+                snoozeSeconds = randomSnoozeSeconds(),
                 snoozeValue1 = randomSnoozeValue1(),
                 snoozeUnit1 = randomSnoozeUnit1(),
                 snoozeValue2 = randomSnoozeValue2(),
@@ -105,14 +105,14 @@ object TaskSeeds {
             ),
             // Task 2: date tomorrow, 3 words title, 75 lines description, endDate 3 hours after date
             CreateTask(
-                date = task2Date,
+                startDate = task2Date,
                 title = randomLoremWords(3),
-                description = randomLoremWordsOnePerLine(75),
+                info = randomLoremWordsOnePerLine(75),
                 expired = false,
                 alarmName = randomAlarmName(),
                 sound = randomAlarmMode(),
                 vibrate = randomAlarmMode(),
-                snoozeTime = randomSnoozeTime(),
+                snoozeSeconds = randomSnoozeSeconds(),
                 snoozeValue1 = randomSnoozeValue1(),
                 snoozeUnit1 = randomSnoozeUnit1(),
                 snoozeValue2 = randomSnoozeValue2(),
@@ -124,14 +124,14 @@ object TaskSeeds {
             ),
             // Task 3: date now, 3 words title, 15 words with 2 newlines, no endDate, random color
             CreateTask(
-                date = task3Date,
+                startDate = task3Date,
                 title = randomLoremWords(3),
-                description = randomLoremWordsWithNewlines(15, 2),
+                info = randomLoremWordsWithNewlines(15, 2),
                 expired = false,
                 alarmName = randomAlarmName(),
                 sound = randomAlarmMode(),
                 vibrate = randomAlarmMode(),
-                snoozeTime = randomSnoozeTime(),
+                snoozeSeconds = randomSnoozeSeconds(),
                 snoozeValue1 = randomSnoozeValue1(),
                 snoozeUnit1 = randomSnoozeUnit1(),
                 snoozeValue2 = randomSnoozeValue2(),
@@ -143,14 +143,14 @@ object TaskSeeds {
             ),
             // Task 4: date tomorrow, 3 words title, 15 words with 2 newlines, allDay=true, no endDate, random color
             CreateTask(
-                date = task4Date,
+                startDate = task4Date,
                 title = randomLoremWords(3),
-                description = randomLoremWordsWithNewlines(15, 2),
+                info = randomLoremWordsWithNewlines(15, 2),
                 expired = false,
                 alarmName = randomAlarmName(),
                 sound = randomAlarmMode(),
                 vibrate = randomAlarmMode(),
-                snoozeTime = randomSnoozeTime(),
+                snoozeSeconds = randomSnoozeSeconds(),
                 snoozeValue1 = randomSnoozeValue1(),
                 snoozeUnit1 = randomSnoozeUnit1(),
                 snoozeValue2 = randomSnoozeValue2(),

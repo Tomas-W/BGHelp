@@ -63,3 +63,14 @@ fun formatTime(time: LocalTime): String {
     return time.format(DateTimeFormatter.ofPattern("HH:mm"))
 }
 
+fun Int.formatSnoozeDuration(): String {
+    return when {
+        this < 60 -> "${this}s"
+        this < 3600 -> "${this / 60}m"
+        this < 86400 -> "${this / 3600}h"
+        this < 604800 -> "${this / 86400}d"
+        this < 2592000 -> "${this / 604800}w"
+        else -> "${this / 2592000}M"
+    }
+}
+

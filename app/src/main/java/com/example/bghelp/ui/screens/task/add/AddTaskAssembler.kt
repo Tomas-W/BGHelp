@@ -87,11 +87,11 @@ object AddTaskAssembler {
         }
 
         val create = CreateTask(
-            date = startDateTime,
+            startDate = startDateTime,
             endDate = endDateTime,
             allDay = allDay,
             title = title,
-            description = description,
+            info = description,
             note = note,
             rrule = rrule,
             expired = false,
@@ -99,7 +99,7 @@ object AddTaskAssembler {
             sound = soundMode,
             vibrate = vibrateMode,
             soundUri = soundUri,
-            snoozeTime = 0,
+            snoozeSeconds = 0,
             snoozeValue1 = snoozeValue1,
             snoozeUnit1 = snoozeUnit1Domain,
             snoozeValue2 = snoozeValue2,

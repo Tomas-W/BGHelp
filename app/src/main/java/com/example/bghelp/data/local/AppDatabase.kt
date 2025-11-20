@@ -23,7 +23,7 @@ import com.example.bghelp.data.local.entity.TaskReminderEntity
         ItemEntity::class,
         ColorEntity::class
     ],
-    version = 18
+    version = 20
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
