@@ -1,5 +1,6 @@
 error.txt
 .env
+.kotlin/
 
 # Built application files
 *.apk

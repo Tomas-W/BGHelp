@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.bghelp.domain.model.Task
@@ -79,6 +80,12 @@ fun TaskScreen(
     // Track deletion and editing
     var taskPendingDeletion by remember { mutableStateOf<Task?>(null) }
     var taskPendingEdit by remember { mutableStateOf<Task?>(null) }
+    var taskPendingDeletionWithTimer by remember { mutableStateOf<Int?>(null) }
+    
+    // Cancel deletion function
+    val cancelDeletion: () -> Unit = {
+        taskPendingDeletionWithTimer = null
+    }
     
     // WeekNav height
     val weekNavHeight by taskViewModel.weekNavHeight.collectAsState()
@@ -127,12 +134,15 @@ fun TaskScreen(
                         ) { index, task ->
                             val isFirst = index == 0
                             val isLast = index == selectedTasks.size - 1
+                            val isPendingDeletion = taskPendingDeletionWithTimer == task.id
                             DayComponent(
                                 task = task,
                                 isExpanded = expandedTaskIds.contains(task.id),
                                 onToggleExpanded = taskViewModel::toggleTaskExpanded,
                                 onDelete = { taskPendingDeletion = it },
                                 onLongPress = { taskPendingDeletion = it },
+                                isPendingDeletion = isPendingDeletion,
+                                onCancelDeletion = cancelDeletion,
                                 isFirst = isFirst,
                                 isLast = isLast
                             )
@@ -203,8 +213,10 @@ fun TaskScreen(
         },
         cancelLabel = "Delete",
         cancelOption = {
-            taskPendingDeletion?.let { taskViewModel.deleteTask(it) }
-            taskPendingDeletion = null
+            taskPendingDeletion?.let { task ->
+                taskPendingDeletionWithTimer = task.id
+                taskPendingDeletion = null
+            }
         },
         confirmLabel = "Edit",
         confirmOption = {
@@ -223,6 +235,19 @@ fun TaskScreen(
                     launchSingleTop = true
                 }
                 taskPendingEdit = null
+            }
+        }
+    }
+    
+    // Handle deletion timer
+    LaunchedEffect(taskPendingDeletionWithTimer) {
+        taskPendingDeletionWithTimer?.let { taskId ->
+            delay(5000)
+            if (taskPendingDeletionWithTimer == taskId) {
+                selectedTasks.find { it.id == taskId }?.let { task ->
+                    taskViewModel.deleteTask(task)
+                }
+                taskPendingDeletionWithTimer = null
             }
         }
     }

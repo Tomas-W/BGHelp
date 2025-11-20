@@ -91,7 +91,7 @@ dependencies {
 
     // DateTimePicker
     implementation(libs.material.dialogs.datetime)
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     // AndroidX core + lifecycle
     implementation(libs.androidx.core.ktx)

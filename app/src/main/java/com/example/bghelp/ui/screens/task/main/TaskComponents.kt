@@ -6,15 +6,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -24,16 +27,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.bghelp.R
 import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.Task
 import com.example.bghelp.ui.theme.Sizes
+import com.example.bghelp.ui.theme.TextGrey
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.theme.TextSizes
 import com.example.bghelp.utils.formatSnoozeDuration
@@ -47,6 +54,8 @@ fun DayComponent(
     onToggleExpanded: (Int) -> Unit,
     onDelete: (Task) -> Unit,
     onLongPress: ((Task) -> Unit)? = null,
+    isPendingDeletion: Boolean = false,
+    onCancelDeletion: () -> Unit = {},
     isFirst: Boolean = false,
     isLast: Boolean = false
 ) {
@@ -77,40 +86,63 @@ fun DayComponent(
         }
     }
 
-    DayContainer(
-        modifier = modifier
-            .animateContentSize()
-            .let { mod ->
-                longPressCallback?.let { longPress ->
-                    mod.combinedClickable(
-                        onClick = toggleCallback,
-                        onLongClick = longPress
-                    )
-                } ?: mod.clickable(onClick = toggleCallback)
-            },
-        backgroundColor = taskBackgroundColor,
-        shape = shape
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+    Box(modifier = modifier) {
+        DayContainer(
+            modifier = Modifier
+//                .blur(if (isPendingDeletion) 3.dp else 0.dp)
+                .alpha(if (isPendingDeletion) 0.4f else 1f)
+                .animateContentSize()
+                .let { mod ->
+                    longPressCallback?.let { longPress ->
+                        mod.combinedClickable(
+                            onClick = toggleCallback,
+                            onLongClick = longPress
+                        )
+                    } ?: mod.clickable(onClick = toggleCallback)
+                },
+            backgroundColor = taskBackgroundColor,
+            shape = shape
         ) {
-            TimeInfo(task = task)
-            AlarmIcons(task = task, onDelete = deleteCallback)
-        }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                TimeInfo(task = task)
+                AlarmIcons(task = task, onDelete = deleteCallback)
+            }
 
-        TitleAndDescription(
-            title = task.title,
-            description = task.description,
-            isExpanded = isExpanded
-        )
-        if (isExpanded) {
-            val imageAttachment = task.image
-            if (imageAttachment?.uri != null) {
-                Spacer(modifier = Modifier.height(Sizes.Icon.XXS))
-                TaskImagePreview(
-                    imagePath = imageAttachment.uri,
-                    displayName = imageAttachment.displayName
+            TitleAndDescription(
+                title = task.title,
+                description = task.description,
+                isExpanded = isExpanded
+            )
+            if (isExpanded) {
+                val imageAttachment = task.image
+                if (imageAttachment?.uri != null) {
+                    Spacer(modifier = Modifier.height(Sizes.Icon.XXS))
+                    TaskImagePreview(
+                        imagePath = imageAttachment.uri,
+                        displayName = imageAttachment.displayName
+                    )
+                }
+            }
+        }
+        
+        // Deletion overlay
+        if (isPendingDeletion) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .let { if (shape != null) it.clip(shape) else it }
+                    .clickable(onClick = onCancelDeletion),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "CANCEL",
+                    fontSize = 56.sp,
+                    color = TextGrey,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 5.sp
                 )
             }
         }

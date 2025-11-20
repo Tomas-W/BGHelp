@@ -68,7 +68,7 @@ fun CollapsibleDateSelector(
     onCalendarMonthChanged: (YearMonth) -> Unit,
     onExpansionChanged: ((Boolean, Dp) -> Unit)? = null
 ) {
-    var currentView by rememberSaveable { mutableStateOf(DateSelectorView.COLLAPSED) }
+    var currentView by rememberSaveable { mutableStateOf(DateSelectorView.WEEK_NAV) }
     var weekNavContentHeightPx by remember { mutableIntStateOf(0) }
     var calendarContentHeightPx by remember { mutableIntStateOf(0) }
     var toggleButtonHeightPx by remember { mutableIntStateOf(0) }
