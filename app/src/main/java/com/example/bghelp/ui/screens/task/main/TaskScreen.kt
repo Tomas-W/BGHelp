@@ -64,9 +64,6 @@ fun TaskScreen(
     val navWeekDisplay by taskViewModel.weekDisplay.collectAsState()
     val navWeekNumbers by taskViewModel.availableWeekNumbers.collectAsState()
     val navWeekDays by taskViewModel.weekDays.collectAsState()
-//    val navSelectedDate = remember(rawSelectedDate, navWeekDays) {
-//        navWeekDays.firstOrNull { it == rawSelectedDate }
-//    }
     // Scroll state
     val listState = rememberLazyListState()
     val savedIndex = taskViewModel.getSavedScrollIndex()

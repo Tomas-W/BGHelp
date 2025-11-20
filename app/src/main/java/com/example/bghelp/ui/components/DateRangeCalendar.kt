@@ -117,13 +117,13 @@ private fun CalendarDismissRow(onDismissRequest: (() -> Unit)?, showDismissButto
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(end = 24.dp, top = 8.dp, bottom = 8.dp),
+            .padding(end = 16.dp, top = 4.dp, bottom = 4.dp),
         horizontalArrangement = Arrangement.End
     ) {
         TextButton(onClick = onDismissRequest) {
             Text(
                 text = AddTaskStrings.HIDE_CALENDAR,
-                style = TextStyles.Grey.Bold.S
+                style = TextStyles.Grey.Bold.XS
             )
         }
     }
@@ -215,7 +215,7 @@ private fun CalendarMonthDropdown(
     Box {
         Text(
             text = currentMonth.format(formatter),
-            style = TextStyles.Grey.Bold.L,
+            style = TextStyles.Grey.Bold.M,
             modifier = Modifier
                 .onGloballyPositioned { anchorWidthPx = it.size.width }
                 .clickable { onMenuOpenChange(true) }
@@ -234,8 +234,8 @@ private fun CalendarMonthDropdown(
                         onMonthChanged(YearMonth.of(currentMonth.year, month))
                         onMenuOpenChange(false)
                     },
-                    textStyle = TextStyles.Default.M,
-                    spacing = Sizes.Icon.S
+                    textStyle = TextStyles.Default.S,
+                    spacing = Sizes.Icon.XS
                 )
             }
         }
@@ -266,7 +266,7 @@ private fun CalendarYearDropdown(
     Box {
         Text(
             text = currentMonth.format(formatter),
-            style = TextStyles.Grey.Bold.L,
+            style = TextStyles.Grey.Bold.M,
             modifier = Modifier
                 .onGloballyPositioned { anchorWidthPx = it.size.width }
                 .clickable { onMenuOpenChange(true) }
@@ -286,7 +286,7 @@ private fun CalendarYearDropdown(
                         onMenuOpenChange(false)
                     },
                     textStyle = TextStyles.Default.M,
-                    spacing = Sizes.Icon.S
+                    spacing = Sizes.Icon.XS
                 )
             }
         }
@@ -320,7 +320,7 @@ private fun CalendarWeekdayHeader(firstDayOfWeek: DayOfWeek) {
     Row(
         modifier = Modifier
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         for (dow in dayOfWeekOrder(firstDayOfWeek)) {
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
@@ -353,7 +353,7 @@ private fun CalendarWeeksGrid(
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 week.forEach { day ->
                     val inCurrentMonth = day.month == currentMonth.month
@@ -384,7 +384,7 @@ private fun CalendarWeeksGrid(
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
         }
     }
 }

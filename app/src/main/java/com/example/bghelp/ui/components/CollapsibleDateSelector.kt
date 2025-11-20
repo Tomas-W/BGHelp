@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.example.bghelp.R
+import com.example.bghelp.ui.theme.MainBlue
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.utils.bottomBorder
 import com.example.bghelp.ui.utils.topBorder
@@ -66,7 +68,7 @@ fun CollapsibleDateSelector(
     onCalendarMonthChanged: (YearMonth) -> Unit,
     onExpansionChanged: ((Boolean, Dp) -> Unit)? = null
 ) {
-    var currentView by rememberSaveable { mutableStateOf(DateSelectorView.WEEK_NAV) }
+    var currentView by rememberSaveable { mutableStateOf(DateSelectorView.COLLAPSED) }
     var weekNavContentHeightPx by remember { mutableIntStateOf(0) }
     var calendarContentHeightPx by remember { mutableIntStateOf(0) }
     var toggleButtonHeightPx by remember { mutableIntStateOf(0) }
@@ -107,11 +109,29 @@ fun CollapsibleDateSelector(
             )
     ) {
         ToggleButtonRow(
-            isExpanded = isExpanded,
             currentView = currentView,
-            onCollapse = { currentView = DateSelectorView.COLLAPSED },
-            onShowWeekNav = { currentView = DateSelectorView.WEEK_NAV },
-            onShowCalendar = { currentView = DateSelectorView.CALENDAR },
+            onLeftArrowClick = {
+                currentView = when (currentView) {
+                    DateSelectorView.COLLAPSED, DateSelectorView.CALENDAR -> {
+                        DateSelectorView.WEEK_NAV
+                    }
+
+                    DateSelectorView.WEEK_NAV -> {
+                        DateSelectorView.COLLAPSED
+                    }
+                }
+            },
+            onRightArrowClick = {
+                currentView = when (currentView) {
+                    DateSelectorView.COLLAPSED, DateSelectorView.WEEK_NAV -> {
+                        DateSelectorView.CALENDAR
+                    }
+
+                    DateSelectorView.CALENDAR -> {
+                        DateSelectorView.COLLAPSED
+                    }
+                }
+            },
             onSizeChanged = { toggleButtonHeightPx = it }
         )
 
@@ -145,13 +165,16 @@ fun CollapsibleDateSelector(
 
 @Composable
 private fun ToggleButtonRow(
-    isExpanded: Boolean,
     currentView: DateSelectorView,
-    onCollapse: () -> Unit,
-    onShowWeekNav: () -> Unit,
-    onShowCalendar: () -> Unit,
+    onLeftArrowClick: () -> Unit,
+    onRightArrowClick: () -> Unit,
     onSizeChanged: (Int) -> Unit
 ) {
+    val isExpanded = currentView != DateSelectorView.COLLAPSED
+    
+    val leftArrowPointsDown = currentView == DateSelectorView.WEEK_NAV
+    val rightArrowPointsDown = currentView == DateSelectorView.CALENDAR
+    
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -163,69 +186,38 @@ private fun ToggleButtonRow(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (isExpanded) {
-            CollapseButton(onClick = onCollapse)
-        } else {
-            ExpandButtons(
-                onShowWeekNav = onShowWeekNav,
-                onShowCalendar = onShowCalendar
-            )
-        }
-    }
-}
-
-@Composable
-private fun CollapseButton(onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .width(3 * Sizes.Icon.L)
-            .height(Sizes.Icon.L)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.navigation_arrow_down),
-            contentDescription = "Collapse",
-            modifier = Modifier.size(Sizes.Icon.L),
-            tint = MaterialTheme.colorScheme.onTertiary
+        NavigationArrow(
+            pointsDown = leftArrowPointsDown,
+            onClick = onLeftArrowClick,
+            contentDescription = if (leftArrowPointsDown) "Collapse week navigation" else "Show week navigation"
+        )
+        
+        Spacer(modifier = Modifier.width(2 * Sizes.Icon.L))
+        
+        NavigationArrow(
+            pointsDown = rightArrowPointsDown,
+            onClick = onRightArrowClick,
+            contentDescription = if (rightArrowPointsDown) "Collapse calendar" else "Show calendar"
         )
     }
 }
 
 @Composable
-private fun ExpandButtons(
-    onShowWeekNav: () -> Unit,
-    onShowCalendar: () -> Unit
-) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(Sizes.Icon.XL),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        ExpandButton(
-            onClick = onShowWeekNav,
-            contentDescription = "Show week navigation"
-        )
-        Box(modifier = Modifier.width(Sizes.Icon.L))
-        ExpandButton(
-            onClick = onShowCalendar,
-            contentDescription = "Show calendar"
-        )
-    }
-}
-
-@Composable
-private fun ExpandButton(
+private fun NavigationArrow(
+    pointsDown: Boolean,
     onClick: () -> Unit,
     contentDescription: String
 ) {
     Box(
         modifier = Modifier
-            .size(Sizes.Icon.L)
+            .width(2 * Sizes.Icon.L)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.navigation_arrow_up),
+            painter = painterResource(
+                id = if (pointsDown) R.drawable.navigation_arrow_down else R.drawable.navigation_arrow_up
+            ),
             contentDescription = contentDescription,
             modifier = Modifier.size(Sizes.Icon.L),
             tint = MaterialTheme.colorScheme.onTertiary
@@ -261,7 +253,9 @@ private fun WeekNavContent(
         )
     ) {
         Box(
-            modifier = Modifier.onSizeChanged { onSizeChanged(it.height) }
+            modifier = Modifier
+                .onSizeChanged { onSizeChanged(it.height) }
+                .padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 12.dp)
         ) {
             WeekNavigation(
                 currentYearMonth = currentYearMonth,
@@ -303,7 +297,7 @@ private fun CalendarContent(
     ) {
         Box(
             modifier = Modifier
-                .padding(horizontal = 6.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 12.dp)
                 .onSizeChanged { onSizeChanged(it.height) }
         ) {
             DateRangeCalendar(

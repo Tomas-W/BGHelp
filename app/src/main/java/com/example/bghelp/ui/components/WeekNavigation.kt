@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -66,13 +67,13 @@ fun WeekNavigation(
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 12.dp),
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -113,7 +114,7 @@ fun WeekNavigation(
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Week days
@@ -124,44 +125,62 @@ fun WeekNavigation(
                 val selectedDayTextColor = MaterialTheme.colorScheme.onPrimary
                 
                 val dayModifier = Modifier
-                    .size(Sizes.Icon.XXXL)
-                    .let { baseModifier ->
-                        if (isToday) {
-                            baseModifier.clip(CircleShape).border(2.dp, Color.Black, CircleShape)
-                        } else {
-                            baseModifier
-                        }
-                    }
+                    .weight(1f)
+                    .aspectRatio(1f)
                     .clickableRipple(onClick = { onDaySelected(day) })
 
                 Box(
                     modifier = dayModifier,
                     contentAlignment = Alignment.Center
                 ) {
-                    if (isSelected) {
-                        Box(
-                            modifier = Modifier
-                                .size(Sizes.Icon.XXXL)
-                                .clip(CircleShape)
-                                .background(selectedDayColor),
-                            contentAlignment = Alignment.Center
-                        ) {
+                    when {
+                        // Selected: show primary color circle
+                        isSelected -> {
+                            Box(
+                                modifier = Modifier
+                                    .size(Sizes.Icon.XXXL)
+                                    .clip(CircleShape)
+                                    .background(selectedDayColor),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "${day.dayOfMonth}",
+                                    style = TextStyles.Default.Bold.M,
+                                    color = selectedDayTextColor
+                                )
+                            }
+                            // Today border on top if also today
+                            if (isToday) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(Sizes.Icon.XXXL)
+                                        .clip(CircleShape)
+                                        .border(2.dp, Color.Black, CircleShape)
+                                )
+                            }
+                        }
+                        // Today: show bold text with black border circle
+                        isToday -> {
+                            Box(
+                                modifier = Modifier
+                                    .size(Sizes.Icon.XXXL)
+                                    .clip(CircleShape)
+                                    .border(2.dp, Color.Black, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "${day.dayOfMonth}",
+                                    style = TextStyles.Default.Bold.M
+                                )
+                            }
+                        }
+                        // Default: normal text
+                        else -> {
                             Text(
                                 text = "${day.dayOfMonth}",
-                                style = TextStyles.Default.Bold.M,
-                                color = selectedDayTextColor
+                                style = TextStyles.Default.M
                             )
                         }
-                    } else if (isToday) {
-                        Text(
-                            text = "${day.dayOfMonth}",
-                            style = TextStyles.Default.Bold.M
-                        )
-                    } else {
-                        Text(
-                            text = "${day.dayOfMonth}",
-                            style = TextStyles.Default.M
-                        )
                     }
                 }
             }
@@ -324,8 +343,8 @@ private fun WeekNavigationMonthDropdown(
                         onMonthSelected(month)
                         onMenuOpenChange(false)
                     },
-                    textStyle = if (isSelected) TextStyles.Default.Bold.M else TextStyles.Default.M,
-                    spacing = Sizes.Icon.S
+                    textStyle = if (isSelected) TextStyles.Default.Bold.S else TextStyles.Default.M,
+                    spacing = Sizes.Icon.XS
                 )
             }
         }
@@ -378,7 +397,7 @@ private fun WeekNavigationYearDropdown(
                         onMenuOpenChange(false)
                     },
                     textStyle = if (isSelected) TextStyles.Default.Bold.M else TextStyles.Default.M,
-                    spacing = Sizes.Icon.S
+                    spacing = Sizes.Icon.XS
                 )
             }
         }
