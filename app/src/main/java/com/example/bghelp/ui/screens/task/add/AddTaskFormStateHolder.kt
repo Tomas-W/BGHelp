@@ -249,6 +249,24 @@ class AddTaskFormStateHolder(
             }
         }
     }
+    
+    fun updateSnooze(snoozeIndex: Int, value: Int? = null, timeUnit: TimeUnit? = null) {
+        val validatedValue = value?.coerceIn(AddTaskConstants.MIN_SNOOZE, AddTaskConstants.MAX_SNOOZE)
+        
+        _formState.update { state ->
+            when (snoozeIndex) {
+                1 -> state.copy(
+                    snoozeValue1 = validatedValue ?: state.snoozeValue1,
+                    snoozeUnit1 = timeUnit ?: state.snoozeUnit1
+                )
+                2 -> state.copy(
+                    snoozeValue2 = validatedValue ?: state.snoozeValue2,
+                    snoozeUnit2 = timeUnit ?: state.snoozeUnit2
+                )
+                else -> state
+            }
+        }
+    }
     // REMIND
 
     // SOUND

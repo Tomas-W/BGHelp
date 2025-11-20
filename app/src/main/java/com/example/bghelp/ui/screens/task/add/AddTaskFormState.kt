@@ -34,6 +34,10 @@ data class AddTaskFormState(
     val soundSelection: UserSoundSelection = UserSoundSelection.OFF,
     val selectedAudioFile: String = "",
     val vibrateSelection: UserVibrateSelection = UserVibrateSelection.OFF,
+    val snoozeValue1: Int = AddTaskConstants.SNOOZE_A_VALUE,
+    val snoozeUnit1: TimeUnit = TimeUnit.MINUTES,
+    val snoozeValue2: Int = AddTaskConstants.SNOOZE_B_VALUE,
+    val snoozeUnit2: TimeUnit = TimeUnit.HOURS,
     
     val noteSelection: UserNoteSelection = UserNoteSelection.OFF,
     val note: String = "",

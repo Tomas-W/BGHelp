@@ -3,6 +3,7 @@ package com.example.bghelp.ui.screens.task.add
 import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.CreateTask
 import com.example.bghelp.domain.model.FeatureColor
+import com.example.bghelp.domain.model.ReminderOffsetUnit
 import com.example.bghelp.domain.model.TaskImageAttachment
 import com.example.bghelp.utils.TaskMapper
 import java.time.LocalDate
@@ -35,6 +36,10 @@ object AddTaskAssembler {
         soundMode: AlarmMode,
         vibrateMode: AlarmMode,
         soundUri: String?,
+        snoozeValue1: Int,
+        snoozeUnit1: TimeUnit,
+        snoozeValue2: Int,
+        snoozeUnit2: TimeUnit,
         color: FeatureColor,
         image: TaskImageAttachment?,
         description: String?,
@@ -74,6 +79,12 @@ object AddTaskAssembler {
         } else emptyList()
 
         val taskLocations = with(TaskMapper) { locations.toDomainLocations() }
+        
+        val snoozeUnit1Domain = snoozeUnit1.toDomainUnit()
+        val snoozeUnit2Domain = snoozeUnit2.toDomainUnit()
+        if (snoozeUnit1Domain == null || snoozeUnit2Domain == null) {
+            return BuildResult.Error("Invalid snooze unit")
+        }
 
         val create = CreateTask(
             date = startDateTime,
@@ -89,11 +100,23 @@ object AddTaskAssembler {
             vibrate = vibrateMode,
             soundUri = soundUri,
             snoozeTime = 0,
+            snoozeValue1 = snoozeValue1,
+            snoozeUnit1 = snoozeUnit1Domain,
+            snoozeValue2 = snoozeValue2,
+            snoozeUnit2 = snoozeUnit2Domain,
             color = color,
             image = image,
             reminders = taskReminders,
             locations = taskLocations
         )
         return BuildResult.Success(create)
+    }
+    
+    private fun TimeUnit.toDomainUnit(): ReminderOffsetUnit? = when (this) {
+        TimeUnit.MINUTES -> ReminderOffsetUnit.MINUTES
+        TimeUnit.HOURS -> ReminderOffsetUnit.HOURS
+        TimeUnit.DAYS -> ReminderOffsetUnit.DAYS
+        TimeUnit.WEEKS -> ReminderOffsetUnit.WEEKS
+        TimeUnit.MONTHS -> ReminderOffsetUnit.MONTHS
     }
 }

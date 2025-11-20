@@ -368,6 +368,18 @@ class AddTaskViewModel @Inject constructor(
     ) {
         formStateHolder.updateReminder(reminderType, reminderId, value, timeUnit)
     }
+    
+    fun updateSnooze(snoozeIndex: Int, value: Int? = null, timeUnit: TimeUnit? = null) {
+        formStateHolder.updateSnooze(snoozeIndex, value, timeUnit)
+    }
+    
+    fun setActiveSnoozeInput(snoozeIndex: Int) {
+        _activeReminderInput.value = ActiveReminderInput(RemindType.START, -1, snoozeIndex)
+        setCalendarVisible(false)
+        clearTimeInputSelection()
+        clearTitleInputSelection()
+        _keyboardDismissKey.value++
+    }
 
     fun setActiveReminderInput(type: RemindType, id: Int) {
         _activeReminderInput.value = ActiveReminderInput(type, id)
@@ -407,6 +419,20 @@ class AddTaskViewModel @Inject constructor(
         formStateHolder.toggleVibrateSelection()
     }
     // VIBRATE
+    
+    // SNOOZE
+    val snoozeValue1: StateFlow<Int> = formState.map { it.snoozeValue1 }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AddTaskConstants.SNOOZE_A_VALUE)
+    
+    val snoozeUnit1: StateFlow<TimeUnit> = formState.map { it.snoozeUnit1 }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TimeUnit.MINUTES)
+    
+    val snoozeValue2: StateFlow<Int> = formState.map { it.snoozeValue2 }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AddTaskConstants.SNOOZE_B_VALUE)
+    
+    val snoozeUnit2: StateFlow<TimeUnit> = formState.map { it.snoozeUnit2 }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TimeUnit.HOURS)
+    // SNOOZE
 
     // NOTE
     val userNoteSelection: StateFlow<UserNoteSelection> = formState.map { it.noteSelection }

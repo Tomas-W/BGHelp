@@ -62,5 +62,12 @@ fun Remind(
             userSectionSelection = userVibrateSelection,
             toggleSection = { viewModel.toggleVibrateSelection() }
         )
+
+        AddTaskSpacerMedium()
+
+        // Snooze
+        SnoozeSelection(
+            viewModel = viewModel
+        )
     }
 }

@@ -4,6 +4,7 @@ import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.CreateFeatureColor
 import com.example.bghelp.domain.model.CreateTask
 import com.example.bghelp.domain.model.FeatureColor
+import com.example.bghelp.domain.model.ReminderOffsetUnit
 import java.time.LocalDateTime
 
 object ColorSeeds {
@@ -65,8 +66,11 @@ object TaskSeeds {
     private fun randomAlarmName(): String? = alarmNames.random()
 
     private fun randomAlarmMode(): AlarmMode = AlarmMode.entries.random()
-
-    private fun randomSnoozeTime(): Int = listOf(0, 15, 30).random()
+    private fun randomSnoozeTime(): Int = listOf(5, 10, 15, 30).random()
+    private fun randomSnoozeValue1(): Int = listOf(5, 10, 15, 30).random()
+    private fun randomSnoozeUnit1(): ReminderOffsetUnit = ReminderOffsetUnit.MINUTES
+    private fun randomSnoozeValue2(): Int = listOf(1, 2, 3).random()
+    private fun randomSnoozeUnit2(): ReminderOffsetUnit = ReminderOffsetUnit.HOURS
 
     private fun randomNote(): String? = noteOptions.random()
 
@@ -90,6 +94,10 @@ object TaskSeeds {
                 sound = randomAlarmMode(),
                 vibrate = randomAlarmMode(),
                 snoozeTime = randomSnoozeTime(),
+                snoozeValue1 = randomSnoozeValue1(),
+                snoozeUnit1 = randomSnoozeUnit1(),
+                snoozeValue2 = randomSnoozeValue2(),
+                snoozeUnit2 = randomSnoozeUnit2(),
                 endDate = task1Date.plusHours(2),
                 allDay = false,
                 note = randomNote(),
@@ -105,6 +113,10 @@ object TaskSeeds {
                 sound = randomAlarmMode(),
                 vibrate = randomAlarmMode(),
                 snoozeTime = randomSnoozeTime(),
+                snoozeValue1 = randomSnoozeValue1(),
+                snoozeUnit1 = randomSnoozeUnit1(),
+                snoozeValue2 = randomSnoozeValue2(),
+                snoozeUnit2 = randomSnoozeUnit2(),
                 endDate = task2Date.plusHours(3),
                 allDay = false,
                 note = randomNote(),
@@ -120,6 +132,10 @@ object TaskSeeds {
                 sound = randomAlarmMode(),
                 vibrate = randomAlarmMode(),
                 snoozeTime = randomSnoozeTime(),
+                snoozeValue1 = randomSnoozeValue1(),
+                snoozeUnit1 = randomSnoozeUnit1(),
+                snoozeValue2 = randomSnoozeValue2(),
+                snoozeUnit2 = randomSnoozeUnit2(),
                 endDate = null,
                 allDay = false,
                 note = randomNote(),
@@ -135,6 +151,10 @@ object TaskSeeds {
                 sound = randomAlarmMode(),
                 vibrate = randomAlarmMode(),
                 snoozeTime = randomSnoozeTime(),
+                snoozeValue1 = randomSnoozeValue1(),
+                snoozeUnit1 = randomSnoozeUnit1(),
+                snoozeValue2 = randomSnoozeValue2(),
+                snoozeUnit2 = randomSnoozeUnit2(),
                 endDate = null,
                 allDay = true,
                 note = randomNote(),

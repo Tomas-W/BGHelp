@@ -6,6 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.bghelp.constants.DatabaseConstants as DB
 import com.example.bghelp.domain.model.AlarmMode
+import com.example.bghelp.domain.model.ReminderOffsetUnit
 import com.example.bghelp.domain.model.TaskImageSourceOption
 
 @Entity(
@@ -38,6 +39,10 @@ data class TaskEntity(
     val vibrate: AlarmMode,
     val soundUri: String?,
     val snoozeMinutes: Int,
+    val snoozeValue1: Int,
+    val snoozeUnit1: ReminderOffsetUnit,
+    val snoozeValue2: Int,
+    val snoozeUnit2: ReminderOffsetUnit,
     val colorId: Int = 1,
     val imageUri: String?,
     val imageName: String?,

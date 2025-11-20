@@ -3,8 +3,10 @@ package com.example.bghelp.ui.screens.task.add.remind
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -35,183 +37,119 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import com.example.bghelp.R
 import com.example.bghelp.ui.components.CustomDropdown
 import com.example.bghelp.ui.components.DropdownItem
 import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableRipple
-import com.example.bghelp.ui.components.clickableRippleDismiss
+import com.example.bghelp.ui.screens.task.add.ActiveReminderInput
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
-import com.example.bghelp.ui.screens.task.add.AddTaskSpacerMedium
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
-import com.example.bghelp.ui.screens.task.add.Reminder
-import com.example.bghelp.ui.screens.task.add.RemindType
-import com.example.bghelp.ui.screens.task.add.UserDateSelection
-import com.example.bghelp.ui.screens.task.add.deselectedStyle
 import com.example.bghelp.ui.screens.task.add.TimeUnit
+import com.example.bghelp.ui.screens.task.add.deselectedStyle
 import com.example.bghelp.ui.screens.task.add.highlightedStyle
 import com.example.bghelp.ui.theme.Sizes
+import com.example.bghelp.ui.theme.TextStyles
 
 @Composable
-fun BeforeSelection (
-    viewModel: AddTaskViewModel,
-) {
-    val startReminders by viewModel.startReminders.collectAsState()
-    val endReminders by viewModel.endReminders.collectAsState()
-    val isEndTimeVisible by viewModel.isEndTimeVisible.collectAsState()
-    val userDateSelection by viewModel.userDateSelection.collectAsState()
-    val showEndReminders = isEndTimeVisible && userDateSelection != UserDateSelection.ON
-
-    // Before Start
-    AddReminder(
-        remindType = RemindType.START,
-        onClick = { viewModel.addReminder(RemindType.START) },
-        viewModel = viewModel
-    )
-    AddTaskSpacerSmall()
-
-    // Before start items
-    startReminders.forEach { reminder ->
-        ReminderItem(
-            reminder = reminder,
-            remindType = RemindType.START,
-            viewModel = viewModel
-        )
-    }
-    if (startReminders.isNotEmpty()) AddTaskSpacerMedium()
-
-    // Before end - only show if end time is visible and not all-day
-    if (showEndReminders) {
-        AddReminder(
-            remindType = RemindType.END,
-            onClick = { viewModel.addReminder(RemindType.END) },
-            viewModel = viewModel
-        )
-        AddTaskSpacerSmall()
-
-        // Before end items
-        endReminders.forEach { reminder ->
-            ReminderItem(
-                reminder = reminder,
-                remindType = RemindType.END,
-                viewModel = viewModel
-            )
-        }
-    }
-}
-
-@Composable
-private fun AddReminder(
-    remindType: RemindType,
-    onClick: () -> Unit,
+fun SnoozeSelection(
     viewModel: AddTaskViewModel
 ) {
-    val remindTypeChoices = remember { mapOf(
-        RemindType.START to STR.BEFORE_START,
-        RemindType.END to STR.BEFORE_END) }
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Before / after start
-        Text(
-            modifier = Modifier
-                .widthIn(min = CONST.MIN_WIDTH.dp),
-            text = remindTypeChoices[remindType]!!,
-            style = deselectedStyle,
-        )
-
-        Spacer(modifier = Modifier.width(Sizes.Icon.M))
-
-        // + Icon
-        WithRipple {
-            Box(
-                modifier = Modifier
-                    .clickableRippleDismiss(
-                        onClick = {
-                            viewModel.clearReminderInputSelection()
-                            onClick()
-                        },
-                        radius = Sizes.Icon.S
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    modifier = Modifier.size(Sizes.Icon.S),
-                    painter = painterResource(R.drawable.add),
-                    contentDescription = STR.ADD_REMINDER
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ReminderItem(
-    reminder: Reminder,
-    remindType: RemindType,
-    viewModel: AddTaskViewModel
-) {
+    val snoozeValue1 by viewModel.snoozeValue1.collectAsState()
+    val snoozeUnit1 by viewModel.snoozeUnit1.collectAsState()
+    val snoozeValue2 by viewModel.snoozeValue2.collectAsState()
+    val snoozeUnit2 by viewModel.snoozeUnit2.collectAsState()
     val activeReminderInput by viewModel.activeReminderInput.collectAsState()
-    val isNumberActive = activeReminderInput?.type == remindType && 
-                        activeReminderInput?.id == reminder.id &&
-                        activeReminderInput?.snoozeIndex == null
-
+    
+    // Header
     Row(
-        modifier = Modifier
-            .padding(vertical = 6.dp),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Input field
+        Icon(
+            modifier = Modifier.size(Sizes.Icon.M),
+            painter = painterResource(R.drawable.snooze),
+            contentDescription = STR.SNOOZE_TIME
+        )
+        
+        Spacer(modifier = Modifier.width(Sizes.Icon.M))
+        
+        Text(
+            modifier = Modifier.weight(1f),
+            text = STR.SNOOZE_TIME,
+            style = TextStyles.Grey.Bold.M
+        )
+    }
+    
+    AddTaskSpacerSmall()
+    
+    // Snooze inputs
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        SnoozeInput(
+            value = snoozeValue1,
+            unit = snoozeUnit1,
+            snoozeIndex = 1,
+            viewModel = viewModel,
+            activeReminderInput = activeReminderInput
+        )
+        
+        AddTaskSpacerSmall()
+        
+        SnoozeInput(
+            value = snoozeValue2,
+            unit = snoozeUnit2,
+            snoozeIndex = 2,
+            viewModel = viewModel,
+            activeReminderInput = activeReminderInput
+        )
+    }
+}
+
+@Composable
+private fun SnoozeInput(
+    value: Int,
+    unit: TimeUnit,
+    snoozeIndex: Int,
+    viewModel: AddTaskViewModel,
+    activeReminderInput: ActiveReminderInput?
+) {
+    val isActive = activeReminderInput?.snoozeIndex == snoozeIndex
+    
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(Sizes.Size.L),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         TimeInput(
-            value = reminder.value,
+            value = value,
             onValueChange = { newValue: Int ->
-                viewModel.updateReminder(remindType, reminder.id, value = newValue)
+                viewModel.updateSnooze(snoozeIndex, value = newValue)
             },
-            isActive = isNumberActive,
+            isActive = isActive,
             onActiveChange = { active: Boolean ->
                 if (active) {
-                    viewModel.setActiveReminderInput(remindType, reminder.id)
+                    viewModel.setActiveSnoozeInput(snoozeIndex)
                 } else {
                     viewModel.clearReminderInputSelection()
                 }
             }
         )
-
-        Spacer(modifier = Modifier.width(Sizes.Size.L))
-
-        // Dropdown
+        
         TimeDropdown(
-            selectedUnit = reminder.timeUnit,
+            selectedUnit = unit,
             onUnitSelected = { newUnit: TimeUnit ->
-                viewModel.updateReminder(remindType, reminder.id, timeUnit = newUnit)
+                viewModel.updateSnooze(snoozeIndex, timeUnit = newUnit)
             },
             onDropdownClick = {
                 viewModel.clearReminderInputSelection()
             }
         )
-
-        Spacer(modifier = Modifier.width(Sizes.Size.L))
-
-        // Delete icon
-        WithRipple {
-            Box(
-                modifier = Modifier
-                    .clickableRippleDismiss(
-                        onClick = { viewModel.removeReminder(remindType, reminder.id) },
-                        radius = Sizes.Icon.M
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    modifier = Modifier.size(Sizes.Icon.M),
-                    painter = painterResource(R.drawable.delete),
-                    contentDescription = STR.REMOVE_REMINDER
-                )
-            }
-        }
     }
 }
 
@@ -273,7 +211,6 @@ private fun TimeInput(
             onDone = { dismissKeyboard() }
         ),
         singleLine = true
-
     )
 
     LaunchedEffect(isActive) {
@@ -366,3 +303,4 @@ private fun TimeDropdown(
         }
     }
 }
+

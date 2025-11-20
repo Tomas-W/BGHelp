@@ -24,6 +24,10 @@ object AddTaskConstants {
     const val REMINDER_START = 0
     const val MIN_REMINDER = 0
     const val MAX_REMINDER = 999
+    const val SNOOZE_A_VALUE = 10
+    const val SNOOZE_B_VALUE = 1
+    const val MIN_SNOOZE = 1
+    const val MAX_SNOOZE = 999
     // Image
     const val IMAGE_SIZE = 120
 }
@@ -69,6 +73,9 @@ object AddTaskStrings {
     const val VIBRATE_OFF = "Vibrate off"
     const val VIBRATE_ONCE = "Vibrate once"
     const val VIBRATE_CONTINUOUS = "Vibrate continuous"
+    
+    // Snooze
+    const val SNOOZE_TIME = "Snooze options"
     
     // Note
     const val SELECT_NOTE = "Select note"
@@ -220,7 +227,7 @@ data class Reminder(
 )
 enum class RemindType { START, END }
 enum class TimeUnit { MINUTES, HOURS, DAYS, WEEKS, MONTHS }
-data class ActiveReminderInput(val type: RemindType, val id: Int)
+data class ActiveReminderInput(val type: RemindType, val id: Int, val snoozeIndex: Int? = null)
 // Sound
 enum class UserSoundSelection(
     override val headerText: String,
