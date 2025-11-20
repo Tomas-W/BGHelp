@@ -57,7 +57,6 @@ fun WeekNavigation(
     onWeekSelected: (Int) -> Unit
 ) {
     val today = remember { LocalDate.now() }
-    val todayDayColor = MaterialTheme.colorScheme.secondary
     val monthFormatter = remember { DateTimeFormatter.ofPattern("MMMM") }
     val yearFormatter = remember { DateTimeFormatter.ofPattern("yyyy") }
     var isMonthMenuOpen by remember { mutableStateOf(false) }
@@ -121,33 +120,47 @@ fun WeekNavigation(
             weekDays.forEach { day ->
                 val isToday = day == today
                 val isSelected = selectedDate?.let { it == day } == true
-                // Set selected outline
+                val selectedDayColor = MaterialTheme.colorScheme.primary
+                val selectedDayTextColor = MaterialTheme.colorScheme.onPrimary
+                
                 val dayModifier = Modifier
                     .size(Sizes.Icon.XXXL)
-                    .let { if (isSelected) it.clip(CircleShape).border(2.dp, Color.Black, CircleShape) else it }
+                    .let { baseModifier ->
+                        if (isToday) {
+                            baseModifier.clip(CircleShape).border(2.dp, Color.Black, CircleShape)
+                        } else {
+                            baseModifier
+                        }
+                    }
                     .clickableRipple(onClick = { onDaySelected(day) })
 
                 Box(
                     modifier = dayModifier,
                     contentAlignment = Alignment.Center
                 ) {
-                    if (isToday) {
+                    if (isSelected) {
                         Box(
-                            // Set today color
                             modifier = Modifier
                                 .size(Sizes.Icon.XXXL)
                                 .clip(CircleShape)
-                                .background(todayDayColor),
+                                .background(selectedDayColor),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = "${day.dayOfMonth}",
-                                style = TextStyles.Default.Bold.M,)
+                                style = TextStyles.Default.Bold.M,
+                                color = selectedDayTextColor
+                            )
                         }
+                    } else if (isToday) {
+                        Text(
+                            text = "${day.dayOfMonth}",
+                            style = TextStyles.Default.Bold.M
+                        )
                     } else {
                         Text(
                             text = "${day.dayOfMonth}",
-                            style = if (isSelected) TextStyles.Default.Bold.M else TextStyles.Default.M
+                            style = TextStyles.Default.M
                         )
                     }
                 }

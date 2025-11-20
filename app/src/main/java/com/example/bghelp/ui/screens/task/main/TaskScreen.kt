@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.bghelp.domain.model.Task
-import com.example.bghelp.ui.components.CollapsibleWeekNavigation
+import com.example.bghelp.ui.components.CollapsibleDateSelector
 import com.example.bghelp.ui.components.LazyColumnContainer
 import com.example.bghelp.ui.components.MainContentContainer
 import com.example.bghelp.ui.components.MainHeader
@@ -57,15 +57,16 @@ fun TaskScreen(
     val selectedTasks by taskViewModel.tasksInRange.collectAsState(initial = emptyList())
     val selectedDate by taskViewModel.selectedDate.collectAsState()
     val expandedTaskIds by taskViewModel.expandedTaskIds.collectAsState()
-    // Week navigation
+    // Date selector (week navigation / calendar)
     val rawSelectedDate by remember { derivedStateOf { selectedDate.toLocalDate() } }
     val navYearMonth by taskViewModel.currentYearMonth.collectAsState()
+    val calendarMonth by taskViewModel.calendarMonth.collectAsState()
     val navWeekDisplay by taskViewModel.weekDisplay.collectAsState()
     val navWeekNumbers by taskViewModel.availableWeekNumbers.collectAsState()
     val navWeekDays by taskViewModel.weekDays.collectAsState()
-    val navSelectedDate = remember(rawSelectedDate, navWeekDays) {
-        navWeekDays.firstOrNull { it == rawSelectedDate }
-    }
+//    val navSelectedDate = remember(rawSelectedDate, navWeekDays) {
+//        navWeekDays.firstOrNull { it == rawSelectedDate }
+//    }
     // Scroll state
     val listState = rememberLazyListState()
     val savedIndex = taskViewModel.getSavedScrollIndex()
@@ -107,8 +108,8 @@ fun TaskScreen(
         isFirstComposition = false
     }
     
-    // Callback to update WeekNav height
-    val onWeekNavExpansionChanged: (Boolean, Dp) -> Unit = { _, height ->
+    // Callback to update date selector height
+    val onDateSelectorExpansionChanged: (Boolean, Dp) -> Unit = { _, height ->
         taskViewModel.updateWeekNavHeight(height)
     }
 
@@ -150,21 +151,23 @@ fun TaskScreen(
                 }
             }
 
-            // Collapsible week navigation at bottom
-            CollapsibleWeekNavigation(
+            // Collapsible date selector (week nav / calendar) at bottom
+            CollapsibleDateSelector(
+                modifier = Modifier.fillMaxWidth(),
                 currentYearMonth = navYearMonth,
+                calendarMonth = calendarMonth,
                 weekNumber = navWeekDisplay.number,
                 availableWeeks = navWeekNumbers,
                 weekDays = navWeekDays,
-                selectedDate = navSelectedDate,
+                selectedDate = rawSelectedDate,
                 onPreviousWeek = { taskViewModel.goToPreviousWeek() },
                 onNextWeek = { taskViewModel.goToNextWeek() },
                 onDaySelected = taskViewModel::goToDay,
                 onMonthSelected = taskViewModel::goToMonth,
                 onYearSelected = taskViewModel::goToYear,
                 onWeekSelected = taskViewModel::goToWeek,
-                onExpansionChanged = onWeekNavExpansionChanged,
-                modifier = Modifier.fillMaxWidth()
+                onCalendarMonthChanged = taskViewModel::setCalendarMonth,
+                onExpansionChanged = onDateSelectorExpansionChanged,
             )
         }
 

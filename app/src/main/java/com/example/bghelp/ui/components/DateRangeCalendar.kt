@@ -1,6 +1,7 @@
 package com.example.bghelp.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -59,7 +60,9 @@ fun DateRangeCalendar(
     isRangeMode: Boolean = true,
     minDate: LocalDate? = null,
     onDismissRequest: (() -> Unit)? = null,
-    onInvalidDateClicked: ((LocalDate) -> Unit)? = null
+    onInvalidDateClicked: ((LocalDate) -> Unit)? = null,
+    selectedDate: LocalDate? = null,
+    showDismissButton: Boolean = true
 ) {
     val monthFormatter = remember { DateTimeFormatter.ofPattern("MMMM") }
     val yearFormatter = remember { DateTimeFormatter.ofPattern("yyyy") }
@@ -74,7 +77,7 @@ fun DateRangeCalendar(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        CalendarDismissRow(onDismissRequest)
+        CalendarDismissRow(onDismissRequest, showDismissButton)
 
         CalendarMonthNavigation(
             currentMonth = currentMonth,
@@ -101,14 +104,15 @@ fun DateRangeCalendar(
             isRangeMode = isRangeMode,
             minDate = minDate,
             onDayClicked = onDayClicked,
-            onInvalidDateClicked = onInvalidDateClicked
+            onInvalidDateClicked = onInvalidDateClicked,
+            selectedDate = selectedDate
         )
     }
 }
 
 @Composable
-private fun CalendarDismissRow(onDismissRequest: (() -> Unit)?) {
-    if (onDismissRequest == null) return
+private fun CalendarDismissRow(onDismissRequest: (() -> Unit)?, showDismissButton: Boolean = true) {
+    if (onDismissRequest == null || !showDismissButton) return
 
     Row(
         modifier = Modifier
@@ -338,7 +342,8 @@ private fun CalendarWeeksGrid(
     isRangeMode: Boolean,
     minDate: LocalDate?,
     onDayClicked: (LocalDate) -> Unit,
-    onInvalidDateClicked: ((LocalDate) -> Unit)? = null
+    onInvalidDateClicked: ((LocalDate) -> Unit)? = null,
+    selectedDate: LocalDate? = null
 ) {
     val rangeStart = if (isRangeMode) minOf(startDate, endDate) else startDate
     val rangeEnd = if (isRangeMode) maxOf(startDate, endDate) else startDate
@@ -352,7 +357,7 @@ private fun CalendarWeeksGrid(
             ) {
                 week.forEach { day ->
                     val inCurrentMonth = day.month == currentMonth.month
-                    val isStart = day == startDate
+                    val isStart = isRangeMode && day == startDate
                     val isEnd = isRangeMode && day == endDate
                     val isBeforeMin = minDate?.let { day.isBefore(it) } ?: false
                     val isSelectable = !isBeforeMin
@@ -369,11 +374,13 @@ private fun CalendarWeeksGrid(
                         isEnd = isEnd,
                         inRange = inRange,
                         isSelectable = isSelectable,
+                        isRangeMode = isRangeMode,
                         rangeBackgroundColor = rangeBgColor,
                         startEndBackgroundColor = startEndBgColor,
                         startEndTextColor = startEndTextColor,
                         onClick = onDayClicked,
-                        onInvalidClick = onInvalidDateClicked
+                        onInvalidClick = onInvalidDateClicked,
+                        selectedDate = selectedDate
                     )
                 }
             }
@@ -390,55 +397,111 @@ private fun RowScope.CalendarDayCell(
     isEnd: Boolean,
     inRange: Boolean,
     isSelectable: Boolean,
+    isRangeMode: Boolean,
     rangeBackgroundColor: Color,
     startEndBackgroundColor: Color,
     startEndTextColor: Color,
     onClick: (LocalDate) -> Unit,
-    onInvalidClick: ((LocalDate) -> Unit)? = null
+    onInvalidClick: ((LocalDate) -> Unit)? = null,
+    selectedDate: LocalDate? = null
 ) {
-    Box(
-        modifier = Modifier
-            .weight(1f)
-            .aspectRatio(1f)
-            .clip(RoundedCornerShape(Sizes.Corner.S))
-            .background(
-                color = if (inRange && !isStart && !isEnd) rangeBackgroundColor else Color.Transparent
-            )
-            .clickable(
-                onClick = {
-                    if (isSelectable) {
-                        onClick(day)
-                    } else {
-                        onInvalidClick?.invoke(day)
-                    }
+    val today = remember { LocalDate.now() }
+    val isToday = day == today
+    val isSelected = selectedDate?.let { it == day } == true
+    
+    val dayModifier = Modifier
+        .weight(1f)
+        .aspectRatio(1f)
+        .clip(RoundedCornerShape(Sizes.Corner.S))
+        .background(
+            color = when {
+                inRange && !isStart && !isEnd -> rangeBackgroundColor
+                else -> Color.Transparent
+            }
+        )
+        .clickable(
+            onClick = {
+                if (isSelectable) {
+                    onClick(day)
+                } else {
+                    onInvalidClick?.invoke(day)
                 }
-            ),
+            }
+        )
+    
+    Box(
+        modifier = dayModifier,
         contentAlignment = Alignment.Center
     ) {
-        if ((isStart || isEnd) && isSelectable) {
-            Box(
-                modifier = Modifier
-                    .size(42.dp)
-                    .clip(CircleShape)
-                    .background(startEndBackgroundColor),
-                contentAlignment = Alignment.Center
-            ) {
+        when {
+            // Range mode: show start/end dates with primary color
+            (isStart || isEnd) && isSelectable && isRangeMode -> {
+                Box(
+                    modifier = Modifier
+                        .size(Sizes.Icon.XXXL)
+                        .clip(CircleShape)
+                        .background(startEndBackgroundColor),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = day.dayOfMonth.toString(),
+                        style = TextStyles.Default.Bold.M,
+                        color = startEndTextColor,
+                    )
+                }
+            }
+            // Selected (single date mode): show primary color circle with onPrimary text
+            isSelected -> {
+                Box(
+                    modifier = Modifier
+                        .size(Sizes.Icon.XXXL)
+                        .clip(CircleShape)
+                        .background(startEndBackgroundColor),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = day.dayOfMonth.toString(),
+                        style = TextStyles.Default.Bold.M,
+                        color = startEndTextColor
+                    )
+                }
+                // Today border on top if also today
+                if (isToday) {
+                    Box(
+                        modifier = Modifier
+                            .size(Sizes.Icon.XXXL)
+                            .clip(CircleShape)
+                            .border(2.dp, Color.Black, CircleShape)
+                    )
+                }
+            }
+            // Today: show bold text with black border circle
+            isToday -> {
+                Box(
+                    modifier = Modifier
+                        .size(Sizes.Icon.XXXL)
+                        .clip(CircleShape)
+                        .border(2.dp, Color.Black, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = day.dayOfMonth.toString(),
+                        style = TextStyles.Default.Bold.M
+                    )
+                }
+            }
+            // Default: normal text
+            else -> {
                 Text(
                     text = day.dayOfMonth.toString(),
-                    style = TextStyles.Default.Bold.M,
-                    color = startEndTextColor,
+                    style = TextStyles.Default.M,
+                    color = when {
+                        !isSelectable -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                        inCurrentMonth -> MaterialTheme.colorScheme.onSurface
+                        else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                    }
                 )
             }
-        } else {
-            Text(
-                text = day.dayOfMonth.toString(),
-                style = TextStyles.Default.M,
-                color = when {
-                    !isSelectable -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-                    inCurrentMonth -> MaterialTheme.colorScheme.onSurface
-                    else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-                }
-            )
         }
     }
 }

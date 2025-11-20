@@ -49,6 +49,8 @@ class TaskViewModel @Inject constructor(
 
     fun goToDay(day: LocalDate) {
         updateSelectedDate(day.atStartOfDay())
+        val weekStart = day.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        updateSelectedWeek(weekStart)
     }
 
     // Week
@@ -154,6 +156,15 @@ class TaskViewModel @Inject constructor(
             initialValue = YearMonth.of(_selectedWeek.value.year, _selectedWeek.value.month)
         )
 
+    // Calendar month (for calendar view)
+    private val _calendarMonth = MutableStateFlow<YearMonth>(
+        YearMonth.of(_selectedDate.value.year, _selectedDate.value.month)
+    )
+    val calendarMonth: StateFlow<YearMonth> = _calendarMonth.asStateFlow()
+
+    fun setCalendarMonth(yearMonth: YearMonth) {
+        _calendarMonth.value = yearMonth
+    }
 
     // Scroll Position
     private val _savedScrollIndex = MutableStateFlow(0)

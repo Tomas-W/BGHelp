@@ -69,7 +69,7 @@ fun SubContainer(
     hasInputStart: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    var inputPaddingOffset =
+    val inputPaddingOffset =
         if (hasInputStart) {
             2 * Sizes.Icon.M - 6.dp
         } else {
@@ -79,7 +79,7 @@ fun SubContainer(
         modifier = modifier
             .fillMaxWidth()
             .padding(
-                start = inputPaddingOffset
+                start = inputPaddingOffset,
             )
     ) {
         content()

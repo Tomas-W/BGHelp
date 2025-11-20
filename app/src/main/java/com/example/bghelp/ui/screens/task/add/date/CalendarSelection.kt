@@ -30,6 +30,7 @@ fun CalendarSelection(
         onDismissRequest = { viewModel.setCalendarVisible(false) },
         onInvalidDateClicked = { clickedDate ->
             viewModel.showSnackbar(AddTaskStrings.DATE_CANNOT_BE_IN_PAST)
-        }
+        },
+        selectedDate = if (!isEndDateVisible) dateStartSelection else null
     )
 }
