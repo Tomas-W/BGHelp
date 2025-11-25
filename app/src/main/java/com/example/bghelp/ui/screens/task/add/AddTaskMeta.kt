@@ -134,8 +134,8 @@ object AddTaskStrings {
     // Actions
     const val CANCEL = "Cancel"
     const val SAVING = "Saving..."
-    const val SAVE_TASK = "Save Task"
-    const val EDIT_TASK = "Edit Task"
+    const val SAVE_TASK = "Save"
+    const val EDIT_TASK = "Edit"
     const val RESET_FORM = "Reset form"
     const val UNDO_RESET_FORM = "Undo reset"
     

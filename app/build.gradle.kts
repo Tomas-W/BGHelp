@@ -60,6 +60,22 @@ android {
     buildFeatures {
         compose = true
     }
+    
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force("androidx.vectordrawable:vectordrawable:1.2.0")
+        force("androidx.vectordrawable:vectordrawable-animated:1.2.0")
+    }
 }
 
 dependencies {

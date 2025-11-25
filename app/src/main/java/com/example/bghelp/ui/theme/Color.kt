@@ -9,9 +9,12 @@ val TextWhite = Color(255, 255, 255)
 
 val MainBlue = Color(51, 102, 178)
 val SecondaryBlue = Color(200, 220, 245)
-val BackgroundGrey = Color(237, 237, 237)
+val BackgroundGrey = Color(245, 245, 245)
+val BackgroundHighlight = Color(237, 237, 237)
 val SecondaryGrey = Color(210, 210, 210)
-val TertiaryGrey = Color(155, 155, 155)
+val TertiaryGrey = Color(185, 185, 185)
+
+val PrimaryOutline = SecondaryGrey
 
 val TaskDefault = SecondaryBlue // Linked to domain/constants/Seeds.kt for now
 

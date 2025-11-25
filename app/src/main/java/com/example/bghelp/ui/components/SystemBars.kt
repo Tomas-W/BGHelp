@@ -10,10 +10,12 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 fun SystemBars() {
     val systemUiController = rememberSystemUiController()
     val backgroundColor = MaterialTheme.colorScheme.background
+    val statusBarColor = backgroundColor
+    val navigationBarColor = backgroundColor
     val useDarkIcons = backgroundColor.luminance() > 0.5f
 
     SideEffect {
-        systemUiController.setStatusBarColor(backgroundColor, darkIcons = useDarkIcons)
-        systemUiController.setNavigationBarColor(backgroundColor, darkIcons = useDarkIcons)
+        systemUiController.setStatusBarColor(statusBarColor, darkIcons = useDarkIcons)
+        systemUiController.setNavigationBarColor(navigationBarColor, darkIcons = useDarkIcons)
     }
 }

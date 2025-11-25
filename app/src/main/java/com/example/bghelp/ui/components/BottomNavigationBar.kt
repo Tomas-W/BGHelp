@@ -1,6 +1,8 @@
 package com.example.bghelp.ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -32,7 +34,9 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.bghelp.R
 import com.example.bghelp.constants.UiConstants as UI
 import com.example.bghelp.ui.navigation.Screen
+import com.example.bghelp.ui.theme.BackgroundHighlight
 import com.example.bghelp.ui.theme.Sizes
+import com.example.bghelp.ui.utils.topBorder
 
 @Composable
 private fun getIconResource(screen: Screen, currentRoute: String?): Int {
@@ -156,12 +160,17 @@ fun BottomNavigationBar(
         modifier = modifier
             .fillMaxWidth()
             .height(totalHeight)
-            .padding(horizontal = 12.dp),
+            .topBorder(),
         windowInsets = WindowInsets(
             bottom = navigationBarHeight,
             top = 12.dp
         )
     ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp)
+        ) {
         // Tasks
         NavigationItem(
             screen = Screen.Tasks.Main,
@@ -178,7 +187,7 @@ fun BottomNavigationBar(
             onClick = { navigateTo(Screen.Targets.Main.route) }
         )
 
-         // Items
+        // Items
         NavigationItem(
             screen = Screen.Items.Main,
             currentRoute = currentRoute,
@@ -199,22 +208,22 @@ fun BottomNavigationBar(
         NavigationBarItem(
             selected = isOptionsRouteActive,
             onClick = { onOptionsClick?.invoke() ?: Unit },
-            icon = { 
+            icon = {
                 Image(
                     painter = painterResource(optionsIconRes),
                     contentDescription = "Options",
                     modifier = Modifier.size(Sizes.Icon.L),
                     colorFilter = ColorFilter.tint(
                         if (isOptionsRouteActive) MaterialTheme.colorScheme.onSurface
-                         else MaterialTheme.colorScheme.onTertiary
+                        else MaterialTheme.colorScheme.onTertiary
                     )
                 )
             },
-            label = { 
+            label = {
                 Text(
                     text = "Options",
                     color = if (isOptionsRouteActive) MaterialTheme.colorScheme.onSurface
-                            else MaterialTheme.colorScheme.onTertiary,
+                    else MaterialTheme.colorScheme.onTertiary,
                     fontWeight = if (isOptionsRouteActive) FontWeight.Bold else FontWeight.Normal,
                 )
             },
@@ -228,5 +237,6 @@ fun BottomNavigationBar(
                 disabledTextColor = MaterialTheme.colorScheme.onTertiary
             )
         )
+        }
     }
 }

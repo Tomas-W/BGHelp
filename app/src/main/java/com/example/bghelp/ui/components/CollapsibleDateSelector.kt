@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -28,6 +29,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -36,6 +38,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.example.bghelp.R
+import com.example.bghelp.ui.theme.BackgroundHighlight
 import com.example.bghelp.ui.theme.MainBlue
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.utils.bottomBorder
@@ -98,14 +101,8 @@ fun CollapsibleDateSelector(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.background)
             .topBorder(
-                strokeWidth = 2.dp,
                 color = if (isExpanded) MaterialTheme.colorScheme.outline else Color.Transparent
-            )
-            .bottomBorder(
-                strokeWidth = 2.dp,
-                color = MaterialTheme.colorScheme.outline
             )
     ) {
         ToggleButtonRow(
@@ -170,19 +167,13 @@ private fun ToggleButtonRow(
     onRightArrowClick: () -> Unit,
     onSizeChanged: (Int) -> Unit
 ) {
-    val isExpanded = currentView != DateSelectorView.COLLAPSED
-    
     val leftArrowPointsDown = currentView == DateSelectorView.WEEK_NAV
     val rightArrowPointsDown = currentView == DateSelectorView.CALENDAR
     
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .onSizeChanged { onSizeChanged(it.height) }
-            .bottomBorder(
-                strokeWidth = 2.dp,
-                color = if (!isExpanded) MaterialTheme.colorScheme.outline else Color.Transparent
-            ),
+            .onSizeChanged { onSizeChanged(it.height) },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {

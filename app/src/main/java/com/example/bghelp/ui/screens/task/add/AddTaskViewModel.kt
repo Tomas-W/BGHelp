@@ -588,6 +588,10 @@ class AddTaskViewModel @Inject constructor(
 
     val isNewTaskValid: StateFlow<Boolean> = validationState.isFormValid
 
+    fun getValidationError(): String? {
+        return validationState.validateForm(formState.value)
+    }
+
     fun consumeSaveState() {
         _saveState.value = SaveTaskState.Idle
     }

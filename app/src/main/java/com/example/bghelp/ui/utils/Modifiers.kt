@@ -9,12 +9,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.example.bghelp.ui.theme.PrimaryOutline
 
 @Composable
 fun Modifier.dismissKeyboardOnTap(
@@ -50,29 +53,37 @@ fun Modifier.clickableDismissFocus(
 }
 
 fun Modifier.topBorder(
-    strokeWidth: Dp,
-    color: Color
+    strokeWidth: Dp = 1.dp,
+    color: Color = PrimaryOutline
 ) = this.then(
-    Modifier.drawBehind {
+    Modifier.drawWithContent {
+        drawContent()
+
+        val strokePx = strokeWidth.toPx()
+        val halfStroke = strokePx / 2
         drawLine(
             color = color,
-            start = Offset(0f, 0f),
-            end = Offset(size.width, 0f),
-            strokeWidth = strokeWidth.toPx()
+            start = Offset(0f, halfStroke),
+            end = Offset(size.width, halfStroke),
+            strokeWidth = strokePx
         )
     }
 )
 
 fun Modifier.bottomBorder(
-    strokeWidth: Dp,
-    color: Color
+    strokeWidth: Dp = 1.dp,
+    color: Color = PrimaryOutline
 ) = this.then(
-    Modifier.drawBehind {
+    Modifier.drawWithContent {
+        drawContent()
+
+        val strokePx = strokeWidth.toPx()
+        val halfStroke = strokePx / 2
         drawLine(
             color = color,
-            start = Offset(0f, size.height),
-            end = Offset(size.width, size.height),
-            strokeWidth = strokeWidth.toPx()
+            start = Offset(0f, size.height - halfStroke),
+            end = Offset(size.width, size.height - halfStroke),
+            strokeWidth = strokePx
         )
     }
 )
