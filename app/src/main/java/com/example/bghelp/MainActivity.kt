@@ -45,6 +45,4 @@ class MainActivity : ComponentActivity() {
 
 // TODO: Loading indicators
 
-// TODO: Undo addtask form reset for 5 sec?
-
 // TODO: Rename table columns for clarity and sync them around

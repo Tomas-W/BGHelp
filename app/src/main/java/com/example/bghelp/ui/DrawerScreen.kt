@@ -34,8 +34,6 @@ import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
 import com.example.bghelp.constants.UiConstants as UI
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextBlack
-import com.example.bghelp.ui.theme.TextGrey
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.navigation.Screen
 
@@ -63,7 +61,7 @@ fun OptionsDrawer(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = bottomOffset)
-                .background(Color.Black.copy(alpha = 0.3f))
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
                 .clickable(onClick = onDismiss)
         )
     }
@@ -143,10 +141,10 @@ private fun DrawerItem(
     }
     
     val colors = NavigationDrawerItemDefaults.colors(
-        selectedIconColor = TextBlack,
-        selectedTextColor = TextBlack,
-        unselectedIconColor = TextGrey,
-        unselectedTextColor = TextGrey
+        selectedIconColor = MaterialTheme.colorScheme.onSurface,
+        selectedTextColor = MaterialTheme.colorScheme.onSurface,
+        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
     )
     
     NavigationDrawerItem(

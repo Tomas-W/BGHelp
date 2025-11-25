@@ -68,9 +68,9 @@ private class TextStyleBranch(
 object TextStyles {
     private fun colorGroup(color: Color): ColorGroup = ColorGroup(color)
 
-    val Default = colorGroup(TextBlack)
-    val Grey = colorGroup(TextGrey)
-    val White = colorGroup(TextWhite)
+    val Default = colorGroup(ColorBlack)
+    val Grey = colorGroup(ColorGrey)
+    val White = colorGroup(ColorWhite)
     val Error = colorGroup(ErrorRed)
     val Warning = colorGroup(WarningOrange)
     val Success = colorGroup(SuccessGreen)
@@ -117,7 +117,7 @@ object TextStyles {
     fun custom(
         size: Float,
         weight: FontWeight = FontWeight.Normal,
-        color: Color = TextBlack,
+        color: Color = ColorBlack,
         style: FontStyle = FontStyle.Normal
     ): TextStyle = create(size, color, weight, style)
 }

@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,8 +40,6 @@ import com.example.bghelp.ui.components.MainContentContainer
 import com.example.bghelp.ui.components.MainHeader
 import com.example.bghelp.ui.components.OptionsModal
 import com.example.bghelp.ui.navigation.Screen
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings
-import com.example.bghelp.ui.theme.MainBlue
 import com.example.bghelp.utils.toDayHeader
 
 @SuppressLint("FrequentlyChangingValue", "FrequentlyChangedStateReadInComposition")
@@ -189,7 +188,7 @@ fun TaskScreen(
                             launchSingleTop = true
                         }
                     },
-                    containerColor = MainBlue,
+                    containerColor = MaterialTheme.colorScheme.primary,
                     shape = CircleShape,
                     modifier = Modifier.offset(y = -animatedWeekNavHeight)
                 ) {

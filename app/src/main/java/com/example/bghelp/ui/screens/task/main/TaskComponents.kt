@@ -40,7 +40,6 @@ import com.example.bghelp.R
 import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.Task
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextGrey
 import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.theme.TextSizes
 import com.example.bghelp.utils.formatSnoozeDuration
@@ -140,7 +139,7 @@ fun DayComponent(
                 Text(
                     text = "CANCEL",
                     fontSize = 56.sp,
-                    color = TextGrey,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 5.sp
                 )

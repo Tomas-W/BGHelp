@@ -11,10 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.example.bghelp.ui.theme.Sizes
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -3,12 +3,10 @@ package com.example.bghelp.ui.utils
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -17,7 +15,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.bghelp.ui.theme.PrimaryOutline
+import com.example.bghelp.ui.theme.SecondaryGrey
 
 @Composable
 fun Modifier.dismissKeyboardOnTap(
@@ -54,7 +52,7 @@ fun Modifier.clickableDismissFocus(
 
 fun Modifier.topBorder(
     strokeWidth: Dp = 1.dp,
-    color: Color = PrimaryOutline
+    color: Color = SecondaryGrey
 ) = this.then(
     Modifier.drawWithContent {
         drawContent()
@@ -72,7 +70,7 @@ fun Modifier.topBorder(
 
 fun Modifier.bottomBorder(
     strokeWidth: Dp = 1.dp,
-    color: Color = PrimaryOutline
+    color: Color = SecondaryGrey
 ) = this.then(
     Modifier.drawWithContent {
         drawContent()

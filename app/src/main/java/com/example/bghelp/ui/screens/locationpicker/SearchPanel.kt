@@ -27,7 +27,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.ui.screens.locationpicker.LocationPickerStrings as STR
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextBlack
 import com.example.bghelp.ui.theme.TextStyles
 
 @Composable
@@ -73,10 +72,10 @@ fun SearchPanel(
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = TextBlack,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface,
                 disabledBorderColor = MaterialTheme.colorScheme.outline,
-                focusedLeadingIconColor = TextBlack,
-                unfocusedLeadingIconColor = TextBlack
+                focusedLeadingIconColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurface
             )
         )
 
