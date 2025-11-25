@@ -69,7 +69,6 @@ class LocationPickerViewModel @Inject constructor(
 
     private var searchJob: Job? = null
     private var sessionToken: AutocompleteSessionToken = AutocompleteSessionToken.newInstance()
-    private var hasLoadedInitialLocations: Boolean = false
 
     fun configureAllowMultiple(isAllowed: Boolean) {
         allowMultiple = isAllowed
@@ -77,8 +76,6 @@ class LocationPickerViewModel @Inject constructor(
 
     // Load previously selected locations from AddTaskScreen
     fun loadInitialLocations(locations: List<TaskLocation>) {
-        if (hasLoadedInitialLocations) return
-        hasLoadedInitialLocations = true
         _selectedLocations.value = locations.map { it.copy() }
         if (locations.isEmpty()) {
             setActiveLocation(null)
@@ -162,26 +159,53 @@ class LocationPickerViewModel @Inject constructor(
     fun onAddMarker(latLng: LatLng) {
         viewModelScope.launch {
             val address = resolveAddress(latLng) ?: formatCoordinatePair(latLng)
-            val newLocation = TaskLocation(
-                latitude = latLng.latitude,
-                longitude = latLng.longitude,
-                address = address
-            )
+            val activeIndex = _activeLocationIndex.value
             _selectedLocations.update { current ->
                 when {
-                    current.isEmpty() -> listOf(newLocation)
-                    allowMultiple -> current + newLocation
-                    else -> listOf(
-                        newLocation.copy(
-                            name = current.first().name
+                    current.isEmpty() -> {
+                        listOf(TaskLocation(
+                            latitude = latLng.latitude,
+                            longitude = latLng.longitude,
+                            address = address
+                        ))
+                    }
+                    activeIndex != null && activeIndex in current.indices -> {
+                        current.mapIndexed { index, location ->
+                            if (index == activeIndex) {
+                                location.copy(
+                                    latitude = latLng.latitude,
+                                    longitude = latLng.longitude,
+                                    address = address
+                                )
+                            } else {
+                                location
+                            }
+                        }
+                    }
+                    allowMultiple -> {
+                        current + TaskLocation(
+                            latitude = latLng.latitude,
+                            longitude = latLng.longitude,
+                            address = address
                         )
-                    )
+                    }
+                    else -> {
+                        listOf(
+                            TaskLocation(
+                                latitude = latLng.latitude,
+                                longitude = latLng.longitude,
+                                address = address
+                            ).copy(
+                                name = current.first().name
+                            )
+                        )
+                    }
                 }
             }
-            val targetIndex = if (allowMultiple) {
-                _selectedLocations.value.lastIndex
-            } else {
-                0
+            val targetIndex = when {
+                activeIndex != null && activeIndex in _selectedLocations.value.indices -> activeIndex
+                allowMultiple -> _selectedLocations.value.lastIndex
+                else -> 0
             }
             setActiveLocation(targetIndex)
             _suggestions.value = emptyList()

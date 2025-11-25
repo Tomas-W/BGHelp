@@ -1,7 +1,6 @@
 package com.example.bghelp.ui.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
@@ -34,7 +33,6 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.example.bghelp.R
 import com.example.bghelp.constants.UiConstants as UI
 import com.example.bghelp.ui.navigation.Screen
-import com.example.bghelp.ui.theme.BackgroundHighlight
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.utils.topBorder
 

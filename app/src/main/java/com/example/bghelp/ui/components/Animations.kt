@@ -71,22 +71,3 @@ fun Modifier.clickableRippleDismiss(
         interactionSource = interactionSource
     )
 }
-
-@Composable
-fun Modifier.clickableWithCalendarRipple(
-    onClick: () -> Unit,
-    enabled: Boolean = true
-): Modifier {
-    val indication = ripple(
-        bounded = true,
-        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
-    )
-    val interactionSource = remember { MutableInteractionSource() }
-    
-    return this.clickable(
-        onClick = onClick,
-        enabled = enabled,
-        indication = indication,
-        interactionSource = interactionSource
-    )
-}

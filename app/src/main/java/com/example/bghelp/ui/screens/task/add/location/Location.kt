@@ -26,15 +26,12 @@ fun Location(
 
     LaunchedEffect(navController) {
         navController.currentBackStackEntryFlow.collectLatest { entry ->
-            if (entry.destination.route == Screen.Tasks.Add.route) {
+            val route = entry.destination.route
+            if (route != null && route.startsWith(Screen.Tasks.Add.route)) {
                 val result = entry.savedStateHandle
                     .get<ArrayList<TaskLocation>>(LocationNavigationKeys.RESULT)
                 if (result != null) {
-                    if (allowMultiple) {
-                        viewModel.appendSelectedLocations(result)
-                    } else {
-                        viewModel.setSelectedLocations(result)
-                    }
+                    viewModel.setSelectedLocations(result)
                     entry.savedStateHandle.remove<ArrayList<TaskLocation>>(LocationNavigationKeys.RESULT)
                 }
             }

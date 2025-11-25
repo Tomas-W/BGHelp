@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.flow.collectLatest
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.bghelp.ui.navigation.Screen
 import com.example.bghelp.ui.screens.locationpicker.LocationPickerConstants as CONST
 import com.example.bghelp.ui.screens.locationpicker.LocationPickerStrings as STR
 import com.example.bghelp.ui.screens.task.add.TaskLocation
@@ -92,14 +94,18 @@ fun LocationPickerScreen(
 
     // Load previously selected locations from AddTaskScreen
     LaunchedEffect(navController) {
-        val initialLocations = navController.previousBackStackEntry
-            ?.savedStateHandle
-            ?.get<ArrayList<TaskLocation>>(LocationNavigationKeys.INITIAL_LOCATIONS)
-        if (initialLocations != null) {
-            viewModel.loadInitialLocations(initialLocations)
-            navController.previousBackStackEntry
-                ?.savedStateHandle
-                ?.remove<ArrayList<TaskLocation>>(LocationNavigationKeys.INITIAL_LOCATIONS)
+        navController.currentBackStackEntryFlow.collectLatest { entry ->
+            if (entry.destination.route?.startsWith(Screen.LocationPicker.route) == true) {
+                val initialLocations = navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.get<ArrayList<TaskLocation>>(LocationNavigationKeys.INITIAL_LOCATIONS)
+                if (initialLocations != null) {
+                    viewModel.loadInitialLocations(initialLocations)
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.remove<ArrayList<TaskLocation>>(LocationNavigationKeys.INITIAL_LOCATIONS)
+                }
+            }
         }
     }
 

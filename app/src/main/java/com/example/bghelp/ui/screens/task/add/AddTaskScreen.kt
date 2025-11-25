@@ -214,8 +214,6 @@ private fun ButtonRow(
     val saveInteractionSource = remember { MutableInteractionSource() }
     val saveIsPressed by saveInteractionSource.collectIsPressedAsState()
 
-    val borderColor = MaterialTheme.colorScheme.outline
-    val transparentColor = Color.Transparent
     val defaultColor = MaterialTheme.colorScheme.surface
     val highlightColor = BackgroundHighlight
 
