@@ -10,23 +10,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.bghelp.domain.model.CreateTarget
-import com.example.bghelp.ui.components.LazyColumnContainer
-import com.example.bghelp.ui.components.MainHeader
-import com.example.bghelp.ui.components.WeekNavigation
 import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.Coordinate
+import com.example.bghelp.domain.model.CreateTarget
+import com.example.bghelp.ui.components.LazyColumnContainer
 import com.example.bghelp.ui.components.MainContentContainer
+import com.example.bghelp.ui.components.MainHeader
 import com.example.bghelp.utils.toDayHeader
 import java.time.LocalDateTime
 
@@ -38,10 +36,6 @@ fun TargetScreen(targetViewModel: TargetViewModel = hiltViewModel()) {
     val selectedDate by targetViewModel.selectedDate.collectAsState()
     val expandedTargetIds by targetViewModel.expandedTargetIds.collectAsState()
     // Week nav
-    val navSelectedDate by remember { derivedStateOf { selectedDate.toLocalDate() } }
-    val navMonthYear by targetViewModel.monthYear.collectAsState()
-    val navWeekNumber by targetViewModel.weekNumber.collectAsState()
-    val navWeekDays by targetViewModel.weekDays.collectAsState()
     // Scroll
     val listState = rememberLazyListState()
     val savedScrollIndex = targetViewModel.getSavedScrollIndex()
@@ -62,18 +56,9 @@ fun TargetScreen(targetViewModel: TargetViewModel = hiltViewModel()) {
 
     Column(
         modifier = Modifier.fillMaxSize()
-        ) {
+    ) {
         AddButtonRow(targetViewModel)
 
-//        WeekNavigation(
-//            monthYear = navMonthYear,
-//            weekNumber = navWeekNumber,
-//            weekDays = navWeekDays,
-//            selectedDate = navSelectedDate,
-//            onPreviousWeek = { targetViewModel.goToPreviousWeek() },
-//            onNextWeek = { targetViewModel.goToNextWeek() },
-//            onDaySelected = targetViewModel::goToDay,
-//        )
         MainContentContainer {
             MainHeader(selectedDate.toDayHeader())
 
@@ -83,7 +68,7 @@ fun TargetScreen(targetViewModel: TargetViewModel = hiltViewModel()) {
                         items = selectedTargets,
                         key = { target -> target.id },
                         contentType = { "target" }
-                        ) { target ->
+                    ) { target ->
                         TargetComponent(
                             target = target,
                             isExpanded = expandedTargetIds.contains(target.id),
@@ -114,7 +99,9 @@ fun AddButtonRow(targetViewModel: TargetViewModel) {
     val oneWeek = remember { 7 * 24 * 60 * 60 * 1000L }
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 8.dp, end = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         AddTargetButton(targetViewModel = targetViewModel, time = oneHour, text = "Hour")

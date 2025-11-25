@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,11 +30,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableRipple
+import com.example.bghelp.ui.components.deselectedTextColor
+import com.example.bghelp.ui.components.deselectedTextStyle
+import com.example.bghelp.ui.components.selectedTextColor
+import com.example.bghelp.ui.components.selectedTextStyle
 import com.example.bghelp.ui.screens.task.add.TimeField
 import com.example.bghelp.ui.screens.task.add.TimeSegment
-import com.example.bghelp.ui.screens.task.add.deselectedStyle
-import com.example.bghelp.ui.screens.task.add.highlightedStyle
-import com.example.bghelp.ui.screens.task.add.selectedStyle
+import com.example.bghelp.ui.theme.lTextBold
+import com.example.bghelp.ui.theme.lTextDefault
 import java.time.LocalTime
 import java.util.Locale
 
@@ -74,14 +78,32 @@ fun TimeSelectionInput(
     fun clampMinute(value: Int): Int = value.coerceIn(0, 59)
 
     fun handleHourInput(raw: String) {
-        val digits = raw.filter { it.isDigit() }.take(2)
-        inputBuffer = digits
-        if (digits.isNotEmpty()) {
-            val h = digits.toIntOrNull()?.let { clampHour(it) }
-            if (h != null) onTimeChanged(time.withHour(h))
-        }
-        if (digits.length == 2) {
-            onSegmentSelected(timeField, TimeSegment.MINUTE)
+        val allDigits = raw.filter { it.isDigit() }
+        val hourDigits = allDigits.take(2)
+        val minuteDigits = allDigits.drop(2).take(2)
+        
+        if (hourDigits.isNotEmpty()) {
+            val h = hourDigits.toIntOrNull()?.let { clampHour(it) }
+            if (h != null) {
+                var newTime = time.withHour(h)
+                
+                if (minuteDigits.isNotEmpty()) {
+                    val m = minuteDigits.toIntOrNull()?.let { clampMinute(it) }
+                    if (m != null) {
+                        newTime = newTime.withMinute(m)
+                    }
+                }
+                
+                onTimeChanged(newTime)
+                
+                if (hourDigits.length == 2) {
+                    onSegmentSelected(timeField, TimeSegment.MINUTE)
+                    inputBuffer = minuteDigits
+                } else {
+                    inputBuffer = hourDigits
+                }
+            }
+        } else {
             inputBuffer = ""
         }
     }
@@ -163,13 +185,22 @@ fun TimeSelectionInput(
         ) {
             Text(
                 text = hourText,
-                style = if (selectedSegment == TimeSegment.HOUR) highlightedStyle else deselectedStyle,
+                style = if (selectedSegment == TimeSegment.HOUR) {
+                    selectedTextStyle()
+                } else {
+                    deselectedTextStyle()
+                },
+                color = if (selectedSegment == TimeSegment.HOUR) {
+                    selectedTextColor()
+                } else {
+                    deselectedTextColor()
+                }
             )
         }
         // Separator
         Text(
             text = ":",
-            style = selectedStyle,
+            style = MaterialTheme.typography.lTextDefault,
             modifier = Modifier.padding(horizontal = 2.dp),
         )
         // Minute input
@@ -181,7 +212,16 @@ fun TimeSelectionInput(
         ) {
             Text(
                 text = minuteText,
-                style = if (selectedSegment == TimeSegment.MINUTE) highlightedStyle else deselectedStyle,
+                style = if (selectedSegment == TimeSegment.MINUTE) {
+                    selectedTextStyle()
+                } else {
+                    deselectedTextStyle()
+                },
+                color = if (selectedSegment == TimeSegment.MINUTE) {
+                    selectedTextColor()
+                } else {
+                    deselectedTextColor()
+                }
             )
         }
     }

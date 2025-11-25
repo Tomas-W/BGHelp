@@ -20,7 +20,8 @@ fun CalendarSelection(
     DateRangeCalendar(
         currentMonth = currentMonth,
         startDate = dateStartSelection,
-        endDate = if (isEndDateVisible) (dateEndSelection ?: dateStartSelection) else dateStartSelection,
+        endDate = if (isEndDateVisible) (dateEndSelection?: dateStartSelection)
+                  else dateStartSelection,
         onDayClicked = { clickedDate ->
             viewModel.onDayClicked(clickedDate)
         },

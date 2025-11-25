@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,13 +17,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.ui.components.CustomDropdown
 import com.example.bghelp.ui.components.DropdownItem
+import com.example.bghelp.ui.components.deselectedDropdownStyle
+import com.example.bghelp.ui.screens.task.add.TaskImageData
+import com.example.bghelp.ui.theme.Sizes
+import com.example.bghelp.ui.theme.lTextDefault
+import com.example.bghelp.ui.utils.clickableDismissFocus
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
-import com.example.bghelp.ui.screens.task.add.TaskImageData
-import com.example.bghelp.ui.screens.task.add.deselectedStyle
-import com.example.bghelp.ui.screens.task.add.selectedStyle
-import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.utils.clickableDismissFocus
 
 @Composable
 fun ImageSelection(
@@ -46,7 +47,7 @@ fun ImageSelection(
                 modifier = Modifier
                     .clickableDismissFocus { onAddImageClick() },
                 text = STR.ADD_IMAGE,
-                style = deselectedStyle
+                style = MaterialTheme.typography.lTextDefault
             )
 
             CustomDropdown(
@@ -59,8 +60,8 @@ fun ImageSelection(
                         onSelectFromLibrary()
                         onDismissMenu()
                     },
-                    textStyle = deselectedStyle,
-                    spacing = Sizes.Icon.M
+                    textStyle = deselectedDropdownStyle(),
+                    spacing = Sizes.Icon.S
                 )
                 DropdownItem(
                     label = STR.IMAGE_FROM_CAMERA,
@@ -68,20 +69,18 @@ fun ImageSelection(
                         onCapturePhoto()
                         onDismissMenu()
                     },
-                    textStyle = deselectedStyle,
+                    textStyle = deselectedDropdownStyle(),
                     spacing = Sizes.Icon.M
                 )
             }
         }
+        if (!hasImage) {
+            Text(
+                text = imageLabel,
+                style = MaterialTheme.typography.lTextDefault
+            )
+        }
 
-        Text(
-            text = imageLabel,
-            style = if (hasImage) {
-                selectedStyle
-            } else {
-                deselectedStyle
-            }
-        )
 
         previewImage?.let { bitmap ->
             Image(

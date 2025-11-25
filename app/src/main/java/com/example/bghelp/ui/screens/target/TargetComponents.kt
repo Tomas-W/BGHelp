@@ -20,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
@@ -28,8 +27,11 @@ import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.Target
 import com.example.bghelp.ui.components.SchedulableContainer
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
-import com.example.bghelp.ui.theme.TextSizes
+import com.example.bghelp.ui.theme.lTextBold
+import com.example.bghelp.ui.theme.lTextDefault
+import com.example.bghelp.ui.theme.lTextItalic
+import com.example.bghelp.ui.theme.mTextDefault
+import com.example.bghelp.ui.theme.sTextDefault
 import com.example.bghelp.utils.isInFuture
 import com.example.bghelp.utils.toTaskTime
 
@@ -74,13 +76,14 @@ private fun TargetTimeInfo(target: Target) {
     Row {
         Text(
             text = target.date.toTaskTime(),
-            style = TextStyles.Default.Bold.M,
+            style = MaterialTheme.typography.lTextBold,
             modifier = Modifier.padding(end = 8.dp)
         )
         if (target.snoozeTime > 0) {
             Text(
                 text = " +${target.snoozeTime}",
-                style = TextStyles.Error.XS
+                style = MaterialTheme.typography.sTextDefault,
+                color = MaterialTheme.colorScheme.error
             )
         }
     }
@@ -97,26 +100,28 @@ private fun TargetDetails(
     Column {
         Text(
             text = title,
-            style = TextStyles.Default.M
+            style = MaterialTheme.typography.lTextDefault
         )
         if (isExpanded && description != null) {
             Text(
                 text = description,
-                style = TextStyles.Default.Italic.M
+                style = MaterialTheme.typography.lTextItalic
             )
         } else if (isExpanded) {
-            Spacer(modifier = Modifier.height(TextSizes.M.dp))
+            Spacer(modifier = Modifier.height(Sizes.Icon.L))
         }
         if (isExpanded) {
             Spacer(modifier = Modifier.height(Sizes.Size.S))
             Text(
                 text = "Locations: $coordinatesCount",
-                style = TextStyles.Grey.S
+                style = MaterialTheme.typography.mTextDefault,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(Sizes.Size.XS))
             Text(
                 text = "Alert distance: ${alertDistance}m",
-                style = TextStyles.Grey.S
+                style = MaterialTheme.typography.mTextDefault,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -178,7 +183,7 @@ private fun VibrateIcon(vibrateMode: AlarmMode) {
 private fun DeleteIcon(onDelete: () -> Unit) {
     Icon(
         imageVector = Icons.Default.Delete,
-        tint = Color.Red,
+        tint = MaterialTheme.colorScheme.error,
         contentDescription = "Delete",
         modifier = Modifier.clickable(onClick = onDelete)
     )

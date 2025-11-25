@@ -18,21 +18,21 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.Header
 import com.example.bghelp.ui.screens.task.add.SubContainer
 import com.example.bghelp.ui.screens.task.add.UserImageSelection
-import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.IOException
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
 @Composable
 fun Image(
@@ -144,13 +144,13 @@ private suspend fun loadImageBitmap(
             uri.scheme == "file" -> {
                 val file = java.io.File(uri.path ?: return@withContext null)
                 if (!file.exists()) return@withContext null
-                
+
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     val source = ImageDecoder.createSource(file)
                     ImageDecoder.decodeBitmap(source)
                 } else {
                     @Suppress("DEPRECATION")
-                    android.graphics.BitmapFactory.decodeFile(file.absolutePath)
+                    BitmapFactory.decodeFile(file.absolutePath)
                 }
             }
             // Handle content:// URIs (gallery)

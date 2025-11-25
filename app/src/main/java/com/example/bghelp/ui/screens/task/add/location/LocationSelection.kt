@@ -9,18 +9,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.example.bghelp.R
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 import com.example.bghelp.ui.screens.task.add.TaskLocation
-import com.example.bghelp.ui.screens.task.add.deselectedStyle
-import com.example.bghelp.ui.screens.task.add.selectedStyle
 import com.example.bghelp.ui.theme.Sizes
-import kotlin.collections.forEach
+import com.example.bghelp.ui.theme.lTextDefault
+import com.example.bghelp.ui.theme.lTextSemi
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
 @Composable
 fun LocationSelection(
@@ -36,7 +36,7 @@ fun LocationSelection(
             modifier = Modifier
                 .clickable { onAddLocation() },
             text = STR.ADD_LOCATION,
-            style = deselectedStyle
+            style = MaterialTheme.typography.lTextDefault
         )
 
         locations.forEach { location ->
@@ -65,12 +65,12 @@ private fun LocationSummary(
         ) {
             Text(
                 text = location.name.ifBlank { STR.UNNAMED_LOCATION },
-                style = selectedStyle
+                style = MaterialTheme.typography.lTextSemi
             )
 
             Text(
                 text = location.address,
-                style = deselectedStyle
+                style = MaterialTheme.typography.lTextDefault
             )
         }
 

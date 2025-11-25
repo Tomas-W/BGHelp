@@ -1,8 +1,8 @@
 package com.example.bghelp.ui.screens.task.add
 
 import android.content.Context
-import com.example.bghelp.data.repository.TaskRepository
 import com.example.bghelp.data.repository.ColorRepository
+import com.example.bghelp.data.repository.TaskRepository
 import com.example.bghelp.domain.model.FeatureColor
 import com.example.bghelp.domain.model.Task
 import com.example.bghelp.ui.theme.TaskDefault
@@ -26,7 +26,7 @@ class SaveTaskHandler(
         if (validationError != null) {
             return SaveTaskResult.ValidationError(validationError)
         }
-        
+
         return try {
             val imageAttachment = withContext(Dispatchers.IO) {
                 TaskImageStorage.persistIfNeeded(
@@ -35,7 +35,7 @@ class SaveTaskHandler(
                     selected = formState.selectedImage
                 )
             }
-            
+
             val allDay = formState.dateSelection == UserDateSelection.ON
             val startDate = formState.startDate
             val startTime = if (allDay) LocalTime.MIDNIGHT else formState.startTime
@@ -43,9 +43,9 @@ class SaveTaskHandler(
             val endTimeVisible = formState.isEndTimeVisible
             val endDate = if (endDateVisible) formState.endDate else null
             val endTime = if (endTimeVisible) formState.endTime else null
-            
+
             val selectedColor = getSelectedTaskColor(formState)
-            
+
             val assembleResult = AddTaskAssembler.buildOrError(
                 title = formState.title,
                 dateSelection = formState.dateSelection,
@@ -74,11 +74,12 @@ class SaveTaskHandler(
                     formState.note.takeIf { it.isNotBlank() } else null,
                 locations = formState.selectedLocations
             )
-            
+
             when (assembleResult) {
                 is AddTaskAssembler.BuildResult.Error -> {
                     SaveTaskResult.ValidationError(assembleResult.message)
                 }
+
                 is AddTaskAssembler.BuildResult.Success -> {
                     taskRepository.addTask(assembleResult.task)
                     SaveTaskResult.Success
@@ -88,7 +89,7 @@ class SaveTaskHandler(
             SaveTaskResult.Error(t)
         }
     }
-    
+
     suspend fun updateTask(
         taskId: Int,
         formState: AddTaskFormState,
@@ -98,11 +99,11 @@ class SaveTaskHandler(
         if (validationError != null) {
             return SaveTaskResult.ValidationError(validationError)
         }
-        
+
         return try {
             val existingTask = taskRepository.getTaskById(taskId).first()
                 ?: return SaveTaskResult.Error(Exception("Task not found"))
-            
+
             val imageAttachment = withContext(Dispatchers.IO) {
                 TaskImageStorage.persistIfNeeded(
                     context = appContext,
@@ -110,7 +111,7 @@ class SaveTaskHandler(
                     selected = formState.selectedImage
                 )
             }
-            
+
             val allDay = formState.dateSelection == UserDateSelection.ON
             val startDate = formState.startDate
             val startTime = if (allDay) LocalTime.MIDNIGHT else formState.startTime
@@ -118,9 +119,9 @@ class SaveTaskHandler(
             val endTimeVisible = formState.isEndTimeVisible
             val endDate = if (endDateVisible) formState.endDate else null
             val endTime = if (endTimeVisible) formState.endTime else null
-            
+
             val selectedColor = getSelectedTaskColor(formState)
-            
+
             val assembleResult = AddTaskAssembler.buildOrError(
                 title = formState.title,
                 dateSelection = formState.dateSelection,
@@ -149,11 +150,12 @@ class SaveTaskHandler(
                     formState.note.takeIf { it.isNotBlank() } else null,
                 locations = formState.selectedLocations
             )
-            
+
             when (assembleResult) {
                 is AddTaskAssembler.BuildResult.Error -> {
                     SaveTaskResult.ValidationError(assembleResult.message)
                 }
+
                 is AddTaskAssembler.BuildResult.Success -> {
                     val createTask = assembleResult.task
                     val updatedTask = Task(
@@ -190,14 +192,14 @@ class SaveTaskHandler(
             SaveTaskResult.Error(t)
         }
     }
-    
+
     private suspend fun getSelectedTaskColor(formState: AddTaskFormState): FeatureColor {
         val colorId = if (formState.colorSelection == UserColorSelection.OFF) {
             1
         } else {
             formState.selectedColorId ?: 1
         }
-        
+
         return colorRepository.getColorById(colorId)
             ?: FeatureColor(
                 id = 1,

@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -13,14 +14,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.example.bghelp.utils.AudioManager
 import com.example.bghelp.ui.components.CustomDropdown
 import com.example.bghelp.ui.components.DropdownItem
+import com.example.bghelp.ui.components.deselectedDropdownStyle
+import com.example.bghelp.ui.components.deselectedTextStyle
+import com.example.bghelp.ui.components.selectedDropdownStyle
 import com.example.bghelp.ui.navigation.Screen
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
-import com.example.bghelp.ui.screens.task.add.deselectedStyle
 import com.example.bghelp.ui.theme.Sizes
+import com.example.bghelp.ui.theme.lTextDefault
+import com.example.bghelp.utils.AudioManager
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
 @Composable
 fun AlarmSelection(
@@ -51,10 +55,10 @@ fun AlarmDropdown(
     onDropdownClick: () -> Unit = {}
 ) {
     var isExpanded by remember { mutableStateOf(false) }
-    
+
     val defaultAudioFiles = remember { audioManager.getDefaultAudioFiles() }
     val userRecordings = remember { audioManager.getUserRecordings() }
-    
+
     val defaultAudioFileLabels = remember(defaultAudioFiles) {
         defaultAudioFiles.associateWith { fileName ->
             audioManager.getAudioFileLabel(fileName)
@@ -69,8 +73,8 @@ fun AlarmDropdown(
         if (selectedAudioFile.isEmpty()) {
             STR.SELECT_ALARM
         } else {
-            userRecordingLabels[selectedAudioFile] 
-                ?: defaultAudioFileLabels[selectedAudioFile] 
+            userRecordingLabels[selectedAudioFile]
+                ?: defaultAudioFileLabels[selectedAudioFile]
                 ?: audioManager.getAudioFileLabel(selectedAudioFile, isFullPath = true)
         }
     }
@@ -81,7 +85,7 @@ fun AlarmDropdown(
     ) {
         Text(
             text = displayText,
-            style = deselectedStyle,
+            style = MaterialTheme.typography.lTextDefault,
             modifier = Modifier
                 .wrapContentWidth()
                 .clickable {
@@ -102,7 +106,11 @@ fun AlarmDropdown(
                     onAudioFileSelected("")
                     isExpanded = false
                 },
-                textStyle = deselectedStyle,
+                textStyle = if (displayText == STR.SELECT_ALARM) {
+                    selectedDropdownStyle()
+                } else {
+                    deselectedDropdownStyle()
+                },
                 spacing = Sizes.Icon.M
             )
             DropdownItem(
@@ -113,17 +121,26 @@ fun AlarmDropdown(
                     }
                     isExpanded = false
                 },
-                textStyle = deselectedStyle,
+                textStyle = if (displayText == STR.CREATE_ALARM) {
+                    selectedDropdownStyle()
+                } else {
+                    deselectedDropdownStyle()
+                },
                 spacing = Sizes.Icon.M
             )
             userRecordings.forEach { filePath ->
                 DropdownItem(
-                    label = userRecordingLabels[filePath] ?: audioManager.getAudioFileLabel(filePath, isFullPath = true),
+                    label = userRecordingLabels[filePath]
+                        ?: audioManager.getAudioFileLabel(filePath, isFullPath = true),
                     onClick = {
                         onAudioFileSelected(filePath)
                         isExpanded = false
                     },
-                    textStyle = deselectedStyle,
+                    textStyle = if (displayText == filePath) {
+                        selectedDropdownStyle()
+                    } else {
+                        deselectedDropdownStyle()
+                    },
                     spacing = Sizes.Icon.M
                 )
             }
@@ -134,7 +151,11 @@ fun AlarmDropdown(
                         onAudioFileSelected(fileName)
                         isExpanded = false
                     },
-                    textStyle = deselectedStyle,
+                    textStyle = if (selectedAudioFile == fileName) {
+                        selectedDropdownStyle()
+                    } else {
+                        deselectedTextStyle()
+                    },
                     spacing = Sizes.Icon.M
                 )
             }

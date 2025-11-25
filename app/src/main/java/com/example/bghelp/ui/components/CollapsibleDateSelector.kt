@@ -81,7 +81,12 @@ fun CollapsibleDateSelector(
         }
     }
 
-    LaunchedEffect(currentView, weekNavContentHeightPx, calendarContentHeightPx, toggleButtonHeightPx) {
+    LaunchedEffect(
+        currentView,
+        weekNavContentHeightPx,
+        calendarContentHeightPx,
+        toggleButtonHeightPx
+    ) {
         val contentHeightPx = when (currentView) {
             DateSelectorView.WEEK_NAV -> weekNavContentHeightPx
             DateSelectorView.CALENDAR -> calendarContentHeightPx
@@ -162,7 +167,7 @@ private fun ToggleButtonRow(
 ) {
     val leftArrowPointsDown = currentView == DateSelectorView.WEEK_NAV
     val rightArrowPointsDown = currentView == DateSelectorView.CALENDAR
-    
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -173,15 +178,17 @@ private fun ToggleButtonRow(
         NavigationArrow(
             pointsDown = leftArrowPointsDown,
             onClick = onLeftArrowClick,
-            contentDescription = if (leftArrowPointsDown) "Collapse week navigation" else "Show week navigation"
+            contentDescription = if (leftArrowPointsDown) "Collapse week navigation"
+                                 else "Show week navigation"
         )
-        
+
         Spacer(modifier = Modifier.width(2 * Sizes.Icon.L))
-        
+
         NavigationArrow(
             pointsDown = rightArrowPointsDown,
             onClick = onRightArrowClick,
-            contentDescription = if (rightArrowPointsDown) "Collapse calendar" else "Show calendar"
+            contentDescription = if (rightArrowPointsDown) "Collapse calendar"
+                                 else "Show calendar"
         )
     }
 }
@@ -200,7 +207,8 @@ private fun NavigationArrow(
     ) {
         Icon(
             painter = painterResource(
-                id = if (pointsDown) R.drawable.navigation_arrow_down else R.drawable.navigation_arrow_up
+                id = if (pointsDown) R.drawable.navigation_arrow_down
+                     else R.drawable.navigation_arrow_up
             ),
             contentDescription = contentDescription,
             modifier = Modifier.size(Sizes.Icon.L),

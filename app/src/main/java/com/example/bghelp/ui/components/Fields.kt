@@ -1,7 +1,6 @@
 package com.example.bghelp.ui.components
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -21,12 +20,9 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.unit.dp
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
 
 @Composable
 fun OutlinedStringInput(
@@ -91,7 +87,8 @@ fun OutlinedStringInput(
                 Text(
                     text = hint,
                     style = textStyle,
-                    color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary
+                    color = if (isActive) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onSecondary
                 )
             },
             placeholder = if (showPlaceholder) {
@@ -99,7 +96,8 @@ fun OutlinedStringInput(
                     Text(
                         text = hint,
                         style = textStyle,
-                        color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary
+                        color = if (isActive) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.onSecondary
                     )
                 }
             } else null,
@@ -128,4 +126,3 @@ fun OutlinedStringInput(
         )
     }
 }
-

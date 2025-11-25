@@ -3,6 +3,7 @@ package com.example.bghelp.ui.screens.task.add
 import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.CreateTask
 import com.example.bghelp.domain.model.FeatureColor
+import com.example.bghelp.domain.model.ReminderKind
 import com.example.bghelp.domain.model.ReminderOffsetUnit
 import com.example.bghelp.domain.model.TaskImageAttachment
 import com.example.bghelp.utils.TaskMapper
@@ -47,7 +48,8 @@ object AddTaskAssembler {
         locations: List<TaskLocation>
     ): BuildResult {
         val allDay = dateSelection == UserDateSelection.ON
-        val startDateTime = LocalDateTime.of(startDate, if (allDay) LocalTime.MIDNIGHT else startTime)
+        val startDateTime =
+            LocalDateTime.of(startDate, if (allDay) LocalTime.MIDNIGHT else startTime)
 
         val hasEnd = isEndDateVisible || isEndTimeVisible
         val effectiveEndDate = when {
@@ -67,19 +69,19 @@ object AddTaskAssembler {
 
         val taskReminders = if (remindSelection == UserRemindSelection.ON) {
             val start = with(TaskMapper) {
-                startReminders.toDomainReminders(com.example.bghelp.domain.model.ReminderKind.START)
+                startReminders.toDomainReminders(ReminderKind.START)
             }
             val includeEnd = isEndDateVisible || isEndTimeVisible
             val end = if (includeEnd) {
                 with(TaskMapper) {
-                    endReminders.toDomainReminders(com.example.bghelp.domain.model.ReminderKind.END)
+                    endReminders.toDomainReminders(ReminderKind.END)
                 }
             } else emptyList()
             start + end
         } else emptyList()
 
         val taskLocations = with(TaskMapper) { locations.toDomainLocations() }
-        
+
         val snoozeUnit1Domain = snoozeUnit1.toDomainUnit()
         val snoozeUnit2Domain = snoozeUnit2.toDomainUnit()
         if (snoozeUnit1Domain == null || snoozeUnit2Domain == null) {
@@ -111,7 +113,7 @@ object AddTaskAssembler {
         )
         return BuildResult.Success(create)
     }
-    
+
     private fun TimeUnit.toDomainUnit(): ReminderOffsetUnit? = when (this) {
         TimeUnit.MINUTES -> ReminderOffsetUnit.MINUTES
         TimeUnit.HOURS -> ReminderOffsetUnit.HOURS

@@ -1,11 +1,11 @@
 package com.example.bghelp.ui.screens.task.add
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.SharingStarted
 
 class AddTaskValidationState(
     formState: StateFlow<AddTaskFormState>,
@@ -20,7 +20,7 @@ class AddTaskValidationState(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = false
         )
-    
+
     val isDateTimeValid: StateFlow<Boolean> = formState
         .map { state ->
             AddTaskValidator.validateDateTime(
@@ -38,7 +38,7 @@ class AddTaskValidationState(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = false
         )
-    
+
     val isRepeatValid: StateFlow<Boolean> = formState
         .map { state ->
             AddTaskValidator.validateRepeat(
@@ -53,7 +53,7 @@ class AddTaskValidationState(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = true
         )
-    
+
     val isRemindersValid: StateFlow<Boolean> = formState
         .map { state ->
             AddTaskValidator.validateReminders(
@@ -74,7 +74,7 @@ class AddTaskValidationState(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = true
         )
-    
+
     val isFormValid: StateFlow<Boolean> = combine(
         isTitleValid,
         isDateTimeValid,
@@ -87,11 +87,11 @@ class AddTaskValidationState(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = false
     )
-    
+
     fun validateForm(state: AddTaskFormState): String? {
         val titleError = AddTaskValidator.validateTitle(state.title)
         if (titleError != null) return titleError
-        
+
         val dateTimeError = AddTaskValidator.validateDateTime(
             dateSelection = state.dateSelection,
             startDate = state.startDate,
@@ -102,7 +102,7 @@ class AddTaskValidationState(
             isEndTimeVisible = state.isEndTimeVisible
         )
         if (dateTimeError != null) return dateTimeError
-        
+
         val repeatError = AddTaskValidator.validateRepeat(
             repeatSelection = state.repeatSelection,
             weeklyDays = state.weeklySelectedDays,
@@ -110,7 +110,7 @@ class AddTaskValidationState(
             monthlyDays = state.monthlySelectedDays
         )
         if (repeatError != null) return repeatError
-        
+
         val reminderError = AddTaskValidator.validateReminders(
             remindSelection = state.remindSelection,
             dateSelection = state.dateSelection,
@@ -124,7 +124,7 @@ class AddTaskValidationState(
             isEndTimeVisible = state.isEndTimeVisible
         )
         if (reminderError != null) return reminderError
-        
+
         return null
     }
 }

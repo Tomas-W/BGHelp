@@ -4,6 +4,7 @@ import com.example.bghelp.ui.screens.task.add.RepeatMonthlyDaySelection
 import com.example.bghelp.ui.screens.task.add.UserRepeatSelection
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.util.Locale
 
 object RepeatRuleBuilder {
     fun buildRRule(
@@ -24,6 +25,7 @@ object RepeatRuleBuilder {
                 startDate = startDate,
                 endDate = endDate
             )
+
             UserRepeatSelection.MONTHLY -> buildMonthlyRRule(
                 selectedMonths = monthlyMonths,
                 monthlyDaySelection = monthlyDaySelection,
@@ -41,7 +43,7 @@ object RepeatRuleBuilder {
         endDate: LocalDate? = null
     ): String {
         val normalizedDays = weeklyDays.mapNotNull { it.toDayOfWeekOrNull() }
-        // Don't add fallback - if user deselected all days, create empty BYDAY to filter out task
+        // No fallback - if all days deselected -> create empty BYDAY to filter out task
         val dayTokens = normalizedDays
             .distinct()
             .sortedBy { it.value }
@@ -52,7 +54,7 @@ object RepeatRuleBuilder {
             if (weeklyInterval > 1) {
                 append(";INTERVAL=$weeklyInterval")
             }
-            // BYDAY may be empty if user deselected all days - this will be filtered out in TaskRepository
+            // Empty BYDAY  will be filtered out in TaskRepository
             append(";BYDAY=$dayTokens")
             if (endDate != null) {
                 append(";UNTIL=${formatUntilDate(endDate)}")
@@ -82,9 +84,10 @@ object RepeatRuleBuilder {
         val days = when (monthlyDaySelection) {
             RepeatMonthlyDaySelection.ALL -> (1..31).toList()
             RepeatMonthlyDaySelection.SELECT -> {
-                // Don't add fallback - if user deselected all days, create empty BYMONTHDAY to filter out task
+                // No fallback - if all days deselected -> create empty BYDAY to filter out task
                 selectedDays.filter { it in 1..31 }.distinct().sorted()
             }
+
             RepeatMonthlyDaySelection.LAST -> listOf(-1)
         }
 
@@ -118,7 +121,6 @@ object RepeatRuleBuilder {
 
     private fun formatUntilDate(date: LocalDate): String {
         // Format as YYYYMMDD for iCal UNTIL parameter
-        return String.format("%04d%02d%02d", date.year, date.monthValue, date.dayOfMonth)
+        return String.format(Locale.ROOT, "%04d%02d%02d", date.year, date.monthValue, date.dayOfMonth)
     }
 }
-

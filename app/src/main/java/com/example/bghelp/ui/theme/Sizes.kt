@@ -13,13 +13,13 @@ const val XXL = 32f
 
 object Sizes {
     object Icon {
-        val XXS = TextSizes.XXS.dp
-        val XS = TextSizes.XS.dp
-        val S = TextSizes.S.dp
-        val M = TextSizes.M.dp
-        val L = TextSizes.L.dp
-        val XL = TextSizes.XL.dp
-        val XXL = TextSizes.XXL.dp
+        val XXS = 14.dp
+        val XS = 16.dp
+        val S = 18.dp
+        val M = 20.dp
+        val L = 24.dp
+        val XL = 28.dp
+        val XXL = 32.dp
         val XXXL = 38f.dp
     }
 

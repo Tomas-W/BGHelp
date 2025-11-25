@@ -2,13 +2,13 @@ package com.example.bghelp.utils
 
 import com.example.bghelp.data.local.dao.ColorDao
 import com.example.bghelp.data.local.entity.ColorEntity
+import com.example.bghelp.data.repository.TaskRepository
 import com.example.bghelp.domain.constants.ColorSeeds
 import com.example.bghelp.domain.constants.TaskSeeds
 import com.example.bghelp.domain.model.FeatureColor
-import com.example.bghelp.data.repository.TaskRepository
+import kotlinx.coroutines.flow.first
 import java.time.LocalDateTime
 import java.time.ZoneId
-import kotlinx.coroutines.flow.first
 
 suspend fun initializeDefaultColors(colorDao: ColorDao) {
     val existingColors = colorDao.getAllColors().first()
@@ -26,7 +26,7 @@ suspend fun initializeDefaultColors(colorDao: ColorDao) {
             isDefault = it.isDefault
         )
     }
-    
+
     defaultColors.forEach { colorDao.insertColor(it) }
 }
 
@@ -49,7 +49,7 @@ suspend fun initializeDefaultTasks(taskRepository: TaskRepository, colorDao: Col
 
     val now = LocalDateTime.now(ZoneId.systemDefault())
     val defaultTasks = TaskSeeds.generateDefaultTasks(colors, now)
-    
+
     defaultTasks.forEach { taskRepository.addTask(it) }
 }
 

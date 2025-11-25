@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -16,6 +15,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,22 +37,26 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import com.example.bghelp.R
 import com.example.bghelp.ui.components.CustomDropdown
 import com.example.bghelp.ui.components.DropdownItem
 import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableRipple
+import com.example.bghelp.ui.components.deselectedDropdownStyle
+import com.example.bghelp.ui.components.deselectedTextColor
+import com.example.bghelp.ui.components.deselectedTextStyle
+import com.example.bghelp.ui.components.selectedDropdownStyle
+import com.example.bghelp.ui.components.selectedTextColor
+import com.example.bghelp.ui.components.selectedTextStyle
 import com.example.bghelp.ui.screens.task.add.ActiveReminderInput
-import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 import com.example.bghelp.ui.screens.task.add.TimeUnit
-import com.example.bghelp.ui.screens.task.add.deselectedStyle
-import com.example.bghelp.ui.screens.task.add.highlightedStyle
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
+import com.example.bghelp.ui.theme.lTextBold
+import com.example.bghelp.ui.theme.lTextDefault
+import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
 @Composable
 fun SnoozeSelection(
@@ -63,7 +67,7 @@ fun SnoozeSelection(
     val snoozeValue2 by viewModel.snoozeValue2.collectAsState()
     val snoozeUnit2 by viewModel.snoozeUnit2.collectAsState()
     val activeReminderInput by viewModel.activeReminderInput.collectAsState()
-    
+
     // Header
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -74,18 +78,19 @@ fun SnoozeSelection(
             painter = painterResource(R.drawable.snooze),
             contentDescription = STR.SNOOZE_TIME
         )
-        
+
         Spacer(modifier = Modifier.width(Sizes.Icon.M))
-        
+
         Text(
             modifier = Modifier.weight(1f),
             text = STR.SNOOZE_TIME,
-            style = TextStyles.Grey.Bold.M
+            style = MaterialTheme.typography.lTextBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
-    
+
     AddTaskSpacerSmall()
-    
+
     // Snooze inputs
     Column(
         modifier = Modifier
@@ -98,9 +103,9 @@ fun SnoozeSelection(
             viewModel = viewModel,
             activeReminderInput = activeReminderInput
         )
-        
+
         AddTaskSpacerSmall()
-        
+
         SnoozeInput(
             value = snoozeValue2,
             unit = snoozeUnit2,
@@ -120,7 +125,7 @@ private fun SnoozeInput(
     activeReminderInput: ActiveReminderInput?
 ) {
     val isActive = activeReminderInput?.snoozeIndex == snoozeIndex
-    
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(Sizes.Size.L),
@@ -140,7 +145,7 @@ private fun SnoozeInput(
                 }
             }
         )
-        
+
         TimeDropdown(
             selectedUnit = unit,
             onUnitSelected = { newUnit: TimeUnit ->
@@ -248,7 +253,16 @@ private fun TimeInput(
         ) {
             Text(
                 text = value.toString(),
-                style = if (isActive) highlightedStyle else deselectedStyle
+                style = if (isActive) {
+                    selectedTextStyle()
+                } else {
+                    deselectedTextStyle()
+                },
+                color = if (isActive) {
+                    selectedTextColor()
+                } else {
+                    deselectedTextColor()
+                }
             )
         }
     }
@@ -276,7 +290,7 @@ private fun TimeDropdown(
     Box(modifier = modifier) {
         Text(
             text = unitLabels[selectedUnit] ?: "",
-            style = deselectedStyle,
+            style = MaterialTheme.typography.lTextDefault,
             modifier = Modifier
                 .widthIn(min = 100.dp)
                 .clickable {
@@ -296,7 +310,11 @@ private fun TimeDropdown(
                         onUnitSelected(unit)
                         isExpanded = false
                     },
-                    textStyle = deselectedStyle,
+                    textStyle = if (selectedUnit == unit) {
+                        selectedDropdownStyle()
+                    } else {
+                        deselectedDropdownStyle()
+                    },
                     spacing = Sizes.Icon.M
                 )
             }

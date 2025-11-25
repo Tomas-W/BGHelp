@@ -39,7 +39,10 @@ fun OptionsModal(
 
     Dialog(
         onDismissRequest = onDismissRequest,
-        properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false
+        )
     ) {
         Surface(
             modifier = modifier
@@ -77,7 +80,7 @@ fun OptionsModal(
                 }
 
                 // Composable
-                if (content != null){
+                if (content != null) {
                     Box(
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -125,4 +128,3 @@ fun OptionsModal(
         }
     }
 }
-

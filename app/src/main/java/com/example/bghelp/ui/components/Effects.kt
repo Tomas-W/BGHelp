@@ -36,7 +36,7 @@ fun Modifier.clickableRipple(
         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
     )
     val interactionSource = remember { MutableInteractionSource() }
-    
+
     return this.clickable(
         onClick = onClick,
         enabled = enabled,
@@ -58,7 +58,7 @@ fun Modifier.clickableRippleDismiss(
         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
     )
     val interactionSource = remember { MutableInteractionSource() }
-    
+
     return this.clickable(
         onClick = {
             focusManager.clearFocus()

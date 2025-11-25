@@ -127,7 +127,10 @@ object TaskImageStorage {
                     imageData.uri != null -> {
                         val sourceFile = if (isTemporaryUri(imageData.uri)) {
                             // Temporary file: move it to permanent location
-                            File(imageData.uri.path ?: throw IllegalStateException("Invalid temporary file URI"))
+                            File(
+                                imageData.uri.path
+                                    ?: throw IllegalStateException("Invalid temporary file URI")
+                            )
                         } else {
                             // Gallery URI: copy it
                             null
@@ -143,9 +146,11 @@ object TaskImageStorage {
                                 FileOutputStream(targetFile).use { output ->
                                     input.copyTo(output)
                                 }
-                            } ?: throw IllegalStateException("Unable to open selected image stream.")
+                            }
+                                ?: throw IllegalStateException("Unable to open selected image stream.")
                         }
                     }
+
                     else -> return@withContext null
                 }
 
@@ -191,11 +196,12 @@ object TaskImageStorage {
         }
     }
 
-    private fun String.toCompressFormat(): Bitmap.CompressFormat = when (lowercase(Locale.getDefault())) {
-        "png" -> Bitmap.CompressFormat.PNG
-        "webp" -> Bitmap.CompressFormat.WEBP
-        else -> Bitmap.CompressFormat.JPEG
-    }
+    private fun String.toCompressFormat(): Bitmap.CompressFormat =
+        when (lowercase(Locale.getDefault())) {
+            "png" -> Bitmap.CompressFormat.PNG
+            "webp" -> Bitmap.CompressFormat.WEBP
+            else -> Bitmap.CompressFormat.JPEG
+        }
 
     private fun TaskImageSource.toDomainSource(): TaskImageSourceOption? = when (this) {
         TaskImageSource.GALLERY -> TaskImageSourceOption.GALLERY

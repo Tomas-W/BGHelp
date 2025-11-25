@@ -9,16 +9,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.ui.Alignment
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,10 +26,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.bghelp.domain.model.Task
@@ -41,6 +40,7 @@ import com.example.bghelp.ui.components.MainHeader
 import com.example.bghelp.ui.components.OptionsModal
 import com.example.bghelp.ui.navigation.Screen
 import com.example.bghelp.utils.toDayHeader
+import kotlinx.coroutines.delay
 
 @SuppressLint("FrequentlyChangingValue", "FrequentlyChangedStateReadInComposition")
 @Composable
@@ -80,16 +80,16 @@ fun TaskScreen(
     var taskPendingDeletion by remember { mutableStateOf<Task?>(null) }
     var taskPendingEdit by remember { mutableStateOf<Task?>(null) }
     var taskPendingDeletionWithTimer by remember { mutableStateOf<Int?>(null) }
-    
+
     // Cancel deletion function
     val cancelDeletion: () -> Unit = {
         taskPendingDeletionWithTimer = null
     }
-    
+
     // WeekNav height
     val weekNavHeight by taskViewModel.weekNavHeight.collectAsState()
     var isFirstComposition by remember { mutableStateOf(true) }
-    
+
     val animatedWeekNavHeight by animateDpAsState(
         targetValue = weekNavHeight,
         animationSpec = if (isFirstComposition && weekNavHeight > 0.dp) {
@@ -101,12 +101,12 @@ fun TaskScreen(
         },
         label = "FAB Offset"
     )
-    
+
     // Mark first composition as complete
     LaunchedEffect(Unit) {
         isFirstComposition = false
     }
-    
+
     // Callback to update date selector height
     val onDateSelectorExpansionChanged: (Boolean, Dp) -> Unit = { _, height ->
         taskViewModel.updateWeekNavHeight(height)
@@ -138,7 +138,6 @@ fun TaskScreen(
                                 task = task,
                                 isExpanded = expandedTaskIds.contains(task.id),
                                 onToggleExpanded = taskViewModel::toggleTaskExpanded,
-                                onDelete = { taskPendingDeletion = it },
                                 onLongPress = { taskPendingDeletion = it },
                                 isPendingDeletion = isPendingDeletion,
                                 onCancelDeletion = cancelDeletion,
@@ -225,7 +224,7 @@ fun TaskScreen(
             }
         }
     )
-    
+
     // Navigate to edit task
     LaunchedEffect(taskPendingEdit) {
         taskPendingEdit?.let { task ->
@@ -237,7 +236,7 @@ fun TaskScreen(
             }
         }
     }
-    
+
     // Handle deletion timer
     LaunchedEffect(taskPendingDeletionWithTimer) {
         taskPendingDeletionWithTimer?.let { taskId ->

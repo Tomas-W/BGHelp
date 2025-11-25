@@ -25,9 +25,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.bghelp.ui.screens.locationpicker.LocationPickerStrings as STR
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
+import com.example.bghelp.ui.theme.lTextDefault
+import com.example.bghelp.ui.theme.mTextDefault
+import com.example.bghelp.ui.theme.sTextItalic
+import com.example.bghelp.ui.screens.locationpicker.LocationPickerStrings as STR
 
 @Composable
 fun SearchPanel(
@@ -49,10 +51,10 @@ fun SearchPanel(
             placeholder = {
                 Text(
                     text = STR.SEARCH_PLACEHOLDER,
-                    style = TextStyles.Default.M
+                    style = MaterialTheme.typography.lTextDefault
                 )
             },
-            textStyle = TextStyles.Default.M,
+            textStyle = MaterialTheme.typography.lTextDefault,
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
@@ -117,14 +119,14 @@ private fun SuggestionRow(
     ) {
         Text(
             text = suggestion.title,
-            style = TextStyles.Default.S,
+            style = MaterialTheme.typography.mTextDefault,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
         if (suggestion.subtitle.isNotEmpty()) {
             Text(
                 text = suggestion.subtitle,
-                style = TextStyles.Default.Italic.XS,
+                style = MaterialTheme.typography.sTextItalic,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

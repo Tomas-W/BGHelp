@@ -18,12 +18,12 @@ import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
 import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableRippleDismiss
-import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 import com.example.bghelp.ui.screens.task.add.TimeField
 import com.example.bghelp.ui.theme.Sizes
+import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
 @Composable
 fun TimeSelection(
@@ -81,7 +81,8 @@ fun TimeSelection(
                 Icon(
                     modifier = Modifier.size(Sizes.Icon.S),
                     painter = painterResource(R.drawable.double_arrow_right),
-                    contentDescription = if (isEndTimeVisible) STR.HIDE_END_TIME else STR.SHOW_END_TIME
+                    contentDescription = if (isEndTimeVisible) STR.HIDE_END_TIME
+                    else STR.SHOW_END_TIME
                 )
             }
         }

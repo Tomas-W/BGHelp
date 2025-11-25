@@ -1,15 +1,10 @@
 package com.example.bghelp.utils
 
-import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.Month
-import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.time.format.TextStyle
-import java.util.Locale
 
 // Cache today's date to avoid repeated calls
 private var cachedToday: LocalDate? = null

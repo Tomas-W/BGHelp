@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.ui.Alignment
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -26,9 +25,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -40,8 +39,10 @@ import com.example.bghelp.R
 import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.Task
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
-import com.example.bghelp.ui.theme.TextSizes
+import com.example.bghelp.ui.theme.lTextBold
+import com.example.bghelp.ui.theme.lTextItalic
+import com.example.bghelp.ui.theme.lTextSemi
+import com.example.bghelp.ui.theme.sTextDefault
 import com.example.bghelp.utils.formatSnoozeDuration
 import com.example.bghelp.utils.toTaskTime
 
@@ -51,7 +52,6 @@ fun DayComponent(
     task: Task,
     isExpanded: Boolean,
     onToggleExpanded: (Int) -> Unit,
-    onDelete: (Task) -> Unit,
     onLongPress: ((Task) -> Unit)? = null,
     isPendingDeletion: Boolean = false,
     onCancelDeletion: () -> Unit = {},
@@ -63,16 +63,15 @@ fun DayComponent(
     } else {
         MaterialTheme.colorScheme.tertiary
     }
-    val deleteCallback = remember(key1 = task.id) { { onDelete(task) } }
     val toggleCallback = remember(key1 = task.id) { { onToggleExpanded(task.id) } }
-    val longPressCallback = remember(key1 = task.id) { 
+    val longPressCallback = remember(key1 = task.id) {
         if (onLongPress != null) {
-            { onLongPress!!.invoke(task) }
+            { onLongPress.invoke(task) }
         } else {
             null
         }
     }
-    
+
     val cornerRadius = remember {
         Sizes.Corner.S
     }
@@ -107,7 +106,7 @@ fun DayComponent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 TimeInfo(task = task)
-                AlarmIcons(task = task, onDelete = deleteCallback)
+                AlarmIcons(task = task)
             }
 
             TitleAndDescription(
@@ -126,7 +125,7 @@ fun DayComponent(
                 }
             }
         }
-        
+
         // Deletion overlay
         if (isPendingDeletion) {
             Box(
@@ -171,13 +170,14 @@ private fun TimeInfo(task: Task) {
     Row {
         Text(
             text = task.date.toTaskTime(),
-            style = TextStyles.Default.Bold.M,
+            style = MaterialTheme.typography.lTextBold,
             modifier = Modifier.padding(end = 8.dp)
         )
         if (task.snoozeSeconds > 0) {
             Text(
                 text = " +${task.snoozeSeconds.formatSnoozeDuration()}",
-                style = TextStyles.Error.XS
+                style = MaterialTheme.typography.sTextDefault,
+                color = MaterialTheme.colorScheme.error
             )
         }
     }
@@ -192,30 +192,28 @@ private fun TitleAndDescription(
     Column {
         Text(
             text = title,
-            style = TextStyles.Default.M
+            style = MaterialTheme.typography.lTextSemi
         )
         if (isExpanded && description != null) {
             Text(
                 text = description,
-                style = TextStyles.Default.Italic.M
+                style = MaterialTheme.typography.lTextItalic
             )
         } else if (isExpanded) {
-            Spacer(modifier = Modifier.height(TextSizes.M.dp))
+            Spacer(modifier = Modifier.height(Sizes.Icon.M))
         }
     }
 }
 
 @Composable
 private fun AlarmIcons(
-    task: Task,
-    onDelete: () -> Unit
+    task: Task
 ) {
     Row {
         SoundIcon(soundMode = task.sound)
         Spacer(modifier = Modifier.width(16.dp))
         VibrateIcon(vibrateMode = task.vibrate)
         Spacer(modifier = Modifier.width(8.dp))
-        DeleteIcon(onDelete = onDelete)
     }
 }
 
@@ -274,7 +272,7 @@ fun TaskPreviewComponent(task: Task) {
     } else {
         MaterialTheme.colorScheme.tertiary
     }
-    
+
     DayContainer(
         modifier = Modifier.fillMaxWidth(),
         backgroundColor = taskBackgroundColor,
@@ -287,7 +285,7 @@ fun TaskPreviewComponent(task: Task) {
             TimeInfo(task = task)
             AlarmIconsPreview(task = task)
         }
-        
+
         TitleAndDescription(
             title = task.title,
             description = task.description,

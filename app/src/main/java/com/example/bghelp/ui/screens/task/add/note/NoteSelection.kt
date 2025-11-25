@@ -3,6 +3,7 @@ package com.example.bghelp.ui.screens.task.add.note
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -13,9 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.example.bghelp.ui.components.CustomDropdown
 import com.example.bghelp.ui.components.DropdownItem
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
-import com.example.bghelp.ui.screens.task.add.deselectedStyle
+import com.example.bghelp.ui.components.deselectedDropdownStyle
+import com.example.bghelp.ui.components.selectedDropdownStyle
 import com.example.bghelp.ui.theme.Sizes
+import com.example.bghelp.ui.theme.lTextDefault
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
 @Composable
 fun NoteSelection(
@@ -40,7 +43,7 @@ fun NoteSelection(
     ) {
         Text(
             text = displayText,
-            style = deselectedStyle,
+            style = MaterialTheme.typography.lTextDefault,
             modifier = Modifier
                 .wrapContentWidth()
                 .clickable {
@@ -60,7 +63,11 @@ fun NoteSelection(
                     onNoteSelected("")
                     isExpanded = false
                 },
-                textStyle = deselectedStyle,
+                textStyle = if (selectedNote == "") {
+                    selectedDropdownStyle()
+                } else {
+                    deselectedDropdownStyle()
+                },
                 spacing = Sizes.Icon.M
             )
             DropdownItem(
@@ -69,7 +76,11 @@ fun NoteSelection(
                     onNoteSelected("CREATE")
                     isExpanded = false
                 },
-                textStyle = deselectedStyle,
+                textStyle = if (selectedNote == "CREATE") {
+                    selectedDropdownStyle()
+                } else {
+                    deselectedDropdownStyle()
+                },
                 spacing = Sizes.Icon.M
             )
             noteOptions.forEach { option ->
@@ -79,7 +90,11 @@ fun NoteSelection(
                         onNoteSelected(option)
                         isExpanded = false
                     },
-                    textStyle = deselectedStyle,
+                    textStyle = if (option == selectedNote) {
+                        selectedDropdownStyle()
+                    } else {
+                        deselectedDropdownStyle()
+                    },
                     spacing = Sizes.Icon.M
                 )
             }

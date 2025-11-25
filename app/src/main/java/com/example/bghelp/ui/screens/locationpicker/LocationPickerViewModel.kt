@@ -163,12 +163,15 @@ class LocationPickerViewModel @Inject constructor(
             _selectedLocations.update { current ->
                 when {
                     current.isEmpty() -> {
-                        listOf(TaskLocation(
-                            latitude = latLng.latitude,
-                            longitude = latLng.longitude,
-                            address = address
-                        ))
+                        listOf(
+                            TaskLocation(
+                                latitude = latLng.latitude,
+                                longitude = latLng.longitude,
+                                address = address
+                            )
+                        )
                     }
+
                     activeIndex != null && activeIndex in current.indices -> {
                         current.mapIndexed { index, location ->
                             if (index == activeIndex) {
@@ -182,6 +185,7 @@ class LocationPickerViewModel @Inject constructor(
                             }
                         }
                     }
+
                     allowMultiple -> {
                         current + TaskLocation(
                             latitude = latLng.latitude,
@@ -189,6 +193,7 @@ class LocationPickerViewModel @Inject constructor(
                             address = address
                         )
                     }
+
                     else -> {
                         listOf(
                             TaskLocation(
@@ -338,6 +343,7 @@ class LocationPickerViewModel @Inject constructor(
                         }
                     }
                 }
+
                 allowMultiple -> current + nextLocation
                 else -> listOf(nextLocation)
             }

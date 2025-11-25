@@ -27,15 +27,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
-import com.example.bghelp.constants.UiConstants as UI
-import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.navigation.Screen
+import com.example.bghelp.ui.theme.Sizes
+import com.example.bghelp.ui.theme.lTextBold
+import com.example.bghelp.ui.theme.lTextDefault
+import com.example.bghelp.constants.UiConstants as UI
 
 @Composable
 fun OptionsDrawer(
@@ -49,7 +49,7 @@ fun OptionsDrawer(
     val bottomBarHeight = UI.BOTTOM_BAR_HEIGHT.dp
     val bottomOffset = navigationBarHeight + bottomBarHeight
     val bottomOffsetPx = with(density) { bottomOffset.toPx().toInt() }
-    
+
     // Scrim to mute all but BottomNav and drawer
     AnimatedVisibility(
         visible = visible,
@@ -65,7 +65,7 @@ fun OptionsDrawer(
                 .clickable(onClick = onDismiss)
         )
     }
-    
+
     // Drawer slides up from underneath BottomBar
     Box(
         modifier = Modifier.fillMaxSize()
@@ -139,30 +139,30 @@ private fun DrawerItem(
         Screen.Options.CreateAlarm -> if (selected) R.drawable.create_alarm_filled else R.drawable.create_alarm_outlined
         Screen.Options.ColorPicker -> if (selected) R.drawable.create_color_filled else R.drawable.create_color_outlined
     }
-    
+
     val colors = NavigationDrawerItemDefaults.colors(
         selectedIconColor = MaterialTheme.colorScheme.onSurface,
         selectedTextColor = MaterialTheme.colorScheme.onSurface,
         unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
         unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
     )
-    
+
     NavigationDrawerItem(
         modifier = Modifier.padding(bottom = 8.dp),
         selected = selected,
         onClick = onClick,
-        label = { 
+        label = {
             Text(
                 text = screen.title,
-                style = if (selected) TextStyles.Default.Bold.M else TextStyles.Default.M
-            ) 
+                style = if (selected) MaterialTheme.typography.lTextBold else MaterialTheme.typography.lTextDefault
+            )
         },
-        icon = { 
+        icon = {
             Icon(
-                painter = painterResource(id = iconRes), 
-                contentDescription = screen.title, 
+                painter = painterResource(id = iconRes),
+                contentDescription = screen.title,
                 modifier = Modifier.size(Sizes.Icon.M)
-            ) 
+            )
         },
         colors = colors,
         shape = RoundedCornerShape(topEnd = Sizes.Corner.L, bottomEnd = Sizes.Corner.L)

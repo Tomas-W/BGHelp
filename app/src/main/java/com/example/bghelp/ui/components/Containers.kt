@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -29,7 +28,8 @@ fun MainContentContainer(
             .fillMaxWidth()
             .then(if (modifier == Modifier) Modifier.fillMaxHeight() else Modifier)
             .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-        verticalArrangement = if (spacing > 0) Arrangement.spacedBy(spacing.dp) else Arrangement.spacedBy(0.dp),
+        verticalArrangement = if (spacing > 0) Arrangement.spacedBy(spacing.dp)
+                              else Arrangement.spacedBy(0.dp),
         content = content
     )
 }

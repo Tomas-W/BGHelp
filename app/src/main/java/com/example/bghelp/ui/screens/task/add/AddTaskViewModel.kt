@@ -1,7 +1,7 @@
 package com.example.bghelp.ui.screens.task.add
 
-import android.graphics.Bitmap
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,12 +14,12 @@ import com.example.bghelp.utils.TaskImageStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
@@ -369,11 +369,11 @@ class AddTaskViewModel @Inject constructor(
     ) {
         formStateHolder.updateReminder(reminderType, reminderId, value, timeUnit)
     }
-    
+
     fun updateSnooze(snoozeIndex: Int, value: Int? = null, timeUnit: TimeUnit? = null) {
         formStateHolder.updateSnooze(snoozeIndex, value, timeUnit)
     }
-    
+
     fun setActiveSnoozeInput(snoozeIndex: Int) {
         _activeReminderInput.value = ActiveReminderInput(RemindType.START, -1, snoozeIndex)
         setCalendarVisible(false)
@@ -420,17 +420,25 @@ class AddTaskViewModel @Inject constructor(
         formStateHolder.toggleVibrateSelection()
     }
     // VIBRATE
-    
+
     // SNOOZE
     val snoozeValue1: StateFlow<Int> = formState.map { it.snoozeValue1 }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AddTaskConstants.SNOOZE_A_VALUE)
-    
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            AddTaskConstants.SNOOZE_A_VALUE
+        )
+
     val snoozeUnit1: StateFlow<TimeUnit> = formState.map { it.snoozeUnit1 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TimeUnit.MINUTES)
-    
+
     val snoozeValue2: StateFlow<Int> = formState.map { it.snoozeValue2 }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AddTaskConstants.SNOOZE_B_VALUE)
-    
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            AddTaskConstants.SNOOZE_B_VALUE
+        )
+
     val snoozeUnit2: StateFlow<TimeUnit> = formState.map { it.snoozeUnit2 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TimeUnit.HOURS)
     // SNOOZE
@@ -598,7 +606,7 @@ class AddTaskViewModel @Inject constructor(
 
     private val _saveState = MutableStateFlow<SaveTaskState>(SaveTaskState.Idle)
     val saveState: StateFlow<SaveTaskState> = _saveState.asStateFlow()
-    
+
     private val _editingTaskId = MutableStateFlow<Int?>(null)
     val editingTaskId: StateFlow<Int?> = _editingTaskId.asStateFlow()
     val isEditing: StateFlow<Boolean> = _editingTaskId.map { it != null }
@@ -608,14 +616,14 @@ class AddTaskViewModel @Inject constructor(
     // RESET DISMISS CLEAR
     private val _showUndoResetForm = MutableStateFlow(false)
     val showUndoResetForm: StateFlow<Boolean> = _showUndoResetForm.asStateFlow()
-    
+
     private data class FormStateSnapshot(
         val formState: AddTaskFormState,
         val nextReminderId: Int,
         val hiddenDateEndValue: LocalDate?,
         val hiddenTimeEndValue: LocalTime?
     )
-    
+
     private var savedStateSnapshot: FormStateSnapshot? = null
 
     fun resetForm() {
@@ -626,7 +634,7 @@ class AddTaskViewModel @Inject constructor(
             hiddenDateEndValue = hiddenDateEndValue,
             hiddenTimeEndValue = hiddenTimeEndValue
         )
-        
+
         formStateHolder.reset()
         resetUIState()
         refreshRepeatRule()

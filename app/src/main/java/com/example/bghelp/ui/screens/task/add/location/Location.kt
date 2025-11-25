@@ -13,7 +13,6 @@ import com.example.bghelp.ui.screens.task.add.SubContainer
 import com.example.bghelp.ui.screens.task.add.TaskLocation
 import com.example.bghelp.ui.screens.task.add.UserLocationSelection
 import kotlinx.coroutines.flow.collectLatest
-import java.util.ArrayList
 
 @Composable
 fun Location(

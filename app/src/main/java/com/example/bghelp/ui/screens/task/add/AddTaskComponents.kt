@@ -20,7 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
+import com.example.bghelp.ui.theme.lTextBold
 import com.example.bghelp.ui.utils.clickableDismissFocus
 
 @Composable
@@ -56,10 +56,10 @@ fun <T> Header(
                     toggleSection()
                 },
             text = userSectionSelection.headerText,
-            style = TextStyles.Grey.Bold.M
+            style = MaterialTheme.typography.lTextBold
         )
     }
-    
+
     AddTaskSpacerSmall()
 }
 
@@ -71,7 +71,7 @@ fun SubContainer(
 ) {
     val inputPaddingOffset =
         if (hasInputStart) {
-            2 * Sizes.Icon.M - 6.dp
+            (2 * Sizes.Icon.M) - 6.dp
         } else {
             2 * Sizes.Icon.M
         }

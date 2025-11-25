@@ -1,9 +1,12 @@
 package com.example.bghelp.ui.screens.task.add
 
+import android.net.Uri
+import androidx.core.net.toUri
 import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.ReminderKind
 import com.example.bghelp.domain.model.ReminderOffsetUnit
 import com.example.bghelp.domain.model.Task
+import com.example.bghelp.domain.model.TaskImageSourceOption
 import com.example.bghelp.domain.service.RecurrenceCalculator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,9 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.time.LocalDate
 import java.time.LocalTime
-import android.net.Uri
-import androidx.core.net.toUri
-import com.example.bghelp.domain.model.TaskImageSourceOption
 
 class AddTaskFormStateHolder(
     private val onRepeatRuleChanged: () -> Unit
@@ -25,7 +25,7 @@ class AddTaskFormStateHolder(
     fun updateTitle(text: String) {
         _formState.update { it.copy(title = text) }
     }
-    
+
     fun updateInfo(text: String) {
         _formState.update { it.copy(info = text) }
     }
@@ -35,7 +35,7 @@ class AddTaskFormStateHolder(
     fun toggleDateSelection() {
         _formState.update { it.copy(dateSelection = it.dateSelection.toggle()) }
     }
-    
+
     fun setDateStart(date: LocalDate) {
         _formState.update { state ->
             val updatedState = state.copy(startDate = date)
@@ -52,7 +52,7 @@ class AddTaskFormStateHolder(
         }
         onRepeatRuleChanged()
     }
-    
+
     fun toggleEndDateVisible() {
         _formState.update { state ->
             if (state.isEndDateVisible) {
@@ -70,7 +70,7 @@ class AddTaskFormStateHolder(
         }
         onRepeatRuleChanged()
     }
-    
+
     fun setDateEnd(date: LocalDate) {
         _formState.update { state ->
             state.copy(
@@ -80,11 +80,11 @@ class AddTaskFormStateHolder(
         }
         onRepeatRuleChanged()
     }
-    
+
     fun setTimeStart(time: LocalTime) {
         _formState.update { it.copy(startTime = time) }
     }
-    
+
     fun toggleEndTimeVisible() {
         _formState.update { state ->
             if (state.isEndTimeVisible) {
@@ -100,7 +100,7 @@ class AddTaskFormStateHolder(
             }
         }
     }
-    
+
     fun setTimeEnd(time: LocalTime) {
         _formState.update { it.copy(endTime = time) }
     }
@@ -113,7 +113,7 @@ class AddTaskFormStateHolder(
         }
         onRepeatRuleChanged()
     }
-    
+
     fun toggleWeeklySelectedDays(day: Int) {
         _formState.update { state ->
             val currentDays = state.weeklySelectedDays.toMutableSet()
@@ -126,12 +126,12 @@ class AddTaskFormStateHolder(
         }
         onRepeatRuleChanged()
     }
-    
+
     fun setWeeklyIntervalWeeks(weeks: Int) {
         _formState.update { it.copy(weeklyIntervalWeeks = weeks) }
         onRepeatRuleChanged()
     }
-    
+
     fun toggleMonthlySelectedMonths(month: Int) {
         _formState.update { state ->
             val currentMonths = state.monthlySelectedMonths.toMutableSet()
@@ -144,7 +144,7 @@ class AddTaskFormStateHolder(
         }
         onRepeatRuleChanged()
     }
-    
+
     fun toggleMonthSelectedDays(day: Int) {
         _formState.update { state ->
             val currentDays = state.monthlySelectedDays.toMutableSet()
@@ -157,27 +157,27 @@ class AddTaskFormStateHolder(
         }
         onRepeatRuleChanged()
     }
-    
+
     fun selectAllMonthlySelectedMonths() {
         _formState.update { it.copy(monthlySelectedMonths = (1..12).toSet()) }
         onRepeatRuleChanged()
     }
-    
+
     fun deselectAllMonthlySelectedMonths() {
         _formState.update { it.copy(monthlySelectedMonths = emptySet()) }
         onRepeatRuleChanged()
     }
-    
+
     fun toggleMonthlyDaySelection(newSelection: RepeatMonthlyDaySelection) {
         _formState.update { it.copy(monthlyDaySelection = newSelection) }
         onRepeatRuleChanged()
     }
-    
+
     fun selectAllMonthlySelectedDays() {
         _formState.update { it.copy(monthlySelectedDays = (1..31).toSet()) }
         onRepeatRuleChanged()
     }
-    
+
     fun deselectAllMonthlySelectedDays() {
         _formState.update { it.copy(monthlySelectedDays = emptySet()) }
         onRepeatRuleChanged()
@@ -196,7 +196,7 @@ class AddTaskFormStateHolder(
             state.copy(remindSelection = state.remindSelection.toggle())
         }
     }
-    
+
     fun addReminder(type: RemindType, nextId: Int): Int {
         val newReminder = Reminder(
             id = nextId,
@@ -211,23 +211,30 @@ class AddTaskFormStateHolder(
         }
         return nextId + 1
     }
-    
+
     fun removeReminder(type: RemindType, reminderId: Int) {
         _formState.update { state ->
             when (type) {
                 RemindType.START -> state.copy(
                     startReminders = state.startReminders.filter { it.id != reminderId }
                 )
+
                 RemindType.END -> state.copy(
                     endReminders = state.endReminders.filter { it.id != reminderId }
                 )
             }
         }
     }
-    
-    fun updateReminder(reminderType: RemindType, reminderId: Int, value: Int? = null, timeUnit: TimeUnit? = null) {
-        val validatedValue = value?.coerceIn(AddTaskConstants.MIN_REMINDER, AddTaskConstants.MAX_REMINDER)
-        
+
+    fun updateReminder(
+        reminderType: RemindType,
+        reminderId: Int,
+        value: Int? = null,
+        timeUnit: TimeUnit? = null
+    ) {
+        val validatedValue =
+            value?.coerceIn(AddTaskConstants.MIN_REMINDER, AddTaskConstants.MAX_REMINDER)
+
         _formState.update { state ->
             when (reminderType) {
                 RemindType.START -> state.copy(
@@ -242,6 +249,7 @@ class AddTaskFormStateHolder(
                         }
                     }
                 )
+
                 RemindType.END -> state.copy(
                     endReminders = state.endReminders.map { reminder ->
                         if (reminder.id == reminderId) {
@@ -257,20 +265,23 @@ class AddTaskFormStateHolder(
             }
         }
     }
-    
+
     fun updateSnooze(snoozeIndex: Int, value: Int? = null, timeUnit: TimeUnit? = null) {
-        val validatedValue = value?.coerceIn(AddTaskConstants.MIN_SNOOZE, AddTaskConstants.MAX_SNOOZE)
-        
+        val validatedValue =
+            value?.coerceIn(AddTaskConstants.MIN_SNOOZE, AddTaskConstants.MAX_SNOOZE)
+
         _formState.update { state ->
             when (snoozeIndex) {
                 1 -> state.copy(
                     snoozeValue1 = validatedValue ?: state.snoozeValue1,
                     snoozeUnit1 = timeUnit ?: state.snoozeUnit1
                 )
+
                 2 -> state.copy(
                     snoozeValue2 = validatedValue ?: state.snoozeValue2,
                     snoozeUnit2 = timeUnit ?: state.snoozeUnit2
                 )
+
                 else -> state
             }
         }
@@ -283,7 +294,7 @@ class AddTaskFormStateHolder(
             state.copy(soundSelection = state.soundSelection.toggle())
         }
     }
-    
+
     fun setSelectedAudioFile(fileName: String) {
         _formState.update { it.copy(selectedAudioFile = fileName) }
     }
@@ -315,7 +326,7 @@ class AddTaskFormStateHolder(
             state.copy(locationSelection = state.locationSelection.toggle())
         }
     }
-    
+
     fun setSelectedLocations(locations: List<TaskLocation>) {
         _formState.update { state ->
             state.copy(
@@ -324,7 +335,7 @@ class AddTaskFormStateHolder(
             )
         }
     }
-    
+
     fun appendSelectedLocations(locations: List<TaskLocation>) {
         if (locations.isEmpty()) return
         _formState.update { state ->
@@ -337,7 +348,7 @@ class AddTaskFormStateHolder(
             )
         }
     }
-    
+
     fun removeSelectedLocation(location: TaskLocation) {
         _formState.update { state ->
             val updatedLocations = state.selectedLocations.filterNot { it == location }
@@ -355,7 +366,7 @@ class AddTaskFormStateHolder(
             state.copy(imageSelection = state.imageSelection.toggle())
         }
     }
-    
+
     fun setImageFromGallery(uri: Uri, displayName: String?) {
         val label = displayName?.takeIf { it.isNotBlank() } ?: AddTaskStrings.NO_IMAGE_SELECTED
         _formState.update { state ->
@@ -396,7 +407,7 @@ class AddTaskFormStateHolder(
             state.copy(colorSelection = state.colorSelection.toggle())
         }
     }
-    
+
     fun setSelectedColorId(colorId: Int) {
         _formState.update { it.copy(selectedColorId = colorId) }
     }
@@ -406,26 +417,27 @@ class AddTaskFormStateHolder(
     fun reset() {
         _formState.value = AddTaskFormState.default()
     }
-    
+
     fun restore(state: AddTaskFormState) {
         _formState.value = state
     }
-    
+
     fun loadFromTask(task: Task) {
         val date = task.date.toLocalDate()
         val time = task.date.toLocalTime()
         val endDate = task.endDate?.toLocalDate()
         val endTime = task.endDate?.toLocalTime()
-        
+
         val dateSelection = if (task.allDay) UserDateSelection.ON else UserDateSelection.OFF
         val isEndDateVisible = endDate != null
         val isEndTimeVisible = endTime != null
-        
+
         val repeatSelection = parseRepeatSelection(task.rrule)
         val (weeklyDays, weeklyInterval) = parseWeeklyRepeat(task.rrule)
         val (monthlyMonths, monthlyDaySelection, monthlyDays) = parseMonthlyRepeat(task.rrule)
-        
-        val remindSelection = if (task.reminders.isNotEmpty()) UserRemindSelection.ON else UserRemindSelection.OFF
+
+        val remindSelection =
+            if (task.reminders.isNotEmpty()) UserRemindSelection.ON else UserRemindSelection.OFF
         val startReminders = task.reminders
             .filter { it.type == ReminderKind.START }
             .mapIndexed { index, entry ->
@@ -444,13 +456,15 @@ class AddTaskFormStateHolder(
                     timeUnit = entry.offsetUnit.toTimeUnit()
                 )
             }
-        
+
         val soundSelection = task.sound.toUserSoundSelection()
         val vibrateSelection = task.vibrate.toUserVibrateSelection()
-        
-        val noteSelection = if (task.note != null && task.note.isNotBlank()) UserNoteSelection.ON else UserNoteSelection.OFF
-        
-        val locationSelection = if (task.locations.isNotEmpty()) UserLocationSelection.ON else UserLocationSelection.OFF
+
+        val noteSelection =
+            if (task.note != null && task.note.isNotBlank()) UserNoteSelection.ON else UserNoteSelection.OFF
+
+        val locationSelection =
+            if (task.locations.isNotEmpty()) UserLocationSelection.ON else UserLocationSelection.OFF
         val selectedLocations = task.locations.map { entry ->
             TaskLocation(
                 latitude = entry.latitude,
@@ -459,8 +473,9 @@ class AddTaskFormStateHolder(
                 name = entry.name
             )
         }
-        
-        val imageSelection = if (task.image != null) UserImageSelection.ON else UserImageSelection.OFF
+
+        val imageSelection =
+            if (task.image != null) UserImageSelection.ON else UserImageSelection.OFF
         val selectedImage = task.image?.let { image ->
             TaskImageData(
                 displayName = image.displayName ?: AddTaskStrings.NO_IMAGE_SELECTED,
@@ -472,9 +487,10 @@ class AddTaskFormStateHolder(
                 }
             )
         }
-        
-        val colorSelection = if (task.color.id != 1) UserColorSelection.ON else UserColorSelection.OFF
-        
+
+        val colorSelection =
+            if (task.color.id != 1) UserColorSelection.ON else UserColorSelection.OFF
+
         _formState.value = AddTaskFormState(
             title = task.title,
             info = task.description ?: "",
@@ -513,7 +529,7 @@ class AddTaskFormStateHolder(
         )
         onRepeatRuleChanged()
     }
-    
+
     private fun parseRepeatSelection(rrule: String?): UserRepeatSelection {
         if (rrule.isNullOrBlank()) return UserRepeatSelection.OFF
         val rule = RecurrenceCalculator.parseRRule(rrule) ?: return UserRepeatSelection.OFF
@@ -522,21 +538,34 @@ class AddTaskFormStateHolder(
             RecurrenceCalculator.Frequency.MONTHLY -> UserRepeatSelection.MONTHLY
         }
     }
-    
+
     private fun parseWeeklyRepeat(rrule: String?): Pair<Set<Int>, Int> {
         if (rrule.isNullOrBlank()) return setOf(1, 2, 3, 4, 5, 6, 7) to 1
         val rule = RecurrenceCalculator.parseRRule(rrule) ?: return setOf(1, 2, 3, 4, 5, 6, 7) to 1
-        if (rule.frequency != RecurrenceCalculator.Frequency.WEEKLY) return setOf(1, 2, 3, 4, 5, 6, 7) to 1
-        
+        if (rule.frequency != RecurrenceCalculator.Frequency.WEEKLY) return setOf(
+            1, 2, 3, 4, 5, 6, 7) to 1
+
         val days = rule.byDay.map { it.value }.toSet()
         return (days.ifEmpty { setOf(1, 2, 3, 4, 5, 6, 7) }) to rule.interval
     }
-    
+
     private fun parseMonthlyRepeat(rrule: String?): Triple<Set<Int>, RepeatMonthlyDaySelection, Set<Int>> {
-        if (rrule.isNullOrBlank()) return Triple((1..12).toSet(), RepeatMonthlyDaySelection.ALL, (1..31).toSet())
-        val rule = RecurrenceCalculator.parseRRule(rrule) ?: return Triple((1..12).toSet(), RepeatMonthlyDaySelection.ALL, (1..31).toSet())
-        if (rule.frequency != RecurrenceCalculator.Frequency.MONTHLY) return Triple((1..12).toSet(), RepeatMonthlyDaySelection.ALL, (1..31).toSet())
-        
+        if (rrule.isNullOrBlank()) return Triple(
+            (1..12).toSet(),
+            RepeatMonthlyDaySelection.ALL,
+            (1..31).toSet()
+        )
+        val rule = RecurrenceCalculator.parseRRule(rrule) ?: return Triple(
+            (1..12).toSet(),
+            RepeatMonthlyDaySelection.ALL,
+            (1..31).toSet()
+        )
+        if (rule.frequency != RecurrenceCalculator.Frequency.MONTHLY) return Triple(
+            (1..12).toSet(),
+            RepeatMonthlyDaySelection.ALL,
+            (1..31).toSet()
+        )
+
         val months = rule.byMonth.ifEmpty { (1..12).toSet() }
         val days = rule.byMonthDay.toSet()
         val daySelection = when {
@@ -544,23 +573,25 @@ class AddTaskFormStateHolder(
             days.isEmpty() || days.containsAll((1..31).toSet()) -> RepeatMonthlyDaySelection.ALL
             else -> RepeatMonthlyDaySelection.SELECT
         }
-        val selectedDays = if (daySelection == RepeatMonthlyDaySelection.ALL) (1..31).toSet() else days.filter { it > 0 }.toSet()
-        
+        val selectedDays =
+            if (daySelection == RepeatMonthlyDaySelection.ALL) (1..31).toSet() else days.filter { it > 0 }
+                .toSet()
+
         return Triple(months, daySelection, selectedDays)
     }
-    
+
     private fun AlarmMode.toUserSoundSelection(): UserSoundSelection = when (this) {
         AlarmMode.OFF -> UserSoundSelection.OFF
         AlarmMode.ONCE -> UserSoundSelection.ONCE
         AlarmMode.CONTINUOUS -> UserSoundSelection.CONTINUOUS
     }
-    
+
     private fun AlarmMode.toUserVibrateSelection(): UserVibrateSelection = when (this) {
         AlarmMode.OFF -> UserVibrateSelection.OFF
         AlarmMode.ONCE -> UserVibrateSelection.ONCE
         AlarmMode.CONTINUOUS -> UserVibrateSelection.CONTINUOUS
     }
-    
+
     private fun ReminderOffsetUnit.toTimeUnit(): TimeUnit = when (this) {
         ReminderOffsetUnit.MINUTES -> TimeUnit.MINUTES
         ReminderOffsetUnit.HOURS -> TimeUnit.HOURS

@@ -2,14 +2,14 @@ package com.example.bghelp.ui.screens.task.add.date
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
+import com.example.bghelp.ui.screens.task.add.DateField
 import com.example.bghelp.ui.screens.task.add.Header
 import com.example.bghelp.ui.screens.task.add.SubContainer
-import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.UserDateSelection
-import com.example.bghelp.ui.screens.task.add.DateField
 
 @Composable
 fun Date(
@@ -23,7 +23,9 @@ fun Date(
 
     val shouldShowCalendar by remember(isCalendarVisible, activeDateField, isEndDateVisible) {
         derivedStateOf {
-            isCalendarVisible && (activeDateField == DateField.START || (isEndDateVisible && activeDateField == DateField.END))
+            isCalendarVisible
+                    && (activeDateField == DateField.START
+                    || (isEndDateVisible && activeDateField == DateField.END))
         }
     }
 

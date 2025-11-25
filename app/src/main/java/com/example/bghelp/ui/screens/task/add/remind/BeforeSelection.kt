@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,21 +42,26 @@ import com.example.bghelp.ui.components.DropdownItem
 import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableRipple
 import com.example.bghelp.ui.components.clickableRippleDismiss
-import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
+import com.example.bghelp.ui.components.deselectedDropdownStyle
+import com.example.bghelp.ui.components.deselectedTextColor
+import com.example.bghelp.ui.components.deselectedTextStyle
+import com.example.bghelp.ui.components.selectedDropdownStyle
+import com.example.bghelp.ui.components.selectedTextColor
+import com.example.bghelp.ui.components.selectedTextStyle
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerMedium
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
-import com.example.bghelp.ui.screens.task.add.Reminder
 import com.example.bghelp.ui.screens.task.add.RemindType
-import com.example.bghelp.ui.screens.task.add.UserDateSelection
-import com.example.bghelp.ui.screens.task.add.deselectedStyle
+import com.example.bghelp.ui.screens.task.add.Reminder
 import com.example.bghelp.ui.screens.task.add.TimeUnit
-import com.example.bghelp.ui.screens.task.add.highlightedStyle
+import com.example.bghelp.ui.screens.task.add.UserDateSelection
 import com.example.bghelp.ui.theme.Sizes
+import com.example.bghelp.ui.theme.lTextDefault
+import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
 @Composable
-fun BeforeSelection (
+fun BeforeSelection(
     viewModel: AddTaskViewModel,
 ) {
     val startReminders by viewModel.startReminders.collectAsState()
@@ -108,9 +114,12 @@ private fun AddReminder(
     onClick: () -> Unit,
     viewModel: AddTaskViewModel
 ) {
-    val remindTypeChoices = remember { mapOf(
-        RemindType.START to STR.BEFORE_START,
-        RemindType.END to STR.BEFORE_END) }
+    val remindTypeChoices = remember {
+        mapOf(
+            RemindType.START to STR.BEFORE_START,
+            RemindType.END to STR.BEFORE_END
+        )
+    }
 
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -120,7 +129,7 @@ private fun AddReminder(
             modifier = Modifier
                 .widthIn(min = CONST.MIN_WIDTH.dp),
             text = remindTypeChoices[remindType]!!,
-            style = deselectedStyle,
+            style = MaterialTheme.typography.lTextDefault,
         )
 
         Spacer(modifier = Modifier.width(Sizes.Icon.M))
@@ -155,9 +164,9 @@ private fun ReminderItem(
     viewModel: AddTaskViewModel
 ) {
     val activeReminderInput by viewModel.activeReminderInput.collectAsState()
-    val isNumberActive = activeReminderInput?.type == remindType && 
-                        activeReminderInput?.id == reminder.id &&
-                        activeReminderInput?.snoozeIndex == null
+    val isNumberActive = activeReminderInput?.type == remindType &&
+            activeReminderInput?.id == reminder.id &&
+            activeReminderInput?.snoozeIndex == null
 
     Row(
         modifier = Modifier
@@ -311,7 +320,8 @@ private fun TimeInput(
         ) {
             Text(
                 text = value.toString(),
-                style = if (isActive) highlightedStyle else deselectedStyle
+                style = if (isActive) selectedTextStyle() else deselectedTextStyle(),
+                color = if (isActive) selectedTextColor() else deselectedTextColor()
             )
         }
     }
@@ -339,7 +349,7 @@ private fun TimeDropdown(
     Box(modifier = modifier) {
         Text(
             text = unitLabels[selectedUnit] ?: "",
-            style = deselectedStyle,
+            style = MaterialTheme.typography.lTextDefault,
             modifier = Modifier
                 .widthIn(min = 100.dp)
                 .clickable {
@@ -359,7 +369,11 @@ private fun TimeDropdown(
                         onUnitSelected(unit)
                         isExpanded = false
                     },
-                    textStyle = deselectedStyle,
+                    textStyle = if (selectedUnit == unit) {
+                        selectedDropdownStyle()
+                    } else {
+                        deselectedDropdownStyle()
+                    },
                     spacing = Sizes.Icon.M
                 )
             }

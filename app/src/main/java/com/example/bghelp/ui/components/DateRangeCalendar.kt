@@ -41,7 +41,9 @@ import com.example.bghelp.R
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
+import com.example.bghelp.ui.theme.lTextBold
+import com.example.bghelp.ui.theme.lTextDefault
+import com.example.bghelp.ui.theme.xsTextBold
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.Month
@@ -67,7 +69,8 @@ fun DateRangeCalendar(
     val monthFormatter = remember { DateTimeFormatter.ofPattern("MMMM") }
     val yearFormatter = remember { DateTimeFormatter.ofPattern("yyyy") }
     val firstDayOfWeek = DayOfWeek.MONDAY
-    val weeks = remember(currentMonth, firstDayOfWeek) { buildMonthWeeks(currentMonth, firstDayOfWeek) }
+    val weeks =
+        remember(currentMonth, firstDayOfWeek) { buildMonthWeeks(currentMonth, firstDayOfWeek) }
     var isMonthMenuOpen by remember { mutableStateOf(false) }
     var isYearMenuOpen by remember { mutableStateOf(false) }
     val months = remember { Month.entries }
@@ -123,7 +126,8 @@ private fun CalendarDismissRow(onDismissRequest: (() -> Unit)?, showDismissButto
         TextButton(onClick = onDismissRequest) {
             Text(
                 text = AddTaskStrings.HIDE_CALENDAR,
-                style = TextStyles.Grey.Bold.XS
+                style = MaterialTheme.typography.xsTextBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -215,7 +219,8 @@ private fun CalendarMonthDropdown(
     Box {
         Text(
             text = currentMonth.format(formatter),
-            style = TextStyles.Grey.Bold.M,
+            style = MaterialTheme.typography.lTextBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
                 .onGloballyPositioned { anchorWidthPx = it.size.width }
                 .clickable { onMenuOpenChange(true) }
@@ -234,8 +239,12 @@ private fun CalendarMonthDropdown(
                         onMonthChanged(YearMonth.of(currentMonth.year, month))
                         onMenuOpenChange(false)
                     },
-                    textStyle = TextStyles.Default.S,
-                    spacing = Sizes.Icon.XS
+                    textStyle = if (month == currentMonth.month) {
+                        selectedDropdownStyle()
+                    } else {
+                        deselectedDropdownStyle()
+                    },
+                    spacing = Sizes.Icon.M
                 )
             }
         }
@@ -266,7 +275,8 @@ private fun CalendarYearDropdown(
     Box {
         Text(
             text = currentMonth.format(formatter),
-            style = TextStyles.Grey.Bold.M,
+            style = MaterialTheme.typography.lTextBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
                 .onGloballyPositioned { anchorWidthPx = it.size.width }
                 .clickable { onMenuOpenChange(true) }
@@ -285,8 +295,12 @@ private fun CalendarYearDropdown(
                         onMonthChanged(YearMonth.of(year, currentMonth.month))
                         onMenuOpenChange(false)
                     },
-                    textStyle = TextStyles.Default.M,
-                    spacing = Sizes.Icon.XS
+                    textStyle = if (year == currentMonth.year) {
+                        selectedDropdownStyle()
+                    } else {
+                        deselectedDropdownStyle()
+                    },
+                    spacing = Sizes.Icon.M
                 )
             }
         }
@@ -326,7 +340,8 @@ private fun CalendarWeekdayHeader(firstDayOfWeek: DayOfWeek) {
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                 Text(
                     text = dow.name.take(1),
-                    style = TextStyles.Grey.Bold.M
+                    style = MaterialTheme.typography.lTextDefault,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -361,7 +376,11 @@ private fun CalendarWeeksGrid(
                     val isEnd = isRangeMode && day == endDate
                     val isBeforeMin = minDate?.let { day.isBefore(it) } ?: false
                     val isSelectable = !isBeforeMin
-                    val inRange = isRangeMode && isSelectable && !day.isBefore(rangeStart) && !day.isAfter(rangeEnd)
+                    val inRange =
+                                isRangeMode
+                                && isSelectable
+                                && !day.isBefore(rangeStart) &&
+                                !day.isAfter(rangeEnd)
 
                     val rangeBgColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
                     val startEndBgColor = MaterialTheme.colorScheme.primary
@@ -408,7 +427,7 @@ private fun RowScope.CalendarDayCell(
     val today = remember { LocalDate.now() }
     val isToday = day == today
     val isSelected = selectedDate?.let { it == day } == true
-    
+
     val dayModifier = Modifier
         .weight(1f)
         .aspectRatio(1f)
@@ -428,7 +447,7 @@ private fun RowScope.CalendarDayCell(
                 }
             }
         )
-    
+
     Box(
         modifier = dayModifier,
         contentAlignment = Alignment.Center
@@ -445,7 +464,7 @@ private fun RowScope.CalendarDayCell(
                 ) {
                     Text(
                         text = day.dayOfMonth.toString(),
-                        style = TextStyles.Default.Bold.M,
+                        style = MaterialTheme.typography.lTextBold,
                         color = startEndTextColor,
                     )
                 }
@@ -461,7 +480,7 @@ private fun RowScope.CalendarDayCell(
                 ) {
                     Text(
                         text = day.dayOfMonth.toString(),
-                        style = TextStyles.Default.Bold.M,
+                        style = MaterialTheme.typography.lTextBold,
                         color = startEndTextColor
                     )
                 }
@@ -471,7 +490,7 @@ private fun RowScope.CalendarDayCell(
                         modifier = Modifier
                             .size(Sizes.Icon.XXXL)
                             .clip(CircleShape)
-                            .border(2.dp, Color.Black, CircleShape)
+                            .border(2.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
                     )
                 }
             }
@@ -481,12 +500,12 @@ private fun RowScope.CalendarDayCell(
                     modifier = Modifier
                         .size(Sizes.Icon.XXXL)
                         .clip(CircleShape)
-                        .border(2.dp, Color.Black, CircleShape),
+                        .border(2.dp, MaterialTheme.colorScheme.onSurface, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = day.dayOfMonth.toString(),
-                        style = TextStyles.Default.Bold.M
+                        style = MaterialTheme.typography.lTextBold
                     )
                 }
             }
@@ -494,7 +513,7 @@ private fun RowScope.CalendarDayCell(
             else -> {
                 Text(
                     text = day.dayOfMonth.toString(),
-                    style = TextStyles.Default.M,
+                    style = MaterialTheme.typography.lTextDefault,
                     color = when {
                         !isSelectable -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                         inCurrentMonth -> MaterialTheme.colorScheme.onSurface

@@ -25,24 +25,24 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.bghelp.ui.components.MainContentContainer
 import com.example.bghelp.ui.components.ReusableSnackbarHost
-import com.example.bghelp.ui.screens.task.add.title.Title
-import com.example.bghelp.ui.screens.task.add.date.Date
-import com.example.bghelp.ui.screens.task.add.remind.Remind
 import com.example.bghelp.ui.screens.task.add.color.Color
-import com.example.bghelp.ui.screens.task.add.repeat.Repeat
-import com.example.bghelp.ui.screens.task.add.location.Location
+import com.example.bghelp.ui.screens.task.add.date.Date
 import com.example.bghelp.ui.screens.task.add.image.Image
+import com.example.bghelp.ui.screens.task.add.location.Location
 import com.example.bghelp.ui.screens.task.add.note.Note
+import com.example.bghelp.ui.screens.task.add.remind.Remind
+import com.example.bghelp.ui.screens.task.add.repeat.Repeat
+import com.example.bghelp.ui.screens.task.add.title.Title
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.utils.dismissKeyboardOnTap
 import com.example.bghelp.ui.utils.topBorder
+import kotlinx.coroutines.delay
 
 @Composable
 fun AddTaskScreen(
@@ -52,7 +52,7 @@ fun AddTaskScreen(
 ) {
     val saveState by viewModel.saveState.collectAsState()
     val scrollState = rememberScrollState()
-    
+
     // Load task for editing if taskId is provided
     LaunchedEffect(taskId) {
         taskId?.let { id ->
@@ -68,10 +68,12 @@ fun AddTaskScreen(
                 navController.popBackStack()
                 viewModel.consumeSaveState()
             }
+
             is SaveTaskState.Error -> {
                 viewModel.showSnackbar(AddTaskStrings.ERROR_SAVE_FAILED)
                 viewModel.consumeSaveState()
             }
+
             else -> {}
         }
     }
@@ -94,7 +96,7 @@ fun AddTaskScreen(
                     .verticalScroll(scrollState)
             ) {
                 val showUndoReset by viewModel.showUndoResetForm.collectAsState()
-                
+
                 LaunchedEffect(showUndoReset) {
                     if (showUndoReset) {
                         delay(5000)
@@ -222,8 +224,10 @@ private fun ButtonRow(
                 ) { navController.popBackStack() },
             contentAlignment = Alignment.Center
         ) {
-            Box(modifier = Modifier
-                .padding(vertical = 16.dp))
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+            )
             {
                 Text(
                     text = "Cancel",

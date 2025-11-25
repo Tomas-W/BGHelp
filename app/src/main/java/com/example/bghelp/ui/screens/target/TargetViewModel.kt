@@ -54,7 +54,7 @@ class TargetViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = ""
         )
-    
+
     val weekDays: StateFlow<List<LocalDate>> = selectedWeek
         .map { weekStart ->
             (0..6).map { weekStart.plusDays(it.toLong()) }
@@ -64,7 +64,7 @@ class TargetViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
-    
+
     fun goToPreviousWeek() {
         updateSelectedWeek(_selectedWeek.value.minusWeeks(1))
     }

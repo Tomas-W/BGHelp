@@ -23,7 +23,7 @@ fun Modifier.dismissKeyboardOnTap(
 ): Modifier {
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    
+
     return this.pointerInput(Unit) {
         detectTapGestures { _ ->
             focusManager.clearFocus()
@@ -39,7 +39,7 @@ fun Modifier.clickableDismissFocus(
 ): Modifier = composed {
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
-    
+
     this.clickable(
         enabled = enabled,
         interactionSource = interactionSource,

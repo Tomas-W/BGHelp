@@ -1,16 +1,17 @@
 package com.example.bghelp.ui.screens.task.add.title
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
-import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
-import com.example.bghelp.ui.theme.TextStyles
 import com.example.bghelp.ui.components.OutlinedStringInput
+import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.TitleInputType
+import com.example.bghelp.ui.theme.lTextSemi
+import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
 @Composable
 fun TitleSelection(
@@ -24,7 +25,7 @@ fun TitleSelection(
         value = titleText,
         onValueChange = { viewModel.setTitleText(it) },
         hint = STR.TITLE_HINT,
-        textStyle = TextStyles.Default.Bold.S,
+        textStyle = MaterialTheme.typography.lTextSemi,
         minLines = CONST.TITLE_MIN_LINES,
         maxLines = CONST.TITLE_MAX_LINES,
         isActive = activeTitleInput == TitleInputType.TITLE,

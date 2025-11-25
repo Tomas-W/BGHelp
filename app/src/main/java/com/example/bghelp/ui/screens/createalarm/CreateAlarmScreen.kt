@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,9 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.bghelp.R
 import com.example.bghelp.ui.components.MainContentContainer
-import com.example.bghelp.ui.screens.createalarm.CreateAlarmViewModel
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
+import com.example.bghelp.ui.theme.lTextBold
+import com.example.bghelp.ui.theme.mTextItalic
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
@@ -40,8 +41,7 @@ fun CreateAlarmScreen(
     val selectedDate by viewModel.selectedDate.collectAsState()
     val selectedTime by viewModel.selectedTime.collectAsState()
 
-    MainContentContainer(
-    ) {
+    MainContentContainer {
         Spacer(modifier = Modifier.height(12.dp))
 
         SelectDayField(
@@ -55,28 +55,6 @@ fun CreateAlarmScreen(
             selectedTime = selectedTime,
             onTimeSelected = { time -> viewModel.updateSelectedTime(time) }
         )
-
-        // Title
-        // Field input
-//        val title = "Title"
-//        var text by remember { mutableStateOf("") }
-//        OutlinedTextField(
-//            modifier = Modifier
-//                .fillMaxWidth(),
-//            value = text,
-//            onValueChange = { text = it },
-//            label = { Text(text = title) }
-//        )
-
-        // Description
-        // Field input
-
-        // Alarm          Selection dropdown (Wave, Horn ect)
-        //                Off   Once    Continuous
-        // Sound           0------------------  (slider)
-        // Vibrate          ------------------0 (slider)
-
-        // Cancel          Create
     }
 }
 
@@ -98,12 +76,13 @@ fun SelectDayField(
         Column {
             Text(
                 text = "Day",
-                style = TextStyles.Grey.Bold.L
+                style = MaterialTheme.typography.lTextBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Text(
                 text = selectedDate.format(formatter),
-                style = TextStyles.Default.Italic.S
+                style = MaterialTheme.typography.mTextItalic
             )
         }
 
@@ -151,12 +130,12 @@ fun SelectTimeField(
         Column {
             Text(
                 text = "Time",
-                style = TextStyles.Grey.Bold.L
+                style = MaterialTheme.typography.lTextBold
             )
 
             Text(
                 text = selectedTime.format(formatter),
-                style = TextStyles.Default.Italic.S
+                style = MaterialTheme.typography.lTextBold
             )
         }
 

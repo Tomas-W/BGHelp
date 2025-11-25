@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,12 +29,12 @@ import com.example.bghelp.ui.components.ConfirmButton
 import com.example.bghelp.ui.components.MainContentContainer
 import com.example.bghelp.ui.components.OutlinedStringInput
 import com.example.bghelp.ui.components.ReusableSnackbarHost
+import com.example.bghelp.ui.screens.task.main.DayComponent
+import com.example.bghelp.ui.theme.lTextDefault
+import com.example.bghelp.ui.utils.dismissKeyboardOnTap
+import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
-import com.github.skydoves.colorpicker.compose.ColorEnvelope
-import com.example.bghelp.ui.screens.task.main.DayComponent
-import com.example.bghelp.ui.theme.TextStyles
-import com.example.bghelp.ui.utils.dismissKeyboardOnTap
 
 @Composable
 fun CreateColorScreen(
@@ -97,7 +98,7 @@ fun CreateColorScreen(
                     value = colorName,
                     onValueChange = viewModel::setColorName,
                     hint = "Name",
-                    textStyle = TextStyles.Default.M,
+                    textStyle = MaterialTheme.typography.lTextDefault,
                     isMultiLine = false,
                     minLines = 1,
                     maxLines = 1,
@@ -114,8 +115,7 @@ fun CreateColorScreen(
                         keyboardController?.hide()
                         viewModel.clearColorNameInputSelection()
                         viewModel.toggleExpandExample()
-                    },
-                    onDelete = {}
+                    }
                 )
             }
 

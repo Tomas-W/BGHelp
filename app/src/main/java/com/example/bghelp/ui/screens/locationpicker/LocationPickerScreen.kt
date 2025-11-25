@@ -16,9 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import com.example.bghelp.ui.components.CancelButton
-import com.example.bghelp.ui.components.ConfirmButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,23 +23,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.flow.collectLatest
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.bghelp.ui.components.CancelButton
+import com.example.bghelp.ui.components.ConfirmButton
 import com.example.bghelp.ui.navigation.Screen
-import com.example.bghelp.ui.screens.locationpicker.LocationPickerConstants as CONST
-import com.example.bghelp.ui.screens.locationpicker.LocationPickerStrings as STR
 import com.example.bghelp.ui.screens.task.add.TaskLocation
 import com.example.bghelp.ui.theme.Sizes
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
@@ -52,7 +48,9 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import java.util.ArrayList
+import kotlinx.coroutines.flow.collectLatest
+import com.example.bghelp.ui.screens.locationpicker.LocationPickerConstants as CONST
+import com.example.bghelp.ui.screens.locationpicker.LocationPickerStrings as STR
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable

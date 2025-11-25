@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -13,16 +14,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.bghelp.ui.screens.task.add.AddTaskSpacerMedium
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
+import com.example.bghelp.ui.components.deselectedTextStyle
+import com.example.bghelp.ui.components.selectedTextStyle
+import com.example.bghelp.ui.screens.task.add.AddTaskSpacerLarge
+import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.RepeatMonthlyDaySelection
-import com.example.bghelp.ui.screens.task.add.deselectedStyle
-import com.example.bghelp.ui.screens.task.add.selectedStyle
 import com.example.bghelp.ui.theme.Sizes
+import com.example.bghelp.ui.theme.lTextBold
+import com.example.bghelp.ui.theme.lTextDefault
 import java.time.Month
 import java.time.format.TextStyle
 import java.util.Locale
+import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
 @Composable
 fun MonthlySelection(
@@ -31,13 +35,15 @@ fun MonthlySelection(
     val selectedMonths by viewModel.monthlySelectedMonths.collectAsState()
     val selectedMonthDays by viewModel.monthlySelectedDays.collectAsState()
 
+    AddTaskSpacerSmall()
+
     MonthSelection(
         viewModel = viewModel,
         selectedMonths = selectedMonths,
         onToggle = { month -> viewModel.toggleMonthlySelectedMonths(month) }
     )
 
-    AddTaskSpacerMedium()
+    AddTaskSpacerLarge()
 
     DaySelection(
         viewModel = viewModel,
@@ -69,14 +75,14 @@ private fun MonthSelection(
                 modifier = Modifier
                     .clickable { viewModel.selectAllMonthlySelectedMonths() },
                 text = STR.SELECT_ALL,
-                style = deselectedStyle
+                style = MaterialTheme.typography.lTextDefault
             )
 
             Text(
                 modifier = Modifier
                     .clickable { viewModel.deselectAllMonthlySelectedMonths() },
                 text = STR.DESELECT_ALL,
-                style = deselectedStyle
+                style = MaterialTheme.typography.lTextDefault
             )
         }
 
@@ -88,14 +94,15 @@ private fun MonthSelection(
                 chunk.forEach { month ->
                     val monthNumber = month.value
                     val label = month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                    val selected = selectedMonths.contains(monthNumber)
                     Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
                         Text(
                             modifier = Modifier.clickable { onToggle(monthNumber) },
                             text = label,
-                            style = if (selectedMonths.contains(monthNumber)) {
-                                selectedStyle
+                            style = if (selected) {
+                                MaterialTheme.typography.lTextBold
                             } else {
-                                deselectedStyle
+                                MaterialTheme.typography.lTextDefault
                             }
                         )
                     }
@@ -112,7 +119,6 @@ private fun DaySelection(
     onToggle: (Int) -> Unit
 ) {
     val monthlyDaySelection by viewModel.userMonthlyDaySelection.collectAsState()
-    val allMonthDaysSelected by viewModel.allMonthDaysSelected.collectAsState()
 
     val dayNumbers = remember { (1..31).toList() }
     val dayChunks = remember(dayNumbers) { dayNumbers.chunked(8) }
@@ -129,25 +135,37 @@ private fun DaySelection(
         ) {
             Text(
                 modifier = Modifier
-                    .clickable { viewModel.toggleMonthlyDaySelection(RepeatMonthlyDaySelection.ALL)},
+                    .clickable { viewModel.toggleMonthlyDaySelection(RepeatMonthlyDaySelection.ALL) },
                 text = STR.ALL_DAYS,
-                style = if (monthlyDaySelection == RepeatMonthlyDaySelection.ALL) selectedStyle else deselectedStyle
+                style = if (monthlyDaySelection == RepeatMonthlyDaySelection.ALL) {
+                    selectedTextStyle()
+                } else {
+                    deselectedTextStyle()
+                }
             )
 
             Text(
                 modifier = Modifier
                     .clickable {
                         viewModel.toggleMonthlyDaySelection(RepeatMonthlyDaySelection.SELECT)
-                               },
+                    },
                 text = STR.SELECT_DAYS,
-                style = if (monthlyDaySelection == RepeatMonthlyDaySelection.SELECT) selectedStyle else deselectedStyle
+                style = if (monthlyDaySelection == RepeatMonthlyDaySelection.SELECT) {
+                    selectedTextStyle()
+                } else {
+                    deselectedTextStyle()
+                }
             )
 
             Text(
                 modifier = Modifier
-                    .clickable { viewModel.toggleMonthlyDaySelection(RepeatMonthlyDaySelection.LAST)},
+                    .clickable { viewModel.toggleMonthlyDaySelection(RepeatMonthlyDaySelection.LAST) },
                 text = STR.LAST_OF_MONTH,
-                style = if (monthlyDaySelection == RepeatMonthlyDaySelection.LAST) selectedStyle else deselectedStyle
+                style = if (monthlyDaySelection == RepeatMonthlyDaySelection.LAST) {
+                    selectedTextStyle()
+                } else {
+                    deselectedTextStyle()
+                }
             )
         }
 
@@ -157,12 +175,16 @@ private fun DaySelection(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(Sizes.Size.S)
                 ) {
-                    chunk.forEach {day ->
+                    chunk.forEach { day ->
                         Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
                             Text(
                                 modifier = Modifier.clickable { onToggle(day) },
                                 text = day.toString(),
-                                style = if (selectedDays.contains(day)) selectedStyle else deselectedStyle
+                                style = if (selectedDays.contains(day)) {
+                                    selectedTextStyle()
+                                } else {
+                                    deselectedTextStyle()
+                                }
                             )
                         }
                         // Hack to align since 31/8 != Int
@@ -186,14 +208,14 @@ private fun DaySelection(
                     modifier = Modifier
                         .clickable { viewModel.selectAllMonthlySelectedDays() },
                     text = STR.SELECT_ALL,
-                    style = deselectedStyle
+                    style = MaterialTheme.typography.lTextDefault
                 )
 
                 Text(
                     modifier = Modifier
                         .clickable { viewModel.deselectAllMonthlySelectedDays() },
                     text = STR.DESELECT_ALL,
-                    style = deselectedStyle
+                    style = MaterialTheme.typography.lTextDefault
                 )
 
             }

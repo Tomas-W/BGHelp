@@ -8,10 +8,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.bghelp.ui.theme.TextSizes
+import com.example.bghelp.ui.theme.mTextSemi
 
 @Composable
 fun CancelButton(
@@ -28,8 +26,7 @@ fun CancelButton(
     ) {
         Text(
             text = text,
-            fontSize = TextSizes.S.sp,
-            fontWeight = FontWeight.SemiBold
+            style = MaterialTheme.typography.mTextSemi
         )
     }
 }
@@ -56,8 +53,7 @@ fun ConfirmButton(
     ) {
         Text(
             text = text,
-            fontSize = TextSizes.S.sp,
-            fontWeight = FontWeight.SemiBold
+            style = MaterialTheme.typography.mTextSemi
         )
     }
 }

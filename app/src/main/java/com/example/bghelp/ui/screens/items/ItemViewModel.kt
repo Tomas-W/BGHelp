@@ -35,7 +35,7 @@ class ItemViewModel @Inject constructor(
 
     fun getSavedScrollIndex(): Int = _savedScrollIndex.value
     fun getSavedScrollOffset(): Int = _savedScrollOffset.value
-    
+
     val allItems: StateFlow<List<Item>> = itemRepository.getAllItems()
         .stateIn(
             scope = viewModelScope,

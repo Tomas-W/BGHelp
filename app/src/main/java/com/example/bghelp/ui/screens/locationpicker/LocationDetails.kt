@@ -33,10 +33,12 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.bghelp.ui.screens.locationpicker.LocationPickerStrings as STR
 import com.example.bghelp.ui.screens.task.add.TaskLocation
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
+import com.example.bghelp.ui.theme.mTextDefault
+import com.example.bghelp.ui.theme.mTextItalic
+import com.example.bghelp.ui.theme.mTextSemi
+import com.example.bghelp.ui.screens.locationpicker.LocationPickerStrings as STR
 
 
 @Composable
@@ -53,7 +55,7 @@ fun LocationDetails(
             modifier = modifier
                 .fillMaxWidth(),
             text = STR.EMPTY_LOCATIONS_HINT,
-            style = TextStyles.Default.S,
+            style = MaterialTheme.typography.mTextDefault,
         )
     } else {
         LazyColumn(
@@ -94,7 +96,8 @@ private fun LocationDetailsItem(
             .fillMaxWidth()
             .clip(RoundedCornerShape(Sizes.Corner.XS))
             .background(
-                if (isActive) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surface
+                if (isActive) MaterialTheme.colorScheme.secondary
+                else MaterialTheme.colorScheme.surface
             )
             .padding(horizontal = 16.dp, vertical = 10.dp)
             .clickable {
@@ -128,7 +131,7 @@ private fun LocationDetailsItem(
         }
         Text(
             text = location.address,
-            style = TextStyles.Default.S,
+            style = MaterialTheme.typography.mTextDefault,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -155,13 +158,13 @@ private fun LocationNameField(
             if (value.isEmpty()) {
                 Text(
                     text = STR.NAME_PLACEHOLDER,
-                    style = TextStyles.Default.Italic.S
+                    style = MaterialTheme.typography.mTextItalic
                 )
             }
             BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
-                textStyle = TextStyles.Default.S.copy(
+                textStyle = MaterialTheme.typography.mTextSemi.copy(
                     color = MaterialTheme.colorScheme.onSurface
                 ),
                 singleLine = true,

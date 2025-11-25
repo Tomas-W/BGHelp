@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,14 +35,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableRipple
-import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
+import com.example.bghelp.ui.components.deselectedTextColor
+import com.example.bghelp.ui.components.deselectedTextStyle
+import com.example.bghelp.ui.components.selectedTextColor
+import com.example.bghelp.ui.components.selectedTextStyle
+import com.example.bghelp.ui.screens.task.add.AddTaskSpacerMedium
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
-import com.example.bghelp.ui.screens.task.add.deselectedStyle
-import com.example.bghelp.ui.screens.task.add.highlightedStyle
-import com.example.bghelp.ui.screens.task.add.selectedStyle
 import com.example.bghelp.ui.theme.Sizes
+import com.example.bghelp.ui.theme.lTextDefault
+import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
 
 @Composable
 fun WeeklySelection(
@@ -50,12 +54,14 @@ fun WeeklySelection(
     val selectedDays by viewModel.weeklySelectedDays.collectAsState()
     val selectedWeek by viewModel.weeklyIntervalWeeks.collectAsState()
 
+    AddTaskSpacerSmall()
+
     DaySelection(
         selectedDays = selectedDays,
         onDayToggle = { day -> viewModel.toggleWeeklySelectedDays(day) }
     )
 
-    AddTaskSpacerSmall()
+    AddTaskSpacerMedium()
 
     WeekSelection(
         selectedWeek = selectedWeek,
@@ -83,7 +89,11 @@ private fun DaySelection(
                 modifier = Modifier
                     .clickable { onDayToggle(dayNumbers[i]) },
                 text = day,
-                style = if (isSelected) selectedStyle else deselectedStyle,
+                style = if (isSelected) {
+                    selectedTextStyle()
+                } else {
+                    deselectedTextStyle()
+                }
             )
         }
     }
@@ -99,7 +109,7 @@ private fun WeekSelection(
     ) {
         Text(
             text = AddTaskStrings.EVERY,
-            style = deselectedStyle
+            style = MaterialTheme.typography.lTextDefault
         )
 
         Spacer(modifier = Modifier.width(Sizes.Icon.S))
@@ -115,7 +125,7 @@ private fun WeekSelection(
 
         Text(
             text = AddTaskStrings.REPEAT_WEEKS,
-            style = deselectedStyle
+            style = MaterialTheme.typography.lTextDefault
         )
     }
 }
@@ -214,7 +224,16 @@ private fun WeekInput(
         ) {
             Text(
                 text = value.toString(),
-                style = if (isActive) highlightedStyle else deselectedStyle
+                style = if (isActive) {
+                    selectedTextStyle()
+                } else {
+                    deselectedTextStyle()
+                },
+                color = if (isActive) {
+                    selectedTextColor()
+                } else {
+                    deselectedTextColor()
+                }
             )
         }
     }

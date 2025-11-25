@@ -14,10 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -27,17 +26,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants
 import com.example.bghelp.ui.theme.Sizes
-import com.example.bghelp.ui.theme.TextStyles
+import com.example.bghelp.ui.theme.lTextBold
+import com.example.bghelp.ui.theme.lTextDefault
 import java.time.LocalDate
 import java.time.Month
 import java.time.YearMonth
@@ -123,7 +122,7 @@ fun WeekNavigation(
                 val isSelected = selectedDate?.let { it == day } == true
                 val selectedDayColor = MaterialTheme.colorScheme.primary
                 val selectedDayTextColor = MaterialTheme.colorScheme.onPrimary
-                
+
                 val dayModifier = Modifier
                     .weight(1f)
                     .aspectRatio(1f)
@@ -145,7 +144,7 @@ fun WeekNavigation(
                             ) {
                                 Text(
                                     text = "${day.dayOfMonth}",
-                                    style = TextStyles.Default.Bold.M,
+                                    style = MaterialTheme.typography.lTextBold,
                                     color = selectedDayTextColor
                                 )
                             }
@@ -155,7 +154,11 @@ fun WeekNavigation(
                                     modifier = Modifier
                                         .size(Sizes.Icon.XXXL)
                                         .clip(CircleShape)
-                                        .border(2.dp, Color.Black, CircleShape)
+                                        .border(
+                                            2.dp,
+                                            MaterialTheme.colorScheme.onSurface,
+                                            CircleShape
+                                        )
                                 )
                             }
                         }
@@ -165,12 +168,12 @@ fun WeekNavigation(
                                 modifier = Modifier
                                     .size(Sizes.Icon.XXXL)
                                     .clip(CircleShape)
-                                    .border(2.dp, Color.Black, CircleShape),
+                                    .border(2.dp, MaterialTheme.colorScheme.onSurface, CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
                                     text = "${day.dayOfMonth}",
-                                    style = TextStyles.Default.Bold.M
+                                    style = MaterialTheme.typography.lTextBold
                                 )
                             }
                         }
@@ -178,7 +181,7 @@ fun WeekNavigation(
                         else -> {
                             Text(
                                 text = "${day.dayOfMonth}",
-                                style = TextStyles.Default.M
+                                style = MaterialTheme.typography.lTextDefault
                             )
                         }
                     }
@@ -234,7 +237,7 @@ fun NavigationArrow(
         Box(
             modifier = Modifier
                 .size(Sizes.Icon.XL)
-                .clickableRipple( onClick ),
+                .clickableRipple(onClick),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -270,7 +273,8 @@ private fun WeekNavigationWeekDropdown(
     Box {
         Text(
             text = formattedWeek,
-            style = TextStyles.Grey.Bold.M,
+            style = MaterialTheme.typography.lTextBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
                 .onGloballyPositioned { anchorWidthPx = it.size.width }
                 .clickable { isMenuOpen = true }
@@ -290,7 +294,11 @@ private fun WeekNavigationWeekDropdown(
                         onWeekSelected(week)
                         isMenuOpen = false
                     },
-                    textStyle = if (isSelected) TextStyles.Default.Bold.S else TextStyles.Default.M,
+                    textStyle = if (isSelected) {
+                        selectedDropdownStyle()
+                    } else {
+                        deselectedDropdownStyle()
+                    },
                     spacing = Sizes.Icon.XS
                 )
             }
@@ -323,7 +331,8 @@ private fun WeekNavigationMonthDropdown(
     Box {
         Text(
             text = currentYearMonth.format(formatter),
-            style = TextStyles.Grey.Bold.M,
+            style = MaterialTheme.typography.lTextBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
                 .onGloballyPositioned { anchorWidthPx = it.size.width }
                 .clickable { onMenuOpenChange(true) }
@@ -343,7 +352,11 @@ private fun WeekNavigationMonthDropdown(
                         onMonthSelected(month)
                         onMenuOpenChange(false)
                     },
-                    textStyle = if (isSelected) TextStyles.Default.Bold.S else TextStyles.Default.M,
+                    textStyle = if (isSelected) {
+                        selectedDropdownStyle()
+                    } else {
+                        deselectedDropdownStyle()
+                    },
                     spacing = Sizes.Icon.XS
                 )
             }
@@ -376,7 +389,8 @@ private fun WeekNavigationYearDropdown(
     Box {
         Text(
             text = currentYearMonth.format(formatter),
-            style = TextStyles.Grey.Bold.M,
+            style = MaterialTheme.typography.lTextBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
                 .onGloballyPositioned { anchorWidthPx = it.size.width }
                 .clickable { onMenuOpenChange(true) }
@@ -396,7 +410,11 @@ private fun WeekNavigationYearDropdown(
                         onYearSelected(year)
                         onMenuOpenChange(false)
                     },
-                    textStyle = if (isSelected) TextStyles.Default.Bold.M else TextStyles.Default.M,
+                    textStyle = if (isSelected) {
+                        selectedDropdownStyle()
+                    } else {
+                        deselectedDropdownStyle()
+                    },
                     spacing = Sizes.Icon.XS
                 )
             }

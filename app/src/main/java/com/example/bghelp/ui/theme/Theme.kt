@@ -1,5 +1,6 @@
 package com.example.bghelp.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
@@ -8,37 +9,6 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
-
-// Dark theme used when system/app theme requests it (currently we always force light)
-private val DarkColorScheme = darkColorScheme(
-    primary = Color.Unspecified,
-    onPrimary = Color.Unspecified, // TODO: Text/icons on primary surfaces
-    secondary = Color.Unspecified,
-    onSecondary = Color.Unspecified, // TODO: Text/icons on secondary surfaces
-    tertiary = Color.Unspecified,
-    onTertiary = Color.Unspecified, // TODO: Text/icons on tertiary surfaces
-    error = Color.Unspecified, // TODO: Error states
-    onError = Color.Unspecified, // TODO: Text/icons on error surfaces
-    background = Color.Unspecified,
-    onBackground = Color.Unspecified, // TODO: Default text color
-    surface = Color.Unspecified,
-    onSurface = Color.Unspecified, // TODO: Text/icons on surfaces
-    surfaceVariant = Color.Unspecified, // TODO: Alternative surface for cards/chips
-    onSurfaceVariant = Color.Unspecified, // TODO: Text/icons on surfaceVariant
-    surfaceContainer = Color.Unspecified, // TODO: Container shades
-    surfaceContainerHighest = Color.Unspecified, // TODO: Highest elevation container
-    surfaceContainerHigh = Color.Unspecified, // TODO: High elevation container
-    surfaceContainerLow = Color.Unspecified, // TODO: Low elevation container
-    surfaceContainerLowest = Color.Unspecified, // TODO: Lowest elevation container
-    surfaceDim = Color.Unspecified, // TODO: Dimmed surface variant
-    surfaceBright = Color.Unspecified, // TODO: Bright surface variant
-    outline = Color.Unspecified, // TODO: Borders/dividers
-    outlineVariant = Color.Unspecified, // TODO: Lighter outline variant
-    inversePrimary = Color.Unspecified, // TODO: Primary when UI inverts
-    inverseSurface = Color.Unspecified, // TODO: Surface when UI inverts
-    inverseOnSurface = Color.Unspecified, // TODO: Text/icons on inverseSurface
-    scrim = Color.Unspecified // TODO: Overlays/backdrops
-)
 
 val ColorBlack = Color(0, 0, 0)
 val ColorGrey = Color(80, 80, 80)
@@ -54,6 +24,10 @@ val TertiaryGrey = Color(185, 185, 185)
 val SnackbarGrey = Color(65, 65, 65)
 
 val TaskDefault = Color(200, 220, 245) // Linked to domain/constants/Seeds.kt for now
+
+
+
+val DarkTaskDefault = Color(72, 128, 210)
 
 // Semantic colors for text
 val ErrorRed = Color(220, 53, 69)
@@ -79,7 +53,7 @@ private val LightColorScheme = lightColorScheme(
     onTertiary = ColorBlack,
 
     // Dark grey
-    surfaceVariant = Color.Red, // TODO: Set alternative surface color
+    surfaceVariant = TertiaryGrey,
     onSurfaceVariant = ColorGrey,
 
     // Cards, sheets, dialogs, navigation drawers
@@ -99,11 +73,11 @@ private val LightColorScheme = lightColorScheme(
     // Container shades for navigation bars, bottom sheets
     surfaceContainer = BackgroundGrey,
     // Highest elevation
-    surfaceContainerHighest = Color.Red,
+    surfaceContainerHighest = BackgroundBright,
     // High elevation container (e.g., elevated cards)
-    surfaceContainerHigh = Color.Red, // TODO: Set high elevation container
+    surfaceContainerHigh = BackgroundDimmed,
     // Low elevation container (e.g., subtle dividers)
-    surfaceContainerLow = Color.Red, // TODO: Set low elevation container
+    surfaceContainerLow = BackgroundGrey,
     // Dims
     surfaceContainerLowest = Color(0, 0, 0, (0.3*255).toInt()),
 
@@ -112,24 +86,78 @@ private val LightColorScheme = lightColorScheme(
     outlineVariant = SecondaryGrey,
 
     // Used when UI inverts colors (pull-to-refresh, etc.)
-    inversePrimary = Color.Red, // TODO: Set inverse primary color
-    // Snackbar
-    inverseSurface = SnackbarGrey, // TODO: Set inverse surface color
-    // Snackbar text
-    inverseOnSurface = Color.White, // TODO: Set text color for inverseSurface
+    inversePrimary = SecondaryBlue,
+    inverseSurface = SnackbarGrey,
+    inverseOnSurface = ColorWhite,
 
     // Overlays/backdrops (modal scrims)
     scrim = TertiaryGrey
 )
 
+val DarkColorBlack = Color(0, 0, 0)
+val DarkColorGrey = Color(160, 160, 160)
+val DarkColorWhite = Color(200, 200, 200)
+
+//val MainBlue = Color(51, 102, 178)
+//val SecondaryBlue = Color(200, 220, 245)
+
+val DarkMainBlue = Color(51, 102, 178, 225)
+val DarkSecondaryBlue = Color(51, 102, 178, 75)
+val DarkBackgroundGrey = Color(18, 18, 18)
+val DarkBackgroundDimmed = Color(24, 24, 24)
+val DarkBackgroundBright = Color(32, 32, 32)
+val DarkSecondaryGrey = Color(60, 60, 60)
+val DarkTertiaryGrey = Color(45, 45, 45)
+
+private val DarkColorScheme = darkColorScheme(
+    background = DarkBackgroundGrey,
+    onBackground = DarkColorWhite,
+
+    primary = DarkMainBlue,
+    onPrimary = DarkColorBlack,
+
+    secondary = DarkSecondaryBlue,
+    onSecondary = DarkColorWhite,
+
+    tertiary = DarkSecondaryGrey,
+    onTertiary = DarkColorWhite,
+
+    surfaceVariant = DarkTertiaryGrey,
+    onSurfaceVariant = DarkColorGrey,
+
+    surface = DarkBackgroundDimmed,
+    onSurface = DarkColorWhite,
+
+    surfaceDim = DarkColorBlack,
+    surfaceBright = DarkBackgroundBright,
+
+    error = ErrorRed,
+    onError = DarkColorBlack,
+
+    surfaceContainer = DarkBackgroundDimmed,
+    surfaceContainerHighest = DarkSecondaryGrey,
+    surfaceContainerHigh = Color(40, 40, 40),
+    surfaceContainerLow = DarkBackgroundBright,
+    surfaceContainerLowest = Color(12, 12, 12),
+
+    outline = DarkSecondaryGrey,
+    outlineVariant = DarkTertiaryGrey,
+
+    inversePrimary = MainBlue,
+    inverseSurface = DarkColorWhite,
+    inverseOnSurface = DarkColorBlack,
+
+    scrim = DarkColorBlack
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BGHelpTheme(
-    darkTheme: Boolean = false,
+    darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = LightColorScheme
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
     
     CompositionLocalProvider(LocalRippleConfiguration provides null) {
         MaterialTheme(
