@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,8 +31,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.bghelp.ui.components.CancelButton
-import com.example.bghelp.ui.components.ConfirmButton
+import com.example.bghelp.ui.components.ButtonRow
 import com.example.bghelp.ui.navigation.Screen
 import com.example.bghelp.ui.screens.task.add.TaskLocation
 import com.example.bghelp.ui.theme.Sizes
@@ -107,16 +105,12 @@ fun LocationPickerScreen(
         }
     }
 
-    // Update the camera position based on the focused location
+    // Update the camera position based on the focused location (only when zoom is specified)
     LaunchedEffect(focusedLocation) {
         val position = focusedLocation?.position
-        if (position != null) {
-            val zoom = focusedLocation?.zoom
-            val cameraUpdate = if (zoom != null) {
-                CameraUpdateFactory.newLatLngZoom(position, zoom)
-            } else {
-                CameraUpdateFactory.newLatLng(position)
-            }
+        val zoom = focusedLocation?.zoom
+        if (position != null && zoom != null) {
+            val cameraUpdate = CameraUpdateFactory.newLatLngZoom(position, zoom)
             cameraPositionState.animate(cameraUpdate)
         }
     }
@@ -176,7 +170,12 @@ fun LocationPickerScreen(
                             snippet = location.address,
                             icon = BitmapDescriptorFactory.defaultMarker(
                                 CONST.MARKER_HUES[index % CONST.MARKER_HUES.size]
-                            )
+                            ),
+                            onClick = {
+                                focusManager.clearFocus(force = true)
+                                viewModel.onLocationFocused(index)
+                                true
+                            }
                         )
                     }
                 }
@@ -239,41 +238,30 @@ private fun BottomButtonRow(
 ) {
     val canSave = selectedLocations.isNotEmpty() &&
             selectedLocations.all { it.name.isNotBlank() }
-    val canAddMarker = allowMultiple || selectedLocations.isEmpty()
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        CancelButton(
-            text = STR.ADD_MARKER,
-            onClick = {
-                val target = cameraPositionState.position.target
-                viewModel.onAddMarker(target)
-            },
-            modifier = Modifier.weight(1f),
-            enabled = canAddMarker
-        )
-        ConfirmButton(
-            text = if (selectedLocations.size <= 1) {
-                STR.SAVE_LOCATION
-            } else {
-                STR.SAVE_LOCATIONS
-            },
-            onClick = {
-                navController.previousBackStackEntry
-                    ?.savedStateHandle
-                    ?.set(
-                        LocationNavigationKeys.RESULT,
-                        ArrayList(selectedLocations)
-                    )
-                navController.popBackStack()
-            },
-            modifier = Modifier.weight(1f),
-            enabled = canSave
-        )
-    }
+    ButtonRow(
+        cancelText = STR.ADD_MARKER,
+        confirmText = if (selectedLocations.size <= 1) {
+            STR.SAVE_LOCATION
+        } else {
+            STR.SAVE_LOCATIONS
+        },
+        onCancelClick = {
+            val target = cameraPositionState.position.target
+            viewModel.onAddMarker(target)
+        },
+        onConfirmClick = {
+            navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.set(
+                    LocationNavigationKeys.RESULT,
+                    ArrayList(selectedLocations)
+                )
+            navController.popBackStack()
+        },
+        isValid = canSave,
+        isLoading = false
+    )
 }
 
 

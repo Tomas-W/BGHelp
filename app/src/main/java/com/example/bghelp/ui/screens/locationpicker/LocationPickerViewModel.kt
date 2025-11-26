@@ -117,10 +117,9 @@ class LocationPickerViewModel @Inject constructor(
                 _suggestions.value = emptyList()
                 place.latLng?.let { latLng ->
                     val address = place.address ?: place.name ?: formatCoordinatePair(latLng)
-                    applyLocationUpdate(
+                    applySearchSuggestionLocation(
                         latLng = latLng,
-                        address = address,
-                        shouldZoom = true
+                        address = address
                     )
                     _query.value = place.name ?: address
                 }
@@ -145,7 +144,6 @@ class LocationPickerViewModel @Inject constructor(
                     )
                 }
             )
-            _focusedLocation.value = FocusedLocation(position = latLng)
             _suggestions.value = emptyList()
             _query.value = address
         }
@@ -159,7 +157,6 @@ class LocationPickerViewModel @Inject constructor(
     fun onAddMarker(latLng: LatLng) {
         viewModelScope.launch {
             val address = resolveAddress(latLng) ?: formatCoordinatePair(latLng)
-            val activeIndex = _activeLocationIndex.value
             _selectedLocations.update { current ->
                 when {
                     current.isEmpty() -> {
@@ -170,20 +167,6 @@ class LocationPickerViewModel @Inject constructor(
                                 address = address
                             )
                         )
-                    }
-
-                    activeIndex != null && activeIndex in current.indices -> {
-                        current.mapIndexed { index, location ->
-                            if (index == activeIndex) {
-                                location.copy(
-                                    latitude = latLng.latitude,
-                                    longitude = latLng.longitude,
-                                    address = address
-                                )
-                            } else {
-                                location
-                            }
-                        }
                     }
 
                     allowMultiple -> {
@@ -207,12 +190,8 @@ class LocationPickerViewModel @Inject constructor(
                     }
                 }
             }
-            val targetIndex = when {
-                activeIndex != null && activeIndex in _selectedLocations.value.indices -> activeIndex
-                allowMultiple -> _selectedLocations.value.lastIndex
-                else -> 0
-            }
-            setActiveLocation(targetIndex)
+            val newMarkerIndex = _selectedLocations.value.lastIndex
+            setActiveLocation(newMarkerIndex)
             _suggestions.value = emptyList()
             _query.value = address
         }
@@ -250,6 +229,9 @@ class LocationPickerViewModel @Inject constructor(
     fun onLocationFocused(index: Int) {
         if (index !in _selectedLocations.value.indices) return
         setActiveLocation(index)
+        val location = _selectedLocations.value[index]
+        _query.value = location.name.ifBlank { location.address }
+        dismissSuggestions()
     }
 
     private suspend fun loadSuggestions(value: String) {
@@ -321,10 +303,9 @@ class LocationPickerViewModel @Inject constructor(
     private fun formatCoordinate(value: Double): String =
         String.format(Locale.getDefault(), "%.5f", value)
 
-    private fun applyLocationUpdate(
+    private fun applySearchSuggestionLocation(
         latLng: LatLng,
-        address: String,
-        shouldZoom: Boolean
+        address: String
     ) {
         val targetIndex = _activeLocationIndex.value
         val nextLocation = TaskLocation(
@@ -356,7 +337,7 @@ class LocationPickerViewModel @Inject constructor(
         setActiveLocation(activeIndex)
         _focusedLocation.value = FocusedLocation(
             position = latLng,
-            zoom = if (shouldZoom) LocationPickerConstants.SEARCH_RESULT_ZOOM else null
+            zoom = LocationPickerConstants.SEARCH_RESULT_ZOOM
         )
     }
 
@@ -377,11 +358,6 @@ class LocationPickerViewModel @Inject constructor(
 
     private fun setActiveLocation(index: Int?) {
         _activeLocationIndex.value = index
-        _focusedLocation.value = index?.let { target ->
-            _selectedLocations.value.getOrNull(target)?.let { location ->
-                FocusedLocation(position = LatLng(location.latitude, location.longitude))
-            }
-        }
     }
 }
 

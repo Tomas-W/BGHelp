@@ -130,7 +130,8 @@ fun OverlayNavHost(
             val viewModel: AddTargetViewModel = hiltViewModel(parentEntry)
             AddTargetScreen(
                 viewModel = viewModel,
-                onTargetCreated = { navController.popBackStack() }
+                onTargetCreated = { navController.popBackStack() },
+                navController = navController
             )
         }
         // AddItemScreen

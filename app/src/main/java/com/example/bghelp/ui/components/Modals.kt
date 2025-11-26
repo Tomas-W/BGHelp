@@ -1,6 +1,5 @@
 package com.example.bghelp.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,78 +51,66 @@ fun OptionsModal(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(Sizes.Corner.M))
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(Sizes.Icon.S),
             ) {
-                // Title
-                if (title != null) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                }
-
-                // Description
-                if (description != null) {
-                    Text(
-                        text = description,
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                }
-
-                // Composable
-                if (content != null) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        content()
-                    }
-                }
-
-                Row(
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        .fillMaxWidth()
+                        .padding(16.dp)
                 ) {
-                    if (extraLabel != null && extraOption != null) {
-                        ConfirmButton(
-                            modifier = Modifier.weight(1f),
-                            text = extraLabel,
-                            onClick = {
-                                extraOption()
-                                onDismissRequest()
-                            }
+                    // Title
+                    if (title != null) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+
+                    // Description
+                    if (description != null) {
+                        Text(
+                            text = description,
+                            style = MaterialTheme.typography.headlineSmall
                         )
                     }
 
-                    if (cancelLabel != null && cancelOption != null) {
-                        CancelButton(
-                            modifier = Modifier.weight(1f),
-                            text = cancelLabel,
-                            onClick = {
-                                cancelOption()
-                                onDismissRequest()
-                            }
-                        )
+                    // Composable
+                    if (content != null) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            content()
+                        }
                     }
+                }
 
-                    ConfirmButton(
-                        modifier = Modifier.weight(1f),
-                        text = confirmLabel,
-                        onClick = {
-                            confirmOption()
+                ButtonRow(
+                    cancelText = cancelLabel ?: "Cancel",
+                    confirmText = confirmLabel,
+                    onCancelClick = {
+                        cancelOption?.invoke()
+                        onDismissRequest()
+                    },
+                    onConfirmClick = {
+                        confirmOption()
+                        onDismissRequest()
+                    },
+                    isValid = true,
+                    isLoading = false,
+                    middleText = extraLabel,
+                    onMiddleClick = extraOption?.let {
+                        {
+                            it()
                             onDismissRequest()
                         }
-                    )
-                }
+                    }
+                )
             }
         }
     }

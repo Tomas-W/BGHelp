@@ -49,3 +49,6 @@ class MainActivity : ComponentActivity() {
 // TODO: Open LocationPickerScreen when selecting a location on AddTaskScreen?
 
 // TODO: Deleting multiple tasks not possible now since the undo is a singleton
+
+// TODO: Task modal should say if task is recurring, and if so add delete all option
+

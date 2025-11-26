@@ -1,9 +1,7 @@
 package com.example.bghelp.ui.screens.colorpicker
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,8 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.bghelp.domain.model.ExampleTask
 import com.example.bghelp.domain.model.FeatureColor
-import com.example.bghelp.ui.components.CancelButton
-import com.example.bghelp.ui.components.ConfirmButton
+import com.example.bghelp.ui.components.ButtonRow
 import com.example.bghelp.ui.components.MainContentContainer
 import com.example.bghelp.ui.components.OutlinedStringInput
 import com.example.bghelp.ui.components.ReusableSnackbarHost
@@ -119,25 +116,14 @@ fun CreateColorScreen(
                 )
             }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                CancelButton(
-                    text = "Cancel",
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.weight(1f),
-                    enabled = !saving
-                )
-                ConfirmButton(
-                    text = if (saving) "Saving..." else "Save Color",
-                    onClick = { viewModel.saveColor() },
-                    modifier = Modifier.weight(1f),
-                    enabled = !saving && isColorNameValid
-                )
-            }
+            ButtonRow(
+                cancelText = "Cancel",
+                confirmText = if (saving) "Saving..." else "Save Color",
+                onCancelClick = { navController.popBackStack() },
+                onConfirmClick = { viewModel.saveColor() },
+                isValid = isColorNameValid,
+                isLoading = saving
+            )
         }
 
         // Snackbar positioned at bottom
