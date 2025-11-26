@@ -323,7 +323,8 @@ class AddTaskViewModel @Inject constructor(
                 monthlyDaySelection = state.monthlyDaySelection,
                 monthlyDays = state.monthlySelectedDays,
                 startDate = state.startDate,
-                endDate = if (state.isEndDateVisible) state.endDate else null
+                endDate = if (state.isEndDateVisible) state.endDate else null,
+                isEndDateVisible = state.isEndDateVisible
             )
         )
     }

@@ -59,6 +59,7 @@ object AddTaskValidator {
     fun validateRepeat(
         repeatSelection: UserRepeatSelection,
         weeklyDays: Set<Int>,
+        monthlyMonths: Set<Int>,
         monthlyDaySelection: RepeatMonthlyDaySelection,
         monthlyDays: Set<Int>
     ): String? {
@@ -72,6 +73,10 @@ object AddTaskValidator {
         }
 
         if (repeatSelection == UserRepeatSelection.MONTHLY) {
+            val validMonths = monthlyMonths.filter { it in 1..12 }
+            if (validMonths.isEmpty()) {
+                return AddTaskStrings.VALIDATION_REPEAT_MIN_MONTHS
+            }
             if (monthlyDaySelection == RepeatMonthlyDaySelection.SELECT) {
                 val normalizedDays = monthlyDays.filter { it in 1..31 }
                 if (normalizedDays.isEmpty()) {

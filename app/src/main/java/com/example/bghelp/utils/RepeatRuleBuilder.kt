@@ -1,6 +1,7 @@
 package com.example.bghelp.utils
 
 import com.example.bghelp.ui.screens.task.add.RepeatMonthlyDaySelection
+import com.example.bghelp.ui.screens.task.add.UserDateSelection
 import com.example.bghelp.ui.screens.task.add.UserRepeatSelection
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -15,14 +16,20 @@ object RepeatRuleBuilder {
         monthlyDaySelection: RepeatMonthlyDaySelection,
         monthlyDays: Set<Int>,
         startDate: LocalDate,
-        endDate: LocalDate? = null
+        endDate: LocalDate? = null,
+        isEndDateVisible: Boolean = false
     ): String? {
         return when (selection) {
-            UserRepeatSelection.OFF -> null
+            UserRepeatSelection.OFF -> {
+                if (isEndDateVisible && endDate != null) {
+                    buildDailyRRule(endDate = endDate)
+                } else {
+                    null
+                }
+            }
             UserRepeatSelection.WEEKLY -> buildWeeklyRRule(
                 weeklyDays = weeklyDays,
                 weeklyInterval = weeklyInterval,
-                startDate = startDate,
                 endDate = endDate
             )
 
@@ -30,20 +37,30 @@ object RepeatRuleBuilder {
                 selectedMonths = monthlyMonths,
                 monthlyDaySelection = monthlyDaySelection,
                 selectedDays = monthlyDays,
-                startDate = startDate,
                 endDate = endDate
             )
+        }
+    }
+
+    private fun buildDailyRRule(
+        endDate: LocalDate
+    ): String {
+        return buildString {
+            append("FREQ=DAILY")
+            append(";UNTIL=${formatUntilDate(endDate)}")
         }
     }
 
     private fun buildWeeklyRRule(
         weeklyDays: Set<Int>,
         weeklyInterval: Int,
-        startDate: LocalDate,
         endDate: LocalDate? = null
-    ): String {
+    ): String? {
         val normalizedDays = weeklyDays.mapNotNull { it.toDayOfWeekOrNull() }
-        // No fallback - if all days deselected -> create empty BYDAY to filter out task
+        if (normalizedDays.isEmpty()) {
+            return null
+        }
+        
         val dayTokens = normalizedDays
             .distinct()
             .sortedBy { it.value }
@@ -54,7 +71,6 @@ object RepeatRuleBuilder {
             if (weeklyInterval > 1) {
                 append(";INTERVAL=$weeklyInterval")
             }
-            // Empty BYDAY  will be filtered out in TaskRepository
             append(";BYDAY=$dayTokens")
             if (endDate != null) {
                 append(";UNTIL=${formatUntilDate(endDate)}")
@@ -66,16 +82,15 @@ object RepeatRuleBuilder {
         selectedMonths: Set<Int>,
         monthlyDaySelection: RepeatMonthlyDaySelection,
         selectedDays: Set<Int>,
-        startDate: LocalDate,
         endDate: LocalDate? = null
-    ): String {
+    ): String? {
         val months = selectedMonths
             .filter { it in 1..12 }
             .distinct()
             .sorted()
             .let {
                 when {
-                    it.isEmpty() -> listOf(startDate.monthValue)
+                    it.isEmpty() -> return null
                     it.size == 12 -> emptyList()
                     else -> it
                 }
@@ -84,11 +99,14 @@ object RepeatRuleBuilder {
         val days = when (monthlyDaySelection) {
             RepeatMonthlyDaySelection.ALL -> (1..31).toList()
             RepeatMonthlyDaySelection.SELECT -> {
-                // No fallback - if all days deselected -> create empty BYDAY to filter out task
                 selectedDays.filter { it in 1..31 }.distinct().sorted()
             }
 
             RepeatMonthlyDaySelection.LAST -> listOf(-1)
+        }
+
+        if (days.isEmpty()) {
+            return null
         }
 
         return buildString {

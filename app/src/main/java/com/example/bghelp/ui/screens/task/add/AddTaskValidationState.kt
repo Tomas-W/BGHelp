@@ -44,6 +44,7 @@ class AddTaskValidationState(
             AddTaskValidator.validateRepeat(
                 repeatSelection = state.repeatSelection,
                 weeklyDays = state.weeklySelectedDays,
+                monthlyMonths = state.monthlySelectedMonths,
                 monthlyDaySelection = state.monthlyDaySelection,
                 monthlyDays = state.monthlySelectedDays
             ) == null
@@ -106,6 +107,7 @@ class AddTaskValidationState(
         val repeatError = AddTaskValidator.validateRepeat(
             repeatSelection = state.repeatSelection,
             weeklyDays = state.weeklySelectedDays,
+            monthlyMonths = state.monthlySelectedMonths,
             monthlyDaySelection = state.monthlyDaySelection,
             monthlyDays = state.monthlySelectedDays
         )

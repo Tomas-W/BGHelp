@@ -46,8 +46,6 @@ class MainActivity : ComponentActivity() {
 
 // TODO: Back button on LocationPickerScreen
 
-// TODO: Monthly reminder no months selected but all days is still valid??
-
-// TODO: Selecting date range must set range days as RRULE until end date/time
-
 // TODO: Open LocationPickerScreen when selecting a location on AddTaskScreen?
+
+// TODO: Deleting multiple tasks not possible now since the undo is a singleton

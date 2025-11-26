@@ -147,8 +147,9 @@ object AddTaskStrings {
     const val VALIDATION_START_TIME_PAST = "Start time cannot be in the past"
     const val VALIDATION_END_TIME_BEFORE_START = "End time must be after start time"
     const val VALIDATION_REPEAT_MIN_DAYS = "Repeats require a 1 day minimum"
+    const val VALIDATION_REPEAT_MIN_MONTHS = "Repeats require a 1 month minimum"
     const val VALIDATION_REMINDERS_PAST = "Reminders cannot be in the past"
-    const val ERROR_SAVE_FAILED = "Failed to save task. Please try again."
+    const val ERROR_SAVE_FAILED = "Failed to save task. Please try again"
     const val ERROR_ADDING_IMAGE = "Error adding image"
 }
 

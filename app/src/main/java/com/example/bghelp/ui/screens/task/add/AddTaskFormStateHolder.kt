@@ -534,6 +534,7 @@ class AddTaskFormStateHolder(
         if (rrule.isNullOrBlank()) return UserRepeatSelection.OFF
         val rule = RecurrenceCalculator.parseRRule(rrule) ?: return UserRepeatSelection.OFF
         return when (rule.frequency) {
+            RecurrenceCalculator.Frequency.DAILY -> UserRepeatSelection.OFF
             RecurrenceCalculator.Frequency.WEEKLY -> UserRepeatSelection.WEEKLY
             RecurrenceCalculator.Frequency.MONTHLY -> UserRepeatSelection.MONTHLY
         }

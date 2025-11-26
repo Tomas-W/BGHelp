@@ -25,6 +25,7 @@ object RecurrenceCalculator {
         }
 
         val frequency = when (values["FREQ"]?.uppercase()) {
+            "DAILY" -> Frequency.DAILY
             "WEEKLY" -> Frequency.WEEKLY
             "MONTHLY" -> Frequency.MONTHLY
             else -> return null
@@ -37,6 +38,14 @@ object RecurrenceCalculator {
         }
 
         return when (frequency) {
+            Frequency.DAILY -> {
+                RecurrenceRule(
+                    frequency = frequency,
+                    interval = interval,
+                    until = until
+                )
+            }
+
             Frequency.WEEKLY -> {
                 val byDay = values["BYDAY"]
                     ?.split(",")
@@ -82,6 +91,7 @@ object RecurrenceCalculator {
         }
 
         return when (rule.frequency) {
+            Frequency.DAILY -> occursDaily(task, rule, date)
             Frequency.WEEKLY -> occursWeekly(task, rule, date)
             Frequency.MONTHLY -> occursMonthly(task, rule, date)
         }
@@ -109,6 +119,17 @@ object RecurrenceCalculator {
         }
 
         return occurrences
+    }
+
+    private fun occursDaily(task: Task, rule: RecurrenceRule, date: LocalDate): Boolean {
+        val baseDate = task.date.toLocalDate()
+        if (date.isBefore(baseDate)) return false
+        if (rule.until != null && date.isAfter(rule.until)) return false
+
+        val daysBetween = java.time.temporal.ChronoUnit.DAYS.between(baseDate, date)
+        if (daysBetween < 0) return false
+
+        return daysBetween % rule.interval == 0L
     }
 
     private fun occursWeekly(task: Task, rule: RecurrenceRule, date: LocalDate): Boolean {
@@ -203,6 +224,7 @@ object RecurrenceCalculator {
     )
 
     enum class Frequency {
+        DAILY,
         WEEKLY,
         MONTHLY
     }
