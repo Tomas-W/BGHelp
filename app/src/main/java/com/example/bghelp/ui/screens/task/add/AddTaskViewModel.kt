@@ -155,8 +155,7 @@ class AddTaskViewModel @Inject constructor(
                 setCalendarVisible(false)
             }
         } else {
-            formStateHolder.toggleEndDateVisible()
-            hiddenDateEndValue = formState.value.endDate
+            formStateHolder.toggleEndDateVisible(restoreDate = hiddenDateEndValue)
         }
     }
 
@@ -178,8 +177,7 @@ class AddTaskViewModel @Inject constructor(
                 clearTimeInputSelection()
             }
         } else {
-            formStateHolder.toggleEndTimeVisible()
-            hiddenTimeEndValue = formState.value.endTime
+            formStateHolder.toggleEndTimeVisible(restoreTime = hiddenTimeEndValue)
         }
     }
 

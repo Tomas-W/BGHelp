@@ -53,7 +53,7 @@ class AddTaskFormStateHolder(
         onRepeatRuleChanged()
     }
 
-    fun toggleEndDateVisible() {
+    fun toggleEndDateVisible(restoreDate: LocalDate? = null) {
         _formState.update { state ->
             if (state.isEndDateVisible) {
                 state.copy(
@@ -61,7 +61,7 @@ class AddTaskFormStateHolder(
                     endDate = null
                 )
             } else {
-                val initialEndDate = state.endDate ?: state.startDate
+                val initialEndDate = restoreDate ?: state.endDate ?: state.startDate
                 state.copy(
                     isEndDateVisible = true,
                     endDate = initialEndDate.coerceAtLeast(state.startDate)
@@ -85,7 +85,7 @@ class AddTaskFormStateHolder(
         _formState.update { it.copy(startTime = time) }
     }
 
-    fun toggleEndTimeVisible() {
+    fun toggleEndTimeVisible(restoreTime: LocalTime? = null) {
         _formState.update { state ->
             if (state.isEndTimeVisible) {
                 state.copy(
@@ -95,7 +95,7 @@ class AddTaskFormStateHolder(
             } else {
                 state.copy(
                     isEndTimeVisible = true,
-                    endTime = state.endTime ?: LocalTime.of(13, 0)
+                    endTime = restoreTime ?: state.endTime ?: LocalTime.of(13, 0)
                 )
             }
         }
