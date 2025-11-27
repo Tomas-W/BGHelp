@@ -53,6 +53,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.time.temporal.TemporalAdjusters
 import java.util.Locale
+import androidx.compose.ui.platform.LocalConfiguration
 
 @Composable
 fun DateRangeCalendar(
@@ -69,7 +70,7 @@ fun DateRangeCalendar(
     selectedDate: LocalDate? = null,
     showDismissButton: Boolean = true
 ) {
-    val locale = LocalContext.current.resources.configuration.locales[0]
+    val locale = LocalConfiguration.current.locales[0]
     val monthFormatter = remember(locale) { DateTimeFormatter.ofPattern("MMMM", locale) }
     val yearFormatter = remember(locale) { DateTimeFormatter.ofPattern("yyyy", locale) }
     val firstDayOfWeek = DayOfWeek.MONDAY

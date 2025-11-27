@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
@@ -62,9 +63,10 @@ fun CollapsibleDateSelector(
     onYearSelected: (Int) -> Unit,
     onWeekSelected: (Int) -> Unit,
     onCalendarMonthChanged: (YearMonth) -> Unit,
-    onExpansionChanged: ((Boolean, Dp) -> Unit)? = null
+    onExpansionChanged: ((Boolean, Dp) -> Unit)? = null,
+    currentView: DateSelectorView = DateSelectorView.WEEK_NAV,
+    onViewChanged: (DateSelectorView) -> Unit = {}
 ) {
-    var currentView by rememberSaveable { mutableStateOf(DateSelectorView.WEEK_NAV) }
     var weekNavContentHeightPx by remember { mutableIntStateOf(0) }
     var calendarContentHeightPx by remember { mutableIntStateOf(0) }
     var toggleButtonHeightPx by remember { mutableIntStateOf(0) }
@@ -106,7 +108,7 @@ fun CollapsibleDateSelector(
         ToggleButtonRow(
             currentView = currentView,
             onLeftArrowClick = {
-                currentView = when (currentView) {
+                val newView = when (currentView) {
                     DateSelectorView.COLLAPSED, DateSelectorView.CALENDAR -> {
                         DateSelectorView.WEEK_NAV
                     }
@@ -115,9 +117,10 @@ fun CollapsibleDateSelector(
                         DateSelectorView.COLLAPSED
                     }
                 }
+                onViewChanged(newView)
             },
             onRightArrowClick = {
-                currentView = when (currentView) {
+                val newView = when (currentView) {
                     DateSelectorView.COLLAPSED, DateSelectorView.WEEK_NAV -> {
                         DateSelectorView.CALENDAR
                     }
@@ -126,6 +129,7 @@ fun CollapsibleDateSelector(
                         DateSelectorView.COLLAPSED
                     }
                 }
+                onViewChanged(newView)
             },
             onSizeChanged = { toggleButtonHeightPx = it }
         )
@@ -152,7 +156,7 @@ fun CollapsibleDateSelector(
             selectedDate = selectedDate,
             onDaySelected = onDaySelected,
             onCalendarMonthChanged = onCalendarMonthChanged,
-            onCollapse = { currentView = DateSelectorView.COLLAPSED },
+            onCollapse = { onViewChanged(DateSelectorView.COLLAPSED) },
             onSizeChanged = { calendarContentHeightPx = it }
         )
     }
@@ -178,8 +182,8 @@ private fun ToggleButtonRow(
         NavigationArrow(
             pointsDown = leftArrowPointsDown,
             onClick = onLeftArrowClick,
-            contentDescription = if (leftArrowPointsDown) "Collapse week navigation"
-                                 else "Show week navigation"
+            contentDescription = if (leftArrowPointsDown) stringResource(R.string.hide_week_nav)
+                                 else stringResource(R.string.show_week_nav)
         )
 
         Spacer(modifier = Modifier.width(2 * Sizes.Icon.L))
@@ -187,8 +191,8 @@ private fun ToggleButtonRow(
         NavigationArrow(
             pointsDown = rightArrowPointsDown,
             onClick = onRightArrowClick,
-            contentDescription = if (rightArrowPointsDown) "Collapse calendar"
-                                 else "Show calendar"
+            contentDescription = if (rightArrowPointsDown) stringResource(R.string.hide_calendar)
+                                 else stringResource(R.string.show_calendar)
         )
     }
 }

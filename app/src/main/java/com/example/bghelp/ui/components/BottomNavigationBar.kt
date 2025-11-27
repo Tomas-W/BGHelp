@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -211,7 +212,7 @@ fun BottomNavigationBar(
                 icon = {
                     Image(
                         painter = painterResource(optionsIconRes),
-                        contentDescription = "Options",
+                        contentDescription = stringResource(R.string.navigation_options),
                         modifier = Modifier.size(Sizes.Icon.L),
                         colorFilter = ColorFilter.tint(
                             if (isOptionsRouteActive) MaterialTheme.colorScheme.onSurface
@@ -221,7 +222,7 @@ fun BottomNavigationBar(
                 },
                 label = {
                     Text(
-                        text = "Options",
+                        text = stringResource(R.string.navigation_options),
                         color = if (isOptionsRouteActive) MaterialTheme.colorScheme.onSurface
                                 else MaterialTheme.colorScheme.onTertiary,
                         fontWeight = if (isOptionsRouteActive) FontWeight.Bold

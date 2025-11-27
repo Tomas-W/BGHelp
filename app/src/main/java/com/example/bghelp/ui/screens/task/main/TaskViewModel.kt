@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bghelp.data.repository.TaskRepository
 import com.example.bghelp.domain.model.Task
+import com.example.bghelp.ui.components.DateSelectorView
 import com.example.bghelp.utils.TaskImageStorage
 import com.example.bghelp.utils.getEpochRange
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -198,6 +199,14 @@ class TaskViewModel @Inject constructor(
 
     fun updateWeekNavHeight(height: Dp) {
         _weekNavHeight.value = height
+    }
+
+    // Date Selector View State
+    private val _dateSelectorView = MutableStateFlow(DateSelectorView.WEEK_NAV)
+    val dateSelectorView: StateFlow<DateSelectorView> = _dateSelectorView.asStateFlow()
+
+    fun updateDateSelectorView(view: DateSelectorView) {
+        _dateSelectorView.value = view
     }
 
     // Tasks
