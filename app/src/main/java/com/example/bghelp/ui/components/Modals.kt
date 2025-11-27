@@ -32,7 +32,8 @@ fun OptionsModal(
     confirmLabel: String,
     confirmOption: () -> Unit,
     extraLabel: String? = null,
-    extraOption: (() -> Unit)? = null
+    extraOption: (() -> Unit)? = null,
+    dismissOnAction: Boolean = true
 ) {
     if (!isVisible) return
 
@@ -95,11 +96,15 @@ fun OptionsModal(
                     confirmText = confirmLabel,
                     onCancelClick = {
                         cancelOption?.invoke()
-                        onDismissRequest()
+                        if (dismissOnAction) {
+                            onDismissRequest()
+                        }
                     },
                     onConfirmClick = {
                         confirmOption()
-                        onDismissRequest()
+                        if (dismissOnAction) {
+                            onDismissRequest()
+                        }
                     },
                     isValid = true,
                     isLoading = false,
@@ -107,7 +112,9 @@ fun OptionsModal(
                     onMiddleClick = extraOption?.let {
                         {
                             it()
-                            onDismissRequest()
+                            if (dismissOnAction) {
+                                onDismissRequest()
+                            }
                         }
                     }
                 )

@@ -142,7 +142,7 @@ fun ButtonRow(
                         enabled = !isLoading
                     ) {
                         if (!isLoading) {
-                            onMiddleClick?.invoke()
+                            onMiddleClick.invoke()
                         }
                     },
                 contentAlignment = Alignment.Center

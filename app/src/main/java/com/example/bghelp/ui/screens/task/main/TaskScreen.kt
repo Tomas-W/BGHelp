@@ -53,6 +53,17 @@ enum class DeletionType {
     REGULAR_TASK
 }
 
+private enum class RecurringActionType {
+    DELETE,
+    EDIT
+}
+
+private enum class ModalState {
+    INITIAL,          // Delete or Edit choice
+    DELETE_RECURRING, // Delete This or All
+    EDIT_RECURRING    // Edit This or All
+}
+
 private data class PendingDeletion(
     val task: Task,
     val deletionType: DeletionType
@@ -68,6 +79,13 @@ fun TaskScreen(
     val selectedTasks by taskViewModel.tasksInRange.collectAsState(initial = emptyList())
     val selectedDate by taskViewModel.selectedDate.collectAsState()
     val expandedTaskIds by taskViewModel.expandedTaskIds.collectAsState()
+    // Track deletion and editing
+    var taskPendingEdit by remember { mutableStateOf<Task?>(null) }
+    var pendingDeletions by remember { mutableStateOf<Map<String, PendingDeletion>>(emptyMap()) }
+    var modalTask by remember { mutableStateOf<Task?>(null) }
+    var modalState by remember { mutableStateOf<ModalState>(ModalState.INITIAL) }
+    var isRecurringModalBase by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
     // Date selector (week navigation / calendar)
     val rawSelectedDate by remember { derivedStateOf { selectedDate.toLocalDate() } }
     val navYearMonth by taskViewModel.currentYearMonth.collectAsState()
@@ -75,38 +93,24 @@ fun TaskScreen(
     val navWeekDisplay by taskViewModel.weekDisplay.collectAsState()
     val navWeekNumbers by taskViewModel.availableWeekNumbers.collectAsState()
     val navWeekDays by taskViewModel.weekDays.collectAsState()
+    val dateSelectorView by taskViewModel.dateSelectorView.collectAsState()
     // Scroll state
     val listState = rememberLazyListState()
     val savedIndex = taskViewModel.getSavedScrollIndex()
     val savedOffset = taskViewModel.getSavedScrollOffset()
-    // Return to scroll position
-    LaunchedEffect(selectedTasks) {
-        if (selectedTasks.isNotEmpty() && savedIndex > 0) {
-            listState.scrollToItem(savedIndex, savedOffset)
-        }
-    }
-    // Save scroll position
-    LaunchedEffect(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset) {
-        taskViewModel.saveScrollPosition(
-            listState.firstVisibleItemIndex,
-            listState.firstVisibleItemScrollOffset
-        )
-    }
-    // Track deletion and editing
-    var taskPendingDeletion by remember { mutableStateOf<Task?>(null) }
-    var taskPendingEdit by remember { mutableStateOf<Task?>(null) }
-    var pendingDeletions by remember { mutableStateOf<Map<String, PendingDeletion>>(emptyMap()) }
-    var isTaskRecurring by remember { mutableStateOf(false) }
-    var isTaskBase by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
 
-    // Helper function to get task key
+    // Key for lazyColumn and recurrence identifying (delete/edit)
     fun getTaskKey(task: Task): String {
         val epoch = task.date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
         return "${task.id}_$epoch"
     }
 
-    // Helper function to schedule a pending deletion
+    fun dismissModal() {
+        modalTask = null
+        modalState = ModalState.INITIAL
+    }
+
+    // Deletes after delay if not cancelled
     fun scheduleDeletion(pendingDeletion: PendingDeletion) {
         val taskKey = getTaskKey(pendingDeletion.task)
         coroutineScope.launch {
@@ -132,10 +136,61 @@ fun TaskScreen(
         }
     }
 
+    // Add to delayed deletion queue
+    fun enqueueDeletion(task: Task, deletionType: DeletionType) {
+        val taskKey = getTaskKey(task)
+        val pendingDeletion = PendingDeletion(task, deletionType)
+        pendingDeletions = pendingDeletions + (taskKey to pendingDeletion)
+        scheduleDeletion(pendingDeletion)
+    }
+
+    // Delete or show recurring modal
+    fun handleDeleteChoice() {
+        val task = modalTask ?: return
+        
+        if (taskViewModel.isRecurringTask(task)) {
+            modalState = ModalState.DELETE_RECURRING
+        } else {
+            enqueueDeletion(task, DeletionType.REGULAR_TASK)
+            dismissModal()
+        }
+    }
+
+    // Delete this or all occurrences
+    fun handleRecurringDelete(deleteAll: Boolean) {
+        val task = modalTask ?: return
+        val deletionType = when {
+            deleteAll -> DeletionType.DELETE_ALL
+            isRecurringModalBase -> DeletionType.BASE_TASK_MARK_DELETED
+            else -> DeletionType.SINGLE_OCCURRENCE
+        }
+        enqueueDeletion(task, deletionType)
+        dismissModal()
+    }
+
+    // Edit or show recurring modal
+    fun handleEditChoice() {
+        val task = modalTask ?: return
+        
+        if (taskViewModel.isRecurringTask(task)) {
+            modalState = ModalState.EDIT_RECURRING
+        } else {
+            taskPendingEdit = task
+            dismissModal()
+        }
+    }
+
+    // Edit this or all occurrences
+    fun handleRecurringEdit(editAll: Boolean) {
+        val task = modalTask ?: return
+        taskPendingEdit = task
+        dismissModal()
+    }
+
     // WeekNav height
     val weekNavHeight by taskViewModel.weekNavHeight.collectAsState()
     var isFirstComposition by remember { mutableStateOf(true) }
-
+    // Animated FAB offset
     val animatedWeekNavHeight by animateDpAsState(
         targetValue = weekNavHeight,
         animationSpec = if (isFirstComposition && weekNavHeight > 0.dp) {
@@ -158,6 +213,21 @@ fun TaskScreen(
         taskViewModel.updateWeekNavHeight(height)
     }
 
+    // Return to scroll position
+    LaunchedEffect(selectedTasks) {
+        if (selectedTasks.isNotEmpty() && savedIndex > 0) {
+            listState.scrollToItem(savedIndex, savedOffset)
+        }
+    }
+
+    // Save scroll position
+    LaunchedEffect(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset) {
+        taskViewModel.saveScrollPosition(
+            listState.firstVisibleItemIndex,
+            listState.firstVisibleItemScrollOffset
+        )
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.fillMaxSize()
@@ -174,21 +244,24 @@ fun TaskScreen(
                     if (selectedTasks.isNotEmpty()) {
                         itemsIndexed(
                             items = selectedTasks,
-                            key = { _, task -> 
+                            key = { _, task ->
                                 val epoch = task.date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
                                 "${task.id}_$epoch"
                             },
                             contentType = { _, _ -> "task" }
                         ) { index, task ->
-                            val isFirst = index == 0
-                            val isLast = index == selectedTasks.size - 1
+                            val isFirst = index == 0 // For rounded corners
+                            val isLast = index == selectedTasks.size - 1 // For rounded corners
                             val taskKey = getTaskKey(task)
-                            val isPendingDeletion = pendingDeletions.containsKey(taskKey)
+                            val isPendingDeletion = pendingDeletions.containsKey(taskKey) // For deletion overlay
                             DayComponent(
                                 task = task,
                                 isExpanded = expandedTaskIds.contains(task.id),
                                 onToggleExpanded = taskViewModel::toggleTaskExpanded,
-                                onLongPress = { taskPendingDeletion = it },
+                                onLongPress = { pressedTask ->
+                                    modalTask = pressedTask
+                                    modalState = ModalState.INITIAL
+                                },
                                 isPendingDeletion = isPendingDeletion,
                                 onCancelDeletion = {
                                     pendingDeletions = pendingDeletions - taskKey
@@ -222,10 +295,12 @@ fun TaskScreen(
                 onWeekSelected = taskViewModel::goToWeek,
                 onCalendarMonthChanged = taskViewModel::setCalendarMonth,
                 onExpansionChanged = onDateSelectorExpansionChanged,
+                currentView = dateSelectorView,
+                onViewChanged = taskViewModel::updateDateSelectorView
             )
         }
 
-        // FAB above WeekNav - moves in sync
+        // Add Task FAB - moves in sync with WeekNav
         if (overlayNavController != null) {
             Box(
                 modifier = Modifier
@@ -252,73 +327,52 @@ fun TaskScreen(
         }
     }
 
-    // Check if task is recurring when modal opens
-    LaunchedEffect(taskPendingDeletion) {
-        taskPendingDeletion?.let { task ->
-            isTaskRecurring = taskViewModel.isRecurringTask(task)
-            if (isTaskRecurring) {
-                isTaskBase = taskViewModel.isBaseRecurringTask(task)
-            } else {
-                isTaskBase = false
-            }
+    // Track base occurrence info for recurring modal
+    LaunchedEffect(modalTask) {
+        modalTask?.let { task ->
+            isRecurringModalBase = taskViewModel.isBaseRecurringTask(task)
         } ?: run {
-            isTaskRecurring = false
-            isTaskBase = false
+            isRecurringModalBase = false
         }
     }
 
-    // Delete Task modal
+    // Single modal with different states (delete/edit | this/all)
     OptionsModal(
-        isVisible = taskPendingDeletion != null,
-        onDismissRequest = { taskPendingDeletion = null },
-        title = if (isTaskRecurring) "This is a recurring Task.\nDelete only this Task or all occurrences?" else null,
+        isVisible = modalTask != null,
+        onDismissRequest = { dismissModal() },
+        dismissOnAction = false,
+        title = when (modalState) {
+            ModalState.INITIAL -> "Delete or edit?"
+            ModalState.DELETE_RECURRING -> "This is a recurring Task.\nDelete this Task or all occurrences?"
+            ModalState.EDIT_RECURRING -> "This is a recurring Task.\nEdit this Task or all occurrences?"
+        },
         content = {
-            taskPendingDeletion?.let { task ->
+            modalTask?.let { task ->
                 TaskPreviewComponent(task = task)
             }
         },
-        cancelLabel = "Delete",
+        cancelLabel = when (modalState) {
+            ModalState.INITIAL -> "Delete"
+            ModalState.DELETE_RECURRING, ModalState.EDIT_RECURRING -> "This Task"
+        },
         cancelOption = {
-            taskPendingDeletion?.let { task ->
-                coroutineScope.launch {
-                    val isRecurring = taskViewModel.isRecurringTask(task)
-                    val deletionType = if (isRecurring) {
-                        val isBase = taskViewModel.isBaseRecurringTask(task)
-                        if (isBase) {
-                            DeletionType.BASE_TASK_MARK_DELETED
-                        } else {
-                            DeletionType.SINGLE_OCCURRENCE
-                        }
-                    } else {
-                        DeletionType.REGULAR_TASK
-                    }
-                    val taskKey = getTaskKey(task)
-                    val pendingDeletion = PendingDeletion(task, deletionType)
-                    pendingDeletions = pendingDeletions + (taskKey to pendingDeletion)
-                    scheduleDeletion(pendingDeletion)
-                    taskPendingDeletion = null
-                }
+            when (modalState) {
+                ModalState.INITIAL -> handleDeleteChoice()
+                ModalState.DELETE_RECURRING -> handleRecurringDelete(deleteAll = false)
+                ModalState.EDIT_RECURRING -> handleRecurringEdit(editAll = false)
             }
         },
-        confirmLabel = "Edit",
+        confirmLabel = when (modalState) {
+            ModalState.INITIAL -> "Edit"
+            ModalState.DELETE_RECURRING, ModalState.EDIT_RECURRING -> "All Tasks"
+        },
         confirmOption = {
-            taskPendingDeletion?.let { task ->
-                taskPendingEdit = task
-                taskPendingDeletion = null
+            when (modalState) {
+                ModalState.INITIAL -> handleEditChoice()
+                ModalState.DELETE_RECURRING -> handleRecurringDelete(deleteAll = true)
+                ModalState.EDIT_RECURRING -> handleRecurringEdit(editAll = true)
             }
-        },
-        extraLabel = if (isTaskRecurring) "Delete All" else null,
-        extraOption = if (isTaskRecurring) {
-            {
-                taskPendingDeletion?.let { task ->
-                    val taskKey = getTaskKey(task)
-                    val pendingDeletion = PendingDeletion(task, DeletionType.DELETE_ALL)
-                    pendingDeletions = pendingDeletions + (taskKey to pendingDeletion)
-                    scheduleDeletion(pendingDeletion)
-                    taskPendingDeletion = null
-                }
-            }
-        } else null
+        }
     )
 
     // Navigate to edit task
