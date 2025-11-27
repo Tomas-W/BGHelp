@@ -75,28 +75,28 @@ fun ConfirmButton(
 @Composable
 fun ButtonRow(
     modifier: Modifier = Modifier,
-    cancelText: String,
-    confirmText: String,
-    onCancelClick: () -> Unit,
-    onConfirmClick: () -> Unit,
     isValid: Boolean,
     isLoading: Boolean,
-
-    middleText: String? = null,
-    onMiddleClick: (() -> Unit)? = null
+    firstLabel: String,
+    firstOnClick: () -> Unit,
+    secondLabel: String? = null,
+    secondOnClick: (() -> Unit)? = null,
+    thirdLabel: String? = null,
+    thirdOnClick: (() -> Unit)? = null
 ) {
-    val cancelInteractionSource = remember { MutableInteractionSource() }
-    val cancelIsPressed by cancelInteractionSource.collectIsPressedAsState()
-
-    val middleInteractionSource = remember { MutableInteractionSource() }
-    val middleIsPressed by middleInteractionSource.collectIsPressedAsState()
-
-    val confirmInteractionSource = remember { MutableInteractionSource() }
-    val confirmIsPressed by confirmInteractionSource.collectIsPressedAsState()
-
     val defaultColor = MaterialTheme.colorScheme.surface
     val highlightColor = MaterialTheme.colorScheme.surfaceDim
-    val hasMiddleButton = middleText != null && onMiddleClick != null
+    val hasSecond = secondLabel != null && secondOnClick != null
+    val hasThird = thirdLabel != null && thirdOnClick != null
+
+    val firstInteractionSource = remember { MutableInteractionSource() }
+    val firstIsPressed by firstInteractionSource.collectIsPressedAsState()
+
+    val secondInteractionSource = remember { MutableInteractionSource() }
+    val secondIsPressed by secondInteractionSource.collectIsPressedAsState()
+
+    val thirdInteractionSource = remember { MutableInteractionSource() }
+    val thirdIsPressed by thirdInteractionSource.collectIsPressedAsState()
 
     Row(
         modifier = modifier
@@ -104,45 +104,19 @@ fun ButtonRow(
             .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .background(if (cancelIsPressed) highlightColor else defaultColor)
-                .topBorder()
-                .clickable(
-                    interactionSource = cancelInteractionSource,
-                    indication = null,
-                    enabled = !isLoading
-                ) {
-                    if (!isLoading) {
-                        onCancelClick()
-                    }
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            Box(
-                modifier = Modifier.padding(vertical = 16.dp)
-            ) {
-                Text(
-                    text = cancelText,
-                    style = MaterialTheme.typography.headlineSmall
-                )
-            }
-        }
-
-        if (hasMiddleButton) {
+        if (hasSecond) {
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .background(if (middleIsPressed) highlightColor else defaultColor)
+                    .background(if (secondIsPressed) highlightColor else defaultColor)
                     .topBorder()
                     .clickable(
-                        interactionSource = middleInteractionSource,
+                        interactionSource = secondInteractionSource,
                         indication = null,
                         enabled = !isLoading
                     ) {
                         if (!isLoading) {
-                            onMiddleClick.invoke()
+                            secondOnClick()
                         }
                     },
                 contentAlignment = Alignment.Center
@@ -151,7 +125,35 @@ fun ButtonRow(
                     modifier = Modifier.padding(vertical = 16.dp)
                 ) {
                     Text(
-                        text = middleText,
+                        text = secondLabel,
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                }
+            }
+        }
+
+        if (hasThird) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .background(if (thirdIsPressed) highlightColor else defaultColor)
+                    .topBorder()
+                    .clickable(
+                        interactionSource = thirdInteractionSource,
+                        indication = null,
+                        enabled = !isLoading
+                    ) {
+                        if (!isLoading) {
+                            thirdOnClick()
+                        }
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier.padding(vertical = 16.dp)
+                ) {
+                    Text(
+                        text = thirdLabel,
                         style = MaterialTheme.typography.headlineSmall
                     )
                 }
@@ -161,15 +163,15 @@ fun ButtonRow(
         Box(
             modifier = Modifier
                 .weight(1f)
-                .background(if (confirmIsPressed) highlightColor else defaultColor)
+                .background(if (firstIsPressed) highlightColor else defaultColor)
                 .topBorder()
                 .clickable(
-                    interactionSource = confirmInteractionSource,
+                    interactionSource = firstInteractionSource,
                     indication = null,
                     enabled = !isLoading
                 ) {
                     if (!isLoading) {
-                        onConfirmClick()
+                        firstOnClick()
                     }
                 },
             contentAlignment = Alignment.Center
@@ -178,7 +180,7 @@ fun ButtonRow(
                 modifier = Modifier.padding(vertical = 16.dp)
             ) {
                 Text(
-                    text = confirmText,
+                    text = firstLabel,
                     style = MaterialTheme.typography.headlineSmall,
                     color = if (isValid && !isLoading) {
                         MaterialTheme.colorScheme.onSurface

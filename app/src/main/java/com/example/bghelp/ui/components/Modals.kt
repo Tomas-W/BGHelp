@@ -92,24 +92,24 @@ fun OptionsModal(
                 }
 
                 ButtonRow(
-                    cancelText = cancelLabel ?: "Cancel",
-                    confirmText = confirmLabel,
-                    onCancelClick = {
-                        cancelOption?.invoke()
-                        if (dismissOnAction) {
-                            onDismissRequest()
-                        }
-                    },
-                    onConfirmClick = {
+                    isValid = true,
+                    isLoading = false,
+                    firstLabel = confirmLabel,
+                    firstOnClick = {
                         confirmOption()
                         if (dismissOnAction) {
                             onDismissRequest()
                         }
                     },
-                    isValid = true,
-                    isLoading = false,
-                    middleText = extraLabel,
-                    onMiddleClick = extraOption?.let {
+                    secondLabel = cancelLabel,
+                    secondOnClick = {
+                        cancelOption?.invoke()
+                        if (dismissOnAction) {
+                            onDismissRequest()
+                        }
+                    },
+                    thirdLabel = extraLabel,
+                    thirdOnClick = extraOption?.let {
                         {
                             it()
                             if (dismissOnAction) {

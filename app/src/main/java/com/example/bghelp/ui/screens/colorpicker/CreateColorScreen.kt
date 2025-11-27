@@ -117,12 +117,12 @@ fun CreateColorScreen(
             }
 
             ButtonRow(
-                cancelText = "Cancel",
-                confirmText = if (saving) "Saving..." else "Save Color",
-                onCancelClick = { navController.popBackStack() },
-                onConfirmClick = { viewModel.saveColor() },
                 isValid = isColorNameValid,
-                isLoading = saving
+                isLoading = saving,
+                firstLabel = if (saving) "Saving..." else "Save Color",
+                firstOnClick = { viewModel.saveColor() },
+                secondLabel = "Cancel",
+                secondOnClick = { navController.popBackStack() },
             )
         }
 

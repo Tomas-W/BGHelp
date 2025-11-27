@@ -240,17 +240,14 @@ private fun BottomButtonRow(
             selectedLocations.all { it.name.isNotBlank() }
 
     ButtonRow(
-        cancelText = STR.ADD_MARKER,
-        confirmText = if (selectedLocations.size <= 1) {
+        isValid = canSave,
+        isLoading = false,
+        firstLabel = if (selectedLocations.size <= 1) {
             STR.SAVE_LOCATION
         } else {
             STR.SAVE_LOCATIONS
         },
-        onCancelClick = {
-            val target = cameraPositionState.position.target
-            viewModel.onAddMarker(target)
-        },
-        onConfirmClick = {
+        firstOnClick = {
             navController.previousBackStackEntry
                 ?.savedStateHandle
                 ?.set(
@@ -259,8 +256,11 @@ private fun BottomButtonRow(
                 )
             navController.popBackStack()
         },
-        isValid = canSave,
-        isLoading = false
+        secondLabel = STR.ADD_MARKER,
+        secondOnClick = {
+            val target = cameraPositionState.position.target
+            viewModel.onAddMarker(target)
+        },
     )
 }
 

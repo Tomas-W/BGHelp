@@ -34,13 +34,13 @@ fun AddTargetScreen(
         }
 
         ButtonRow(
-            cancelText = "Cancel",
-            confirmText = "Save",
-            onCancelClick = { navController?.popBackStack() ?: onTargetCreated() },
-            onConfirmClick = onTargetCreated,
+            modifier = Modifier.align(Alignment.BottomCenter),
             isValid = true,
             isLoading = false,
-            modifier = Modifier.align(Alignment.BottomCenter)
+            firstLabel = "Save",
+            firstOnClick = onTargetCreated,
+            secondLabel = "Cancel",
+            secondOnClick = { navController?.popBackStack() ?: onTargetCreated() }
         )
     }
 }

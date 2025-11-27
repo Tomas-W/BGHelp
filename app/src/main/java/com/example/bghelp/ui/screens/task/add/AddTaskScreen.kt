@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -161,14 +160,14 @@ fun AddTaskScreen(
             }
 
             ButtonRow(
-                cancelText = "Cancel",
-                confirmText = when {
+                isValid = isValid,
+                isLoading = saveState is SaveTaskState.Saving,
+                firstLabel = when {
                     saveState is SaveTaskState.Saving -> AddTaskStrings.SAVING
                     isEditing -> AddTaskStrings.EDIT_TASK
                     else -> AddTaskStrings.SAVE_TASK
                 },
-                onCancelClick = { navController.popBackStack() },
-                onConfirmClick = {
+                firstOnClick = {
                     if (isValid && saveState !is SaveTaskState.Saving) {
                         viewModel.saveTask()
                     } else if (!isValid && saveState !is SaveTaskState.Saving) {
@@ -176,8 +175,8 @@ fun AddTaskScreen(
                         errorMessage?.let { viewModel.showSnackbar(it) }
                     }
                 },
-                isValid = isValid,
-                isLoading = saveState is SaveTaskState.Saving
+                secondLabel = "Cancel",
+                secondOnClick = { navController.popBackStack() },
             )
         }
 
