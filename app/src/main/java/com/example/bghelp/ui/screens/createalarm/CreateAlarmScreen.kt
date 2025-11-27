@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,6 +34,8 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 
 @Composable
 fun CreateAlarmScreen(
@@ -64,7 +67,10 @@ fun SelectDayField(
     onDateSelected: (LocalDate) -> Unit
 ) {
     val dateDialogState = rememberMaterialDialogState()
-    val formatter = remember { DateTimeFormatter.ofPattern("EEEE MMMM dd") }
+    val locale = LocalContext.current.resources.configuration.locales[0]
+    val formatter = remember(locale) {
+        DateTimeFormatter.ofPattern("EEEE MMMM dd", locale)
+    }
 
     Row(
         modifier = Modifier
@@ -118,7 +124,10 @@ fun SelectTimeField(
     onTimeSelected: (LocalTime) -> Unit
 ) {
     val timeDialogState = rememberMaterialDialogState()
-    val formatter = remember { DateTimeFormatter.ofPattern("HH:mm") }
+    val locale = LocalContext.current.resources.configuration.locales[0]
+    val formatter = remember(locale) {
+        DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)
+    }
 
     Row(
         modifier = Modifier

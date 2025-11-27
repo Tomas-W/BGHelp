@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpOffset
@@ -49,7 +50,9 @@ import java.time.LocalDate
 import java.time.Month
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
 import java.time.temporal.TemporalAdjusters
+import java.util.Locale
 
 @Composable
 fun DateRangeCalendar(
@@ -66,8 +69,9 @@ fun DateRangeCalendar(
     selectedDate: LocalDate? = null,
     showDismissButton: Boolean = true
 ) {
-    val monthFormatter = remember { DateTimeFormatter.ofPattern("MMMM") }
-    val yearFormatter = remember { DateTimeFormatter.ofPattern("yyyy") }
+    val locale = LocalContext.current.resources.configuration.locales[0]
+    val monthFormatter = remember(locale) { DateTimeFormatter.ofPattern("MMMM", locale) }
+    val yearFormatter = remember(locale) { DateTimeFormatter.ofPattern("yyyy", locale) }
     val firstDayOfWeek = DayOfWeek.MONDAY
     val weeks =
         remember(currentMonth, firstDayOfWeek) { buildMonthWeeks(currentMonth, firstDayOfWeek) }
@@ -97,7 +101,7 @@ fun DateRangeCalendar(
 
         Spacer(modifier = Modifier.height(Sizes.Size.S))
 
-        CalendarWeekdayHeader(firstDayOfWeek = firstDayOfWeek)
+        CalendarWeekdayHeader(firstDayOfWeek = firstDayOfWeek, locale = locale)
 
         CalendarWeeksGrid(
             weeks = weeks,
@@ -330,7 +334,7 @@ private fun CalendarNavigationButton(
 }
 
 @Composable
-private fun CalendarWeekdayHeader(firstDayOfWeek: DayOfWeek) {
+private fun CalendarWeekdayHeader(firstDayOfWeek: DayOfWeek, locale: Locale) {
     Row(
         modifier = Modifier
             .fillMaxWidth(),
@@ -339,7 +343,7 @@ private fun CalendarWeekdayHeader(firstDayOfWeek: DayOfWeek) {
         for (dow in dayOfWeekOrder(firstDayOfWeek)) {
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                 Text(
-                    text = dow.name.take(1),
+                    text = dow.getDisplayName(TextStyle.NARROW, locale),
                     style = MaterialTheme.typography.lTextDefault,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

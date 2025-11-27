@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpOffset
@@ -41,6 +42,7 @@ import java.time.LocalDate
 import java.time.Month
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun WeekNavigation(
@@ -56,9 +58,10 @@ fun WeekNavigation(
     onYearSelected: (Int) -> Unit,
     onWeekSelected: (Int) -> Unit
 ) {
+    val locale = LocalContext.current.resources.configuration.locales[0]
     val today = remember { LocalDate.now() }
-    val monthFormatter = remember { DateTimeFormatter.ofPattern("MMMM") }
-    val yearFormatter = remember { DateTimeFormatter.ofPattern("yyyy") }
+    val monthFormatter = remember(locale) { DateTimeFormatter.ofPattern("MMMM", locale) }
+    val yearFormatter = remember(locale) { DateTimeFormatter.ofPattern("yyyy", locale) }
     var isMonthMenuOpen by remember { mutableStateOf(false) }
     var isYearMenuOpen by remember { mutableStateOf(false) }
     val months = remember { Month.entries }

@@ -1,10 +1,15 @@
 package com.example.bghelp.utils
 
+import android.icu.text.MeasureFormat
+import android.icu.util.Measure
+import android.icu.util.MeasureUnit
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 
 // Cache today's date to avoid repeated calls
 private var cachedToday: LocalDate? = null
@@ -31,8 +36,9 @@ fun getEpochRange(date: LocalDateTime = LocalDateTime.now(ZoneId.systemDefault()
 fun LocalDateTime.toDayHeader(): String {
     val date = this.toLocalDate()
     val today = getToday()  // Use cached today instead of LocalDate.now()
-    val monthDayFormatter = DateTimeFormatter.ofPattern("MMM dd") // "Jan 01"
-    val weekdayFormatter = DateTimeFormatter.ofPattern("EEE") // "Mon"
+    val locale = Locale.getDefault()
+    val monthDayFormatter = DateTimeFormatter.ofPattern("MMM dd", locale)
+    val weekdayFormatter = DateTimeFormatter.ofPattern("EEEE", locale)
 
     val prefix = when (date) {
         today.minusDays(1) -> "Yesterday"
@@ -41,7 +47,7 @@ fun LocalDateTime.toDayHeader(): String {
         else -> date.format(weekdayFormatter)
     }
 
-    return "$prefix, ${date.format(monthDayFormatter)}"
+    return "$prefix ${date.format(monthDayFormatter)}"
 }
 
 fun LocalDateTime.isInFuture(): Boolean {
@@ -54,18 +60,35 @@ fun LocalDateTime.toTaskTime(): String {
 
 // Centralized date/time formatting helpers
 
-fun formatTime(time: LocalTime): String {
-    return time.format(DateTimeFormatter.ofPattern("HH:mm"))
+fun formatTime(time: LocalTime, locale: Locale = Locale.getDefault()): String {
+    val formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)
+    return time.format(formatter)
 }
 
-fun Int.formatSnoozeDuration(): String {
-    return when {
-        this < 60 -> "${this}s"
-        this < 3600 -> "${this / 60}m"
-        this < 86400 -> "${this / 3600}h"
-        this < 604800 -> "${this / 86400}d"
-        this < 2592000 -> "${this / 604800}w"
-        else -> "${this / 2592000}M"
+fun formatDuration(hours: Int, minutes: Int, locale: Locale = Locale.getDefault()): String {
+    val measures = buildList {
+        if (hours > 0) add(Measure(hours, MeasureUnit.HOUR))
+        if (minutes > 0) add(Measure(minutes, MeasureUnit.MINUTE))
+    }.takeIf { it.isNotEmpty() } ?: listOf(Measure(0, MeasureUnit.MINUTE))
+    val formatter = MeasureFormat.getInstance(locale, MeasureFormat.FormatWidth.SHORT)
+    return formatter.formatMeasures(*measures.toTypedArray())
+}
+
+fun formatDuration(totalSeconds: Int, locale: Locale = Locale.getDefault()): String {
+    val safeSeconds = totalSeconds.coerceAtLeast(0)
+    val (value, unit) = when {
+        safeSeconds < 60 -> safeSeconds to MeasureUnit.SECOND
+        safeSeconds < 3600 -> safeSeconds / 60 to MeasureUnit.MINUTE
+        safeSeconds < 86400 -> safeSeconds / 3600 to MeasureUnit.HOUR
+        safeSeconds < 604800 -> safeSeconds / 86400 to MeasureUnit.DAY
+        safeSeconds < 2592000 -> safeSeconds / 604800 to MeasureUnit.WEEK
+        else -> safeSeconds / 2592000 to MeasureUnit.MONTH
     }
+    val formatter = MeasureFormat.getInstance(locale, MeasureFormat.FormatWidth.SHORT)
+    return formatter.format(Measure(value, unit))
+}
+
+fun Int.formatSnoozeDuration(locale: Locale = Locale.getDefault()): String {
+    return formatDuration(this, locale)
 }
 

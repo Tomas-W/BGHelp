@@ -20,8 +20,9 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.time.temporal.WeekFields
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,7 +42,9 @@ class TargetViewModel @Inject constructor(
     val expandedTargetIds: StateFlow<Set<Int>> = _expandedTargetIds.asStateFlow()
 
     val monthYear: StateFlow<String> = selectedWeek
-        .map { it.format(DateTimeFormatter.ofPattern("MMMM ''yy")) }
+        .map { week ->
+            week.format(DateTimeFormatter.ofPattern("MMMM ''yy", Locale.getDefault()))
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

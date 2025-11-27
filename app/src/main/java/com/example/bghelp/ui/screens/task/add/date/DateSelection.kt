@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
@@ -29,6 +30,7 @@ import com.example.bghelp.ui.screens.task.add.DateField
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.utils.clickableDismissFocus
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
 import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
@@ -36,7 +38,10 @@ import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 fun DateSelection(
     viewModel: AddTaskViewModel
 ) {
-    val fMonthYearDayShort = remember { DateTimeFormatter.ofPattern("EEE, MMM d") }
+    val locale = LocalContext.current.resources.configuration.locales[0]
+    val fMonthYearDayShort = remember(locale) {
+        DateTimeFormatter.ofPattern("EEE MMM d", locale)
+    }
     val dateStartSelection by viewModel.dateStartSelection.collectAsState()
     val dateEndSelection by viewModel.dateEndSelection.collectAsState()
     val activeDateField by viewModel.activeDateField.collectAsState()
