@@ -27,12 +27,12 @@ fun OptionsModal(
     title: String? = null,
     description: String? = null,
     content: @Composable (() -> Unit)? = null,
-    cancelLabel: String? = null,
-    cancelOption: (() -> Unit)? = null,
-    confirmLabel: String,
-    confirmOption: () -> Unit,
-    extraLabel: String? = null,
-    extraOption: (() -> Unit)? = null,
+    secondLabel: String? = null,
+    secondOnClick: (() -> Unit)? = null,
+    firstLabel: String,
+    firstOnClick: () -> Unit,
+    thirdLabel: String? = null,
+    thirdOnClick: (() -> Unit)? = null,
     dismissOnAction: Boolean = true
 ) {
     if (!isVisible) return
@@ -94,22 +94,22 @@ fun OptionsModal(
                 ButtonRow(
                     isValid = true,
                     isLoading = false,
-                    firstLabel = confirmLabel,
+                    firstLabel = firstLabel,
                     firstOnClick = {
-                        confirmOption()
+                        firstOnClick()
                         if (dismissOnAction) {
                             onDismissRequest()
                         }
                     },
-                    secondLabel = cancelLabel,
+                    secondLabel = secondLabel,
                     secondOnClick = {
-                        cancelOption?.invoke()
+                        secondOnClick?.invoke()
                         if (dismissOnAction) {
                             onDismissRequest()
                         }
                     },
-                    thirdLabel = extraLabel,
-                    thirdOnClick = extraOption?.let {
+                    thirdLabel = thirdLabel,
+                    thirdOnClick = thirdOnClick?.let {
                         {
                             it()
                             if (dismissOnAction) {

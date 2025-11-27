@@ -43,7 +43,6 @@ import com.example.bghelp.ui.components.OptionsModal
 import com.example.bghelp.ui.navigation.Screen
 import com.example.bghelp.utils.toDayHeader
 import kotlinx.coroutines.delay
-import java.time.LocalDateTime
 import java.time.ZoneId
 
 enum class DeletionType {
@@ -351,22 +350,22 @@ fun TaskScreen(
                 TaskPreviewComponent(task = task)
             }
         },
-        cancelLabel = when (modalState) {
+        secondLabel = when (modalState) {
             ModalState.INITIAL -> "Delete"
             ModalState.DELETE_RECURRING, ModalState.EDIT_RECURRING -> "This Task"
         },
-        cancelOption = {
+        secondOnClick = {
             when (modalState) {
                 ModalState.INITIAL -> handleDeleteChoice()
                 ModalState.DELETE_RECURRING -> handleRecurringDelete(deleteAll = false)
                 ModalState.EDIT_RECURRING -> handleRecurringEdit(editAll = false)
             }
         },
-        confirmLabel = when (modalState) {
+        firstLabel = when (modalState) {
             ModalState.INITIAL -> "Edit"
             ModalState.DELETE_RECURRING, ModalState.EDIT_RECURRING -> "All Tasks"
         },
-        confirmOption = {
+        firstOnClick = {
             when (modalState) {
                 ModalState.INITIAL -> handleEditChoice()
                 ModalState.DELETE_RECURRING -> handleRecurringDelete(deleteAll = true)
