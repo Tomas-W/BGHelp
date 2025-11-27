@@ -6,7 +6,9 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
+import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
+import java.util.Locale
 
 object RecurrenceCalculator {
     fun parseRRule(rrule: String): RecurrenceRule? {
@@ -37,12 +39,18 @@ object RecurrenceCalculator {
             parseUntilDate(untilStr)
         }
 
+        val exDates = values["EXDATE"]?.split(",")
+            ?.mapNotNull { parseUntilDate(it) }
+            ?.toSet()
+            ?: emptySet()
+
         return when (frequency) {
             Frequency.DAILY -> {
                 RecurrenceRule(
                     frequency = frequency,
                     interval = interval,
-                    until = until
+                    until = until,
+                    exDates = exDates
                 )
             }
 
@@ -56,7 +64,8 @@ object RecurrenceCalculator {
                     frequency = frequency,
                     interval = interval,
                     byDay = byDay,
-                    until = until
+                    until = until,
+                    exDates = exDates
                 )
             }
 
@@ -79,7 +88,8 @@ object RecurrenceCalculator {
                     interval = interval,
                     byMonth = byMonth,
                     byMonthDay = byMonthDay,
-                    until = until
+                    until = until,
+                    exDates = exDates
                 )
             }
         }
@@ -87,6 +97,9 @@ object RecurrenceCalculator {
 
     fun occursOnDate(task: Task, rule: RecurrenceRule, date: LocalDate): Boolean {
         if (rule.until != null && date.isAfter(rule.until)) {
+            return false
+        }
+        if (date in rule.exDates) {
             return false
         }
 
@@ -201,7 +214,7 @@ object RecurrenceCalculator {
     private fun Task.createOccurrence(start: LocalDateTime): Task {
         val duration = endDate?.let { Duration.between(date, it) }
         val newEnd = duration?.let { start.plus(it) }
-        val now = LocalDateTime.now()
+        val now = LocalDateTime.now(ZoneId.systemDefault())
         val isExpired = if (allDay && newEnd != null) {
             newEnd.isBefore(now)
         } else {
@@ -214,13 +227,61 @@ object RecurrenceCalculator {
         )
     }
 
+    fun addExDateToRRule(rrule: String, exDate: LocalDate): String {
+        val rule = parseRRule(rrule) ?: return rrule
+        val updatedExDates = rule.exDates + exDate
+        return buildRRuleString(rule.copy(exDates = updatedExDates))
+    }
+
+    private fun buildRRuleString(rule: RecurrenceRule): String {
+        val parts = mutableListOf<String>()
+        parts.add("FREQ=${rule.frequency.name}")
+        if (rule.interval > 1) {
+            parts.add("INTERVAL=${rule.interval}")
+        }
+        if (rule.until != null) {
+            val untilStr = String.format(Locale.getDefault(), "%04d%02d%02d", rule.until.year, rule.until.monthValue, rule.until.dayOfMonth)
+            parts.add("UNTIL=$untilStr")
+        }
+        if (rule.byDay.isNotEmpty()) {
+            val byDayStr = rule.byDay.joinToString(",") { it.toRRuleToken() }
+            parts.add("BYDAY=$byDayStr")
+        }
+        if (rule.byMonth.isNotEmpty()) {
+            val byMonthStr = rule.byMonth.joinToString(",") { it.toString() }
+            parts.add("BYMONTH=$byMonthStr")
+        }
+        if (rule.byMonthDay.isNotEmpty()) {
+            val byMonthDayStr = rule.byMonthDay.joinToString(",") { it.toString() }
+            parts.add("BYMONTHDAY=$byMonthDayStr")
+        }
+        if (rule.exDates.isNotEmpty()) {
+            val exDateStr = rule.exDates.sorted().joinToString(",") { date ->
+                String.format(Locale.getDefault(), "%04d%02d%02d", date.year, date.monthValue, date.dayOfMonth)
+            }
+            parts.add("EXDATE=$exDateStr")
+        }
+        return parts.joinToString(";")
+    }
+
+    private fun DayOfWeek.toRRuleToken(): String = when (this) {
+        DayOfWeek.MONDAY -> "MO"
+        DayOfWeek.TUESDAY -> "TU"
+        DayOfWeek.WEDNESDAY -> "WE"
+        DayOfWeek.THURSDAY -> "TH"
+        DayOfWeek.FRIDAY -> "FR"
+        DayOfWeek.SATURDAY -> "SA"
+        DayOfWeek.SUNDAY -> "SU"
+    }
+
     data class RecurrenceRule(
         val frequency: Frequency,
         val interval: Int,
         val byDay: Set<DayOfWeek> = emptySet(),
         val byMonth: Set<Int> = emptySet(),
         val byMonthDay: List<Int> = emptyList(),
-        val until: LocalDate? = null
+        val until: LocalDate? = null,
+        val exDates: Set<LocalDate> = emptySet()
     )
 
     enum class Frequency {

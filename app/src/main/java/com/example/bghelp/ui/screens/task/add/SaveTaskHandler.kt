@@ -11,7 +11,9 @@ import com.example.bghelp.utils.TaskMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 
 class SaveTaskHandler(
     private val taskRepository: TaskRepository,
@@ -182,7 +184,7 @@ class SaveTaskHandler(
                         reminders = createTask.reminders,
                         locations = createTask.locations,
                         createdAt = existingTask.createdAt,
-                        updatedAt = java.time.LocalDateTime.now()
+                        updatedAt = LocalDateTime.now(ZoneId.systemDefault())
                     )
                     taskRepository.updateTask(updatedTask)
                     SaveTaskResult.Success

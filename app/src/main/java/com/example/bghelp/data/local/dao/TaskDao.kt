@@ -98,6 +98,7 @@ abstract class TaskDao {
         SELECT * FROM ${DB.TASK_TABLE} 
         WHERE startEpoch BETWEEN :startDate
         AND :endDate
+        AND deleted = 0
         ORDER BY startEpoch
         ASC
         """)

@@ -3,6 +3,7 @@ package com.example.bghelp.ui.screens.task.add
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 
 object AddTaskValidator {
     fun validateTitle(title: String): String? {
@@ -30,7 +31,7 @@ object AddTaskValidator {
             }
         } else {
             val startDateTime = LocalDateTime.of(startDate, startTime)
-            val now = LocalDateTime.now()
+            val now = LocalDateTime.now(ZoneId.systemDefault())
             if (startDateTime.isBefore(now)) {
                 return AddTaskStrings.VALIDATION_START_TIME_PAST
             }
@@ -108,7 +109,7 @@ object AddTaskValidator {
         } else {
             LocalDateTime.of(startDate, startTime)
         }
-        val now = LocalDateTime.now()
+        val now = LocalDateTime.now(ZoneId.systemDefault())
 
         for (reminder in startReminders) {
             val reminderTime = calculateReminderTime(startDateTime, reminder)

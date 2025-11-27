@@ -93,7 +93,8 @@ data class Task(
     val reminders: List<TaskReminderEntry> = emptyList(),
     val locations: List<TaskLocationEntry> = emptyList(),
     val createdAt: LocalDateTime = LocalDateTime.now(ZoneId.systemDefault()),
-    val updatedAt: LocalDateTime = LocalDateTime.now(ZoneId.systemDefault())
+    val updatedAt: LocalDateTime = LocalDateTime.now(ZoneId.systemDefault()),
+    val deleted: Boolean = false
 )
 
 data class ExampleTask(
@@ -146,6 +147,7 @@ data class ExampleTask(
         reminders = reminders,
         locations = locations,
         createdAt = createdAt,
-        updatedAt = updatedAt
+        updatedAt = updatedAt,
+        deleted = false
     )
 }

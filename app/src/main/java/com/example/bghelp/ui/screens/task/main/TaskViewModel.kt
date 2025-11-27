@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -27,6 +28,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.YearMonth
+import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import javax.inject.Inject
@@ -39,7 +41,7 @@ class TaskViewModel @Inject constructor(
     private val isoWeekFields = WeekFields.ISO
 
     // Date / day
-    private val _selectedDate = MutableStateFlow<LocalDateTime>(LocalDateTime.now())
+    private val _selectedDate = MutableStateFlow<LocalDateTime>(LocalDateTime.now(ZoneId.systemDefault()))
     val selectedDate: StateFlow<LocalDateTime> = _selectedDate.asStateFlow()
 
     fun updateSelectedDate(date: LocalDateTime) {
@@ -222,6 +224,42 @@ class TaskViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun isRecurringTask(task: Task): Boolean {
+        return task.rrule != null
+    }
+
+    suspend fun isBaseRecurringTask(task: Task): Boolean {
+        if (task.rrule == null) return false
+        val baseTask = taskRepository.getTaskById(task.id).first() ?: return false
+        return baseTask.date.toLocalDate() == task.date.toLocalDate()
+    }
+
+    fun deleteRecurringTaskOccurrence(task: Task) {
+        viewModelScope.launch {
+            taskRepository.deleteRecurringTaskOccurrence(task)
+        }
+    }
+
+    fun deleteAllRecurringTaskOccurrences(task: Task) {
+        viewModelScope.launch {
+            val baseTask = taskRepository.getTaskById(task.id).first() ?: return@launch
+            taskRepository.deleteAllRecurringTaskOccurrences(task)
+            baseTask.image?.uri?.let { relativePath ->
+                withContext(Dispatchers.IO) {
+                    runCatching {
+                        TaskImageStorage.deleteImage(appContext, relativePath)
+                    }
+                }
+            }
+        }
+    }
+
+    fun markRecurringTaskBaseAsDeleted(task: Task) {
+        viewModelScope.launch {
+            taskRepository.markRecurringTaskBaseAsDeleted(task)
         }
     }
 }

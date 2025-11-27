@@ -27,6 +27,7 @@ import com.example.bghelp.ui.components.MainContentContainer
 import com.example.bghelp.ui.components.MainHeader
 import com.example.bghelp.utils.toDayHeader
 import java.time.LocalDateTime
+import java.time.ZoneId
 
 @SuppressLint("FrequentlyChangingValue")
 @Composable
@@ -119,7 +120,7 @@ fun AddTargetButton(
 ) {
     Button(
         onClick = {
-            val now = LocalDateTime.now()
+            val now = LocalDateTime.now(ZoneId.systemDefault())
             val localDateTime = now.plusSeconds(time / 1000)
             val coords = listOf(Coordinate(53.5, -4.7))
             targetViewModel.addTarget(

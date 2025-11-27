@@ -18,12 +18,16 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 interface TaskRepository {
     suspend fun addTask(createTask: CreateTask)
     suspend fun updateTask(task: Task)
     suspend fun deleteTask(task: Task)
+    suspend fun deleteRecurringTaskOccurrence(task: Task)
+    suspend fun deleteAllRecurringTaskOccurrences(task: Task)
+    suspend fun markRecurringTaskBaseAsDeleted(task: Task)
     fun getTaskById(id: Int): Flow<Task?>
     fun getTasksByDateRange(startDate: Long, endDate: Long): Flow<List<Task>>
 }
@@ -51,6 +55,44 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
         taskDao.deleteTask(task.toEntity())
     }
 
+    override suspend fun deleteRecurringTaskOccurrence(task: Task) {
+        val baseTaskEntity = taskDao.getTaskById(task.id).first() ?: return
+        val baseTask = baseTaskEntity.toDomain()
+        
+        if (baseTask.rrule == null) {
+            deleteTask(task)
+            return
+        }
+        
+        val occurrenceDate = task.date.toLocalDate()
+        val updatedRRule = RecurrenceCalculator.addExDateToRRule(baseTask.rrule, occurrenceDate)
+        val updatedTask = baseTask.copy(rrule = updatedRRule, deleted = baseTask.deleted)
+        updateTask(updatedTask)
+    }
+
+    override suspend fun deleteAllRecurringTaskOccurrences(task: Task) {
+        val baseTaskEntity = taskDao.getTaskById(task.id).first() ?: return
+        val baseTask = baseTaskEntity.toDomain()
+        
+        deleteTask(baseTask)
+    }
+
+    override suspend fun markRecurringTaskBaseAsDeleted(task: Task) {
+        val baseTaskEntity = taskDao.getTaskById(task.id).first() ?: return
+        val baseTask = baseTaskEntity.toDomain()
+        
+        if (baseTask.rrule != null) {
+            // Add the base task's date to EXDATE so it doesn't show as an occurrence
+            val baseDate = baseTask.date.toLocalDate()
+            val updatedRRule = RecurrenceCalculator.addExDateToRRule(baseTask.rrule, baseDate)
+            val updatedTask = baseTask.copy(deleted = true, rrule = updatedRRule)
+            updateTask(updatedTask)
+        } else {
+            val updatedTask = baseTask.copy(deleted = true)
+            updateTask(updatedTask)
+        }
+    }
+
     override fun getTaskById(id: Int): Flow<Task?> =
         taskDao.getTaskById(id).map { it?.toDomain() }
 
@@ -69,6 +111,8 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
         return combine(baseFlow, recurringFlow) { baseTasks, recurringTasks ->
             val baseDomain = baseTasks.map { it.toDomain() }
                 .filter { task ->
+                    // Filter out deleted tasks (deleted base tasks won't show, but occurrences will still be generated)
+                    if (task.deleted) return@filter false
                     // If it's a recurring task, check if its date matches the pattern
                     if (task.rrule != null) {
                         val rule = RecurrenceCalculator.parseRRule(task.rrule) ?: return@filter true
@@ -79,14 +123,17 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
                 }
             val baseOccurrences = baseDomain.map { it.id to it.date }.toSet()
 
-            val additional = recurringTasks.flatMap { relation ->
-                val task = relation.toDomain()
-                val rule = task.rrule ?: return@flatMap emptyList<Task>()
-                val occurrences = RecurrenceCalculator.generateOccurrences(task, rule, windowStart, windowEndExclusive)
-                occurrences.filter { occurrence ->
-                    (occurrence.id to occurrence.date) !in baseOccurrences
+            // Generate occurrences from ALL recurring tasks, including deleted ones
+            // (deleted base tasks should still generate occurrences, just not show the base task itself)
+            val additional = recurringTasks
+                .map { it.toDomain() }
+                .flatMap { task ->
+                    val rule = task.rrule ?: return@flatMap emptyList<Task>()
+                    val occurrences = RecurrenceCalculator.generateOccurrences(task, rule, windowStart, windowEndExclusive)
+                    occurrences.filter { occurrence ->
+                        (occurrence.id to occurrence.date) !in baseOccurrences
+                    }
                 }
-            }
 
             (baseDomain + additional).sortedBy { it.date }
         }
@@ -109,7 +156,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
             .toLocalDateTime()
 
         // Recalculate expiration for all tasks
-        val now = LocalDateTime.now()
+        val now = LocalDateTime.now(zone)
         val isExpired = if (task.allDay && endDateTime != null) {
             // All-day task - check endDate
             endDateTime.isBefore(now)
@@ -155,7 +202,8 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
                 .sortedBy { it.orderIndex }
                 .map { it.toDomain() },
             createdAt = createdAt,
-            updatedAt = updatedAt
+            updatedAt = updatedAt,
+            deleted = task.deleted
         )
     }
 
@@ -197,7 +245,8 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
             imageName = image?.displayName,
             imageSource = image?.source,
             createdAt = createdAt.toEpochMillis(),
-            updatedAt = updatedAtMillis
+            updatedAt = updatedAtMillis,
+            deleted = deleted
         )
 
     // Domain → Persistence bundle
@@ -215,7 +264,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
 
     private fun CreateTask.toPersistenceBundle(): TaskPersistenceModel {
         val now = System.currentTimeMillis()
-        val entity = TaskEntity(
+            val entity = TaskEntity(
             id = 0,
             title = title,
             info = info,
@@ -239,7 +288,8 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
             imageName = image?.displayName,
             imageSource = image?.source,
             createdAt = now,
-            updatedAt = now
+            updatedAt = now,
+            deleted = false
         )
         val reminderEntities = reminders.map { it.toEntity() }
         val locationEntities = locations.map { it.toEntity() }

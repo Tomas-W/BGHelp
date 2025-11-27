@@ -20,7 +20,7 @@ private fun getToday(): LocalDate {
     return cachedToday!!
 }
 
-fun getEpochRange(date: LocalDateTime = LocalDateTime.now()): Pair<Long, Long> {
+fun getEpochRange(date: LocalDateTime = LocalDateTime.now(ZoneId.systemDefault())): Pair<Long, Long> {
     val zone = ZoneId.systemDefault()
     val today = date.toLocalDate()
     val startOfDay = today.atStartOfDay(zone).toInstant().toEpochMilli()
@@ -45,7 +45,7 @@ fun LocalDateTime.toDayHeader(): String {
 }
 
 fun LocalDateTime.isInFuture(): Boolean {
-    return this.isAfter(LocalDateTime.now())
+    return this.isAfter(LocalDateTime.now(ZoneId.systemDefault()))
 }
 
 fun LocalDateTime.toTaskTime(): String {

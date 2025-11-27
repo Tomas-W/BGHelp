@@ -25,7 +25,9 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
@@ -41,6 +43,15 @@ import com.example.bghelp.ui.components.OptionsModal
 import com.example.bghelp.ui.navigation.Screen
 import com.example.bghelp.utils.toDayHeader
 import kotlinx.coroutines.delay
+import java.time.LocalDateTime
+import java.time.ZoneId
+
+enum class DeletionType {
+    SINGLE_OCCURRENCE,
+    BASE_TASK_MARK_DELETED,
+    DELETE_ALL,
+    REGULAR_TASK
+}
 
 @SuppressLint("FrequentlyChangingValue", "FrequentlyChangedStateReadInComposition")
 @Composable
@@ -79,11 +90,18 @@ fun TaskScreen(
     // Track deletion and editing
     var taskPendingDeletion by remember { mutableStateOf<Task?>(null) }
     var taskPendingEdit by remember { mutableStateOf<Task?>(null) }
-    var taskPendingDeletionWithTimer by remember { mutableStateOf<Int?>(null) }
+    var taskPendingDeletionWithTimer by remember { mutableStateOf<Pair<Int, Long>?>(null) }
+    var taskPendingDeletionData by remember { mutableStateOf<Task?>(null) }
+    var deletionType by remember { mutableStateOf<DeletionType?>(null) }
+    var isTaskRecurring by remember { mutableStateOf(false) }
+    var isTaskBase by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     // Cancel deletion function
     val cancelDeletion: () -> Unit = {
         taskPendingDeletionWithTimer = null
+        taskPendingDeletionData = null
+        deletionType = null
     }
 
     // WeekNav height
@@ -128,12 +146,18 @@ fun TaskScreen(
                     if (selectedTasks.isNotEmpty()) {
                         itemsIndexed(
                             items = selectedTasks,
-                            key = { _, task -> task.id },
+                            key = { _, task -> 
+                                val epoch = task.date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                                "${task.id}_$epoch"
+                            },
                             contentType = { _, _ -> "task" }
                         ) { index, task ->
                             val isFirst = index == 0
                             val isLast = index == selectedTasks.size - 1
-                            val isPendingDeletion = taskPendingDeletionWithTimer == task.id
+                            val isPendingDeletion = taskPendingDeletionWithTimer?.let { (pendingId, pendingEpoch) ->
+                                val taskEpoch = task.date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                                task.id == pendingId && taskEpoch == pendingEpoch
+                            } ?: false
                             DayComponent(
                                 task = task,
                                 isExpanded = expandedTaskIds.contains(task.id),
@@ -200,10 +224,26 @@ fun TaskScreen(
         }
     }
 
+    // Check if task is recurring when modal opens
+    LaunchedEffect(taskPendingDeletion) {
+        taskPendingDeletion?.let { task ->
+            isTaskRecurring = taskViewModel.isRecurringTask(task)
+            if (isTaskRecurring) {
+                isTaskBase = taskViewModel.isBaseRecurringTask(task)
+            } else {
+                isTaskBase = false
+            }
+        } ?: run {
+            isTaskRecurring = false
+            isTaskBase = false
+        }
+    }
+
     // Delete Task modal
     OptionsModal(
         isVisible = taskPendingDeletion != null,
         onDismissRequest = { taskPendingDeletion = null },
+        title = if (isTaskRecurring) "This is a recurring Task.\nDelete only this Task or all occurrences?" else null,
         content = {
             taskPendingDeletion?.let { task ->
                 TaskPreviewComponent(task = task)
@@ -212,8 +252,23 @@ fun TaskScreen(
         cancelLabel = "Delete",
         cancelOption = {
             taskPendingDeletion?.let { task ->
-                taskPendingDeletionWithTimer = task.id
-                taskPendingDeletion = null
+                coroutineScope.launch {
+                    val isRecurring = taskViewModel.isRecurringTask(task)
+                    if (isRecurring) {
+                        val isBase = taskViewModel.isBaseRecurringTask(task)
+                        deletionType = if (isBase) {
+                            DeletionType.BASE_TASK_MARK_DELETED
+                        } else {
+                            DeletionType.SINGLE_OCCURRENCE
+                        }
+                    } else {
+                        deletionType = DeletionType.REGULAR_TASK
+                    }
+                    val taskEpoch = task.date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                    taskPendingDeletionWithTimer = Pair(task.id, taskEpoch)
+                    taskPendingDeletionData = task
+                    taskPendingDeletion = null
+                }
             }
         },
         confirmLabel = "Edit",
@@ -222,7 +277,19 @@ fun TaskScreen(
                 taskPendingEdit = task
                 taskPendingDeletion = null
             }
-        }
+        },
+        extraLabel = if (isTaskRecurring) "Delete All" else null,
+        extraOption = if (isTaskRecurring) {
+            {
+                taskPendingDeletion?.let { task ->
+                    deletionType = DeletionType.DELETE_ALL
+                    val taskEpoch = task.date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                    taskPendingDeletionWithTimer = Pair(task.id, taskEpoch)
+                    taskPendingDeletionData = task
+                    taskPendingDeletion = null
+                }
+            }
+        } else null
     )
 
     // Navigate to edit task
@@ -238,14 +305,35 @@ fun TaskScreen(
     }
 
     // Handle deletion timer
-    LaunchedEffect(taskPendingDeletionWithTimer) {
-        taskPendingDeletionWithTimer?.let { taskId ->
-            delay(5000)
-            if (taskPendingDeletionWithTimer == taskId) {
-                selectedTasks.find { it.id == taskId }?.let { task ->
-                    taskViewModel.deleteTask(task)
+    LaunchedEffect(taskPendingDeletionWithTimer, deletionType) {
+        val timerData = taskPendingDeletionWithTimer
+        val taskData = taskPendingDeletionData
+        val typeToDelete = deletionType
+        if (timerData != null && taskData != null && typeToDelete != null) {
+            val (taskId, taskEpoch) = timerData
+            delay(2500)
+            if (taskPendingDeletionWithTimer?.first == taskId && 
+                taskPendingDeletionWithTimer?.second == taskEpoch && 
+                deletionType == typeToDelete) {
+                coroutineScope.launch {
+                    when (typeToDelete) {
+                        DeletionType.SINGLE_OCCURRENCE -> {
+                            taskViewModel.deleteRecurringTaskOccurrence(taskData)
+                        }
+                        DeletionType.BASE_TASK_MARK_DELETED -> {
+                            taskViewModel.markRecurringTaskBaseAsDeleted(taskData)
+                        }
+                        DeletionType.DELETE_ALL -> {
+                            taskViewModel.deleteAllRecurringTaskOccurrences(taskData)
+                        }
+                        DeletionType.REGULAR_TASK -> {
+                            taskViewModel.deleteTask(taskData)
+                        }
+                    }
                 }
                 taskPendingDeletionWithTimer = null
+                taskPendingDeletionData = null
+                deletionType = null
             }
         }
     }

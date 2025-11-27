@@ -48,7 +48,8 @@ data class TaskEntity(
     val imageUri: String?,
     val imageSource: TaskImageSourceOption?,
     val createdAt: Long,
-    val updatedAt: Long
+    val updatedAt: Long,
+    val deleted: Boolean = false
 ) {
     companion object {
         const val COL_ID = "id"

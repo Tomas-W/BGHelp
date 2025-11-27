@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.WeekFields
 import javax.inject.Inject
@@ -27,7 +28,7 @@ import javax.inject.Inject
 class TargetViewModel @Inject constructor(
     private val targetRepository: TargetRepository
 ) : ViewModel() {
-    private val _selectedDate = MutableStateFlow<LocalDateTime>(LocalDateTime.now())
+    private val _selectedDate = MutableStateFlow<LocalDateTime>(LocalDateTime.now(ZoneId.systemDefault()))
     val selectedDate: StateFlow<LocalDateTime> = _selectedDate.asStateFlow()
 
     private val _selectedWeek = MutableStateFlow<LocalDate>(LocalDate.now().with(DayOfWeek.MONDAY))
