@@ -53,6 +53,11 @@ enum class DeletionType {
     REGULAR_TASK
 }
 
+private data class PendingDeletion(
+    val task: Task,
+    val deletionType: DeletionType
+)
+
 @SuppressLint("FrequentlyChangingValue", "FrequentlyChangedStateReadInComposition")
 @Composable
 fun TaskScreen(
@@ -90,18 +95,41 @@ fun TaskScreen(
     // Track deletion and editing
     var taskPendingDeletion by remember { mutableStateOf<Task?>(null) }
     var taskPendingEdit by remember { mutableStateOf<Task?>(null) }
-    var taskPendingDeletionWithTimer by remember { mutableStateOf<Pair<Int, Long>?>(null) }
-    var taskPendingDeletionData by remember { mutableStateOf<Task?>(null) }
-    var deletionType by remember { mutableStateOf<DeletionType?>(null) }
+    var pendingDeletions by remember { mutableStateOf<Map<String, PendingDeletion>>(emptyMap()) }
     var isTaskRecurring by remember { mutableStateOf(false) }
     var isTaskBase by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
-    // Cancel deletion function
-    val cancelDeletion: () -> Unit = {
-        taskPendingDeletionWithTimer = null
-        taskPendingDeletionData = null
-        deletionType = null
+    // Helper function to get task key
+    fun getTaskKey(task: Task): String {
+        val epoch = task.date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        return "${task.id}_$epoch"
+    }
+
+    // Helper function to schedule a pending deletion
+    fun scheduleDeletion(pendingDeletion: PendingDeletion) {
+        val taskKey = getTaskKey(pendingDeletion.task)
+        coroutineScope.launch {
+            delay(2500)
+            // Check if deletion is still pending (not cancelled)
+            if (pendingDeletions.containsKey(taskKey)) {
+                when (pendingDeletion.deletionType) {
+                    DeletionType.SINGLE_OCCURRENCE -> {
+                        taskViewModel.deleteRecurringTaskOccurrence(pendingDeletion.task)
+                    }
+                    DeletionType.BASE_TASK_MARK_DELETED -> {
+                        taskViewModel.markRecurringTaskBaseAsDeleted(pendingDeletion.task)
+                    }
+                    DeletionType.DELETE_ALL -> {
+                        taskViewModel.deleteAllRecurringTaskOccurrences(pendingDeletion.task)
+                    }
+                    DeletionType.REGULAR_TASK -> {
+                        taskViewModel.deleteTask(pendingDeletion.task)
+                    }
+                }
+                pendingDeletions = pendingDeletions - taskKey
+            }
+        }
     }
 
     // WeekNav height
@@ -154,17 +182,17 @@ fun TaskScreen(
                         ) { index, task ->
                             val isFirst = index == 0
                             val isLast = index == selectedTasks.size - 1
-                            val isPendingDeletion = taskPendingDeletionWithTimer?.let { (pendingId, pendingEpoch) ->
-                                val taskEpoch = task.date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                                task.id == pendingId && taskEpoch == pendingEpoch
-                            } ?: false
+                            val taskKey = getTaskKey(task)
+                            val isPendingDeletion = pendingDeletions.containsKey(taskKey)
                             DayComponent(
                                 task = task,
                                 isExpanded = expandedTaskIds.contains(task.id),
                                 onToggleExpanded = taskViewModel::toggleTaskExpanded,
                                 onLongPress = { taskPendingDeletion = it },
                                 isPendingDeletion = isPendingDeletion,
-                                onCancelDeletion = cancelDeletion,
+                                onCancelDeletion = {
+                                    pendingDeletions = pendingDeletions - taskKey
+                                },
                                 isFirst = isFirst,
                                 isLast = isLast
                             )
@@ -254,19 +282,20 @@ fun TaskScreen(
             taskPendingDeletion?.let { task ->
                 coroutineScope.launch {
                     val isRecurring = taskViewModel.isRecurringTask(task)
-                    if (isRecurring) {
+                    val deletionType = if (isRecurring) {
                         val isBase = taskViewModel.isBaseRecurringTask(task)
-                        deletionType = if (isBase) {
+                        if (isBase) {
                             DeletionType.BASE_TASK_MARK_DELETED
                         } else {
                             DeletionType.SINGLE_OCCURRENCE
                         }
                     } else {
-                        deletionType = DeletionType.REGULAR_TASK
+                        DeletionType.REGULAR_TASK
                     }
-                    val taskEpoch = task.date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                    taskPendingDeletionWithTimer = Pair(task.id, taskEpoch)
-                    taskPendingDeletionData = task
+                    val taskKey = getTaskKey(task)
+                    val pendingDeletion = PendingDeletion(task, deletionType)
+                    pendingDeletions = pendingDeletions + (taskKey to pendingDeletion)
+                    scheduleDeletion(pendingDeletion)
                     taskPendingDeletion = null
                 }
             }
@@ -282,10 +311,10 @@ fun TaskScreen(
         extraOption = if (isTaskRecurring) {
             {
                 taskPendingDeletion?.let { task ->
-                    deletionType = DeletionType.DELETE_ALL
-                    val taskEpoch = task.date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                    taskPendingDeletionWithTimer = Pair(task.id, taskEpoch)
-                    taskPendingDeletionData = task
+                    val taskKey = getTaskKey(task)
+                    val pendingDeletion = PendingDeletion(task, DeletionType.DELETE_ALL)
+                    pendingDeletions = pendingDeletions + (taskKey to pendingDeletion)
+                    scheduleDeletion(pendingDeletion)
                     taskPendingDeletion = null
                 }
             }
@@ -304,39 +333,6 @@ fun TaskScreen(
         }
     }
 
-    // Handle deletion timer
-    LaunchedEffect(taskPendingDeletionWithTimer, deletionType) {
-        val timerData = taskPendingDeletionWithTimer
-        val taskData = taskPendingDeletionData
-        val typeToDelete = deletionType
-        if (timerData != null && taskData != null && typeToDelete != null) {
-            val (taskId, taskEpoch) = timerData
-            delay(2500)
-            if (taskPendingDeletionWithTimer?.first == taskId && 
-                taskPendingDeletionWithTimer?.second == taskEpoch && 
-                deletionType == typeToDelete) {
-                coroutineScope.launch {
-                    when (typeToDelete) {
-                        DeletionType.SINGLE_OCCURRENCE -> {
-                            taskViewModel.deleteRecurringTaskOccurrence(taskData)
-                        }
-                        DeletionType.BASE_TASK_MARK_DELETED -> {
-                            taskViewModel.markRecurringTaskBaseAsDeleted(taskData)
-                        }
-                        DeletionType.DELETE_ALL -> {
-                            taskViewModel.deleteAllRecurringTaskOccurrences(taskData)
-                        }
-                        DeletionType.REGULAR_TASK -> {
-                            taskViewModel.deleteTask(taskData)
-                        }
-                    }
-                }
-                taskPendingDeletionWithTimer = null
-                taskPendingDeletionData = null
-                deletionType = null
-            }
-        }
-    }
 }
 
 @Composable
