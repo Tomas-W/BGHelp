@@ -33,6 +33,7 @@ data class TaskEntity(
     val endEpoch: Long?,
     val snoozeSeconds: Int,
     val expired: Boolean,
+    val deleted: Boolean = false,
     val rrule: String?,
     val sound: AlarmMode,
     val alarmName: String?,
@@ -43,13 +44,12 @@ data class TaskEntity(
     val snoozeValue2: Int,
     val snoozeUnit2: ReminderOffsetUnit,
     val note: String?,
-    val colorId: Int = 1,
     val imageName: String?,
     val imageUri: String?,
     val imageSource: TaskImageSourceOption?,
+    val colorId: Int = 1,
     val createdAt: Long,
-    val updatedAt: Long,
-    val deleted: Boolean = false
+    val updatedAt: Long
 ) {
     companion object {
         const val COL_ID = "id"

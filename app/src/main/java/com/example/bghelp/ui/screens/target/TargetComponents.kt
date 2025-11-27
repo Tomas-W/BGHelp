@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
 import com.example.bghelp.domain.model.AlarmMode
@@ -113,13 +114,13 @@ private fun TargetDetails(
         if (isExpanded) {
             Spacer(modifier = Modifier.height(Sizes.Size.S))
             Text(
-                text = "Locations: $coordinatesCount",
+                text = "${stringResource(R.string.target_locations_colon)} $coordinatesCount",
                 style = MaterialTheme.typography.mTextDefault,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(Sizes.Size.XS))
             Text(
-                text = "Alert distance: ${alertDistance}m",
+                text = "${stringResource(R.string.target_alert_distance_colon)} ${alertDistance}m",
                 style = MaterialTheme.typography.mTextDefault,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -184,7 +185,7 @@ private fun DeleteIcon(onDelete: () -> Unit) {
     Icon(
         imageVector = Icons.Default.Delete,
         tint = MaterialTheme.colorScheme.error,
-        contentDescription = "Delete",
+        contentDescription = stringResource(R.string.button_delete),
         modifier = Modifier.clickable(onClick = onDelete)
     )
 }

@@ -23,13 +23,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.bghelp.R
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.lTextDefault
 import com.example.bghelp.ui.theme.mTextDefault
 import com.example.bghelp.ui.theme.sTextItalic
-import com.example.bghelp.ui.screens.locationpicker.LocationPickerStrings as STR
 
 @Composable
 fun SearchPanel(
@@ -50,7 +51,7 @@ fun SearchPanel(
             onValueChange = onQueryChange,
             placeholder = {
                 Text(
-                    text = STR.SEARCH_PLACEHOLDER,
+                    text = stringResource(R.string.extra_search_placeholder),
                     style = MaterialTheme.typography.lTextDefault
                 )
             },
@@ -58,7 +59,7 @@ fun SearchPanel(
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = STR.SEARCH_ICON_DESCRIPTION
+                    contentDescription = stringResource(R.string.extra_search_placeholder)
                 )
             },
             trailingIcon = {
@@ -66,7 +67,7 @@ fun SearchPanel(
                     IconButton(onClick = { onQueryChange("") }) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = STR.CLEAR_SEARCH_DESCRIPTION
+                            contentDescription = stringResource(R.string.extra_clear_search)
                         )
                     }
                 }

@@ -18,9 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -111,7 +109,7 @@ fun DayComponent(
 
             TitleAndDescription(
                 title = task.title,
-                description = task.description,
+                description = task.info,
                 isExpanded = isExpanded
             )
             if (isExpanded) {
@@ -135,12 +133,17 @@ fun DayComponent(
                     .clickable(onClick = onCancelDeletion),
                 contentAlignment = Alignment.Center
             ) {
+                val deletionText = stringResource(R.string.task_revert_deletion)
+                val fontSize = remember(deletionText.length) {
+                    calculateDeletionTextSize(deletionText.length)
+                }
                 Text(
-                    text = "CANCEL",
-                    fontSize = 56.sp,
+                    text = deletionText,
+                    fontSize = fontSize,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 5.sp
+                    letterSpacing = 5.sp,
+                    maxLines = 1
                 )
             }
         }
@@ -256,16 +259,6 @@ private fun VibrateIcon(vibrateMode: AlarmMode) {
 }
 
 @Composable
-private fun DeleteIcon(onDelete: () -> Unit) {
-    Icon(
-        imageVector = Icons.Default.Delete,
-        tint = Color.Red,
-        contentDescription = "Delete",
-        modifier = Modifier.clickable(onClick = onDelete)
-    )
-}
-
-@Composable
 fun TaskPreviewComponent(task: Task) {
     val taskBackgroundColor = if (!task.expired) {
         task.color.toComposeColor()
@@ -288,7 +281,7 @@ fun TaskPreviewComponent(task: Task) {
 
         TitleAndDescription(
             title = task.title,
-            description = task.description,
+            description = task.info,
             isExpanded = false
         )
     }
@@ -300,6 +293,25 @@ private fun AlarmIconsPreview(task: Task) {
         SoundIcon(soundMode = task.sound)
         Spacer(modifier = Modifier.width(16.dp))
         VibrateIcon(vibrateMode = task.vibrate)
+    }
+}
+
+private fun calculateDeletionTextSize(charCount: Int): androidx.compose.ui.unit.TextUnit {
+    // 8 chars or less: 54.sp
+    // 20 chars or more: 26.sp
+    // Linear interpolation between these points
+    return when {
+        charCount <= 8 -> 54.sp
+        charCount >= 20 -> 26.sp
+        else -> {
+            // Linear interpolation: y = y1 + (y2 - y1) * (x - x1) / (x2 - x1)
+            val x1 = 8
+            val y1 = 54f
+            val x2 = 20
+            val y2 = 26f
+            val fontSize = y1 + (y2 - y1) * (charCount - x1) / (x2 - x1)
+            fontSize.sp
+        }
     }
 }
 

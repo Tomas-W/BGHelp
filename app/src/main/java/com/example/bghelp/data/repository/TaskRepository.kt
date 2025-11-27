@@ -180,7 +180,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
             id = task.id,
             date = startDateTime,
             title = task.title,
-            description = task.info,
+            info = task.info,
             expired = isExpired,
             alarmName = task.alarmName,
             sound = task.sound,
@@ -224,7 +224,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
         TaskEntity(
             id = id,
             title = title,
-            info = description,
+            info = info,
             note = note,
             startEpoch = date.toEpochMillis(),
             endEpoch = endDate?.toEpochMillis(),

@@ -13,7 +13,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import com.example.bghelp.R
 import com.example.bghelp.ui.components.CustomDropdown
 import com.example.bghelp.ui.components.DropdownItem
 import com.example.bghelp.ui.components.deselectedDropdownStyle
@@ -24,7 +26,6 @@ import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.lTextDefault
 import com.example.bghelp.utils.AudioManager
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
 @Composable
 fun AlarmSelection(
@@ -69,9 +70,10 @@ fun AlarmDropdown(
             audioManager.getAudioFileLabel(filePath, isFullPath = true)
         }
     }
+    val defaultAlarmName = stringResource(R.string.task_select_alarm)
     val displayText = remember(selectedAudioFile, defaultAudioFileLabels, userRecordingLabels) {
         if (selectedAudioFile.isEmpty()) {
-            STR.SELECT_ALARM
+            defaultAlarmName
         } else {
             userRecordingLabels[selectedAudioFile]
                 ?: defaultAudioFileLabels[selectedAudioFile]
@@ -101,12 +103,12 @@ fun AlarmDropdown(
             onDismissRequest = { isExpanded = false }
         ) {
             DropdownItem(
-                label = STR.SELECT_ALARM,
+                label = stringResource(R.string.task_select_alarm),
                 onClick = {
                     onAudioFileSelected("")
                     isExpanded = false
                 },
-                textStyle = if (displayText == STR.SELECT_ALARM) {
+                textStyle = if (displayText == stringResource(R.string.task_select_alarm)) {
                     selectedDropdownStyle()
                 } else {
                     deselectedDropdownStyle()
@@ -114,14 +116,14 @@ fun AlarmDropdown(
                 spacing = Sizes.Icon.M
             )
             DropdownItem(
-                label = STR.CREATE_ALARM,
+                label = stringResource(R.string.task_create_alarm),
                 onClick = {
                     navController.navigate(Screen.Options.CreateAlarm.route) {
                         launchSingleTop = true
                     }
                     isExpanded = false
                 },
-                textStyle = if (displayText == STR.CREATE_ALARM) {
+                textStyle = if (displayText == stringResource(R.string.task_create_alarm)) {
                     selectedDropdownStyle()
                 } else {
                     deselectedDropdownStyle()

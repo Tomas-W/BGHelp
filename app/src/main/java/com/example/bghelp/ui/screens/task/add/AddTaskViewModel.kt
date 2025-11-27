@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bghelp.R
 import com.example.bghelp.data.repository.ColorRepository
 import com.example.bghelp.data.repository.TaskRepository
 import com.example.bghelp.domain.model.FeatureColor
@@ -35,6 +36,7 @@ class AddTaskViewModel @Inject constructor(
 ) : ViewModel() {
     // STATES & HANDLERS
     private val formStateHolder = AddTaskFormStateHolder(
+        context = appContext,
         onRepeatRuleChanged = { refreshRepeatRule() }
     )
 
@@ -42,7 +44,8 @@ class AddTaskViewModel @Inject constructor(
 
     private val validationState = AddTaskValidationState(
         formState = formState,
-        scope = viewModelScope
+        scope = viewModelScope,
+        context = appContext
     )
 
     private val saveTaskHandler = SaveTaskHandler(
@@ -322,7 +325,6 @@ class AddTaskViewModel @Inject constructor(
                 monthlyMonths = state.monthlySelectedMonths,
                 monthlyDaySelection = state.monthlyDaySelection,
                 monthlyDays = state.monthlySelectedDays,
-                startDate = state.startDate,
                 endDate = if (state.isEndDateVisible) state.endDate else null,
                 isEndDateVisible = state.isEndDateVisible
             )
@@ -502,24 +504,25 @@ class AddTaskViewModel @Inject constructor(
         formStateHolder.setImageFromGallery(uri, displayName)
     }
 
-    fun setImageFromCamera(bitmap: Bitmap, displayName: String = AddTaskStrings.CAPTURED_IMAGE) {
+    fun setImageFromCamera(bitmap: Bitmap, displayName: String? = null) {
         // Save temporary image
         viewModelScope.launch {
             try {
+                val imageDisplayName = displayName ?: appContext.getString(R.string.task_captured_image)
                 val tempUri = TaskImageStorage.saveTemporaryImage(
                     context = appContext,
                     bitmap = bitmap,
-                    displayName = displayName
+                    displayName = imageDisplayName
                 )
                 // Recycle after saving
                 bitmap.recycle()
                 // Store URI
-                formStateHolder.setImageFromCamera(tempUri, displayName)
+                formStateHolder.setImageFromCamera(tempUri, imageDisplayName)
             } catch (e: Exception) {
                 bitmap.recycle()
                 // Clear image selection and show error
                 formStateHolder.clearImage()
-                showSnackbar(AddTaskStrings.ERROR_ADDING_IMAGE)
+                showSnackbar(appContext.getString(R.string.snackbar_add_image_failed))
             }
         }
     }
@@ -543,7 +546,7 @@ class AddTaskViewModel @Inject constructor(
         formStateHolder.toggleColorSelection()
     }
 
-    fun setSelectedColorId(colorId: Int) {
+    fun setSelectedColorId(colorId: Int?) {
         formStateHolder.setSelectedColorId(colorId)
     }
     // COLOR

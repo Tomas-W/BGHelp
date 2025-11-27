@@ -15,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
@@ -30,15 +29,15 @@ import com.example.bghelp.ui.screens.task.add.DateField
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.utils.clickableDismissFocus
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun DateSelection(
     viewModel: AddTaskViewModel
 ) {
-    val locale = LocalContext.current.resources.configuration.locales[0]
+    val locale = LocalConfiguration.current.locales[0]
     val fMonthYearDayShort = remember(locale) {
         DateTimeFormatter.ofPattern("EEE MMM d", locale)
     }
@@ -87,8 +86,8 @@ fun DateSelection(
                 Icon(
                     modifier = Modifier.size(Sizes.Icon.S),
                     painter = painterResource(R.drawable.double_arrow_right),
-                    contentDescription = if (isEndDateVisible) STR.HIDE_END_DATE
-                                         else STR.SHOW_END_DATE
+                    contentDescription = if (isEndDateVisible) stringResource(R.string.task_hide_end_date)
+                                         else stringResource(R.string.task_show_end_date)
                 )
             }
         }

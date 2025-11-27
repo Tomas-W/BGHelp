@@ -17,9 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.bghelp.R
 import com.example.bghelp.domain.model.ExampleTask
 import com.example.bghelp.domain.model.FeatureColor
 import com.example.bghelp.ui.components.ButtonRow
@@ -32,6 +34,16 @@ import com.example.bghelp.ui.utils.dismissKeyboardOnTap
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
+
+val defaultColorNames = listOf(
+    "Default",
+    "Red",
+    "Green",
+    "Blue",
+    "Yellow",
+    "Cyan",
+    "Magenta"
+)
 
 @Composable
 fun CreateColorScreen(
@@ -94,7 +106,7 @@ fun CreateColorScreen(
                 OutlinedStringInput(
                     value = colorName,
                     onValueChange = viewModel::setColorName,
-                    hint = "Name",
+                    hint = stringResource(R.string.extra_color_name),
                     textStyle = MaterialTheme.typography.lTextDefault,
                     isMultiLine = false,
                     minLines = 1,
@@ -119,9 +131,9 @@ fun CreateColorScreen(
             ButtonRow(
                 isValid = isColorNameValid,
                 isLoading = saving,
-                firstLabel = if (saving) "Saving..." else "Save Color",
+                firstLabel = if (saving) stringResource(R.string.button_saving) else stringResource(R.string.button_save_color),
                 firstOnClick = { viewModel.saveColor() },
-                secondLabel = "Cancel",
+                secondLabel = stringResource(R.string.button_cancel),
                 secondOnClick = { navController.popBackStack() },
             )
         }

@@ -1,7 +1,9 @@
 package com.example.bghelp.ui.screens.task.add
 
+import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
+import com.example.bghelp.R
 import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.ReminderKind
 import com.example.bghelp.domain.model.ReminderOffsetUnit
@@ -16,6 +18,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 class AddTaskFormStateHolder(
+    private val context: Context,
     private val onRepeatRuleChanged: () -> Unit
 ) {
     private val _formState = MutableStateFlow(AddTaskFormState.default())
@@ -368,7 +371,7 @@ class AddTaskFormStateHolder(
     }
 
     fun setImageFromGallery(uri: Uri, displayName: String?) {
-        val label = displayName?.takeIf { it.isNotBlank() } ?: AddTaskStrings.NO_IMAGE_SELECTED
+        val label = displayName?.takeIf { it.isNotBlank() } ?: context.getString(R.string.task_no_image_selected)
         _formState.update { state ->
             state.copy(
                 selectedImage = TaskImageData(
@@ -408,7 +411,7 @@ class AddTaskFormStateHolder(
         }
     }
 
-    fun setSelectedColorId(colorId: Int) {
+    fun setSelectedColorId(colorId: Int?) {
         _formState.update { it.copy(selectedColorId = colorId) }
     }
     // COLOR
@@ -478,7 +481,7 @@ class AddTaskFormStateHolder(
             if (task.image != null) UserImageSelection.ON else UserImageSelection.OFF
         val selectedImage = task.image?.let { image ->
             TaskImageData(
-                displayName = image.displayName ?: AddTaskStrings.NO_IMAGE_SELECTED,
+                displayName = image.displayName ?: context.getString(R.string.task_no_image_selected),
                 uri = image.uri?.toUri(),
                 bitmap = null,
                 source = when (image.source) {
@@ -493,7 +496,7 @@ class AddTaskFormStateHolder(
 
         _formState.value = AddTaskFormState(
             title = task.title,
-            info = task.description ?: "",
+            info = task.info ?: "",
             dateSelection = dateSelection,
             startDate = date,
             endDate = endDate,

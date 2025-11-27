@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="task_title">Tasks</string>
+    <string name="task_add_title">Add Task</string>
+    <string name="task_wallpaper_title">Tasks</string>
+    <string name="task_revert_deletion">REVERT</string>
+    <string name="task_add_task">Add task</string>
+    <string name="task_save_failed">Failed to save task. Please try again</string>
+    <string name="task_no_tasks">No tasks for this day</string>
+    <string name="task_reset_form">Reset form</string>
+    <string name="task_undo_reset">Undo reset</string>
+    <string name="task_select_all">Select all</string>
+    <string name="task_deselect_all">Deselect all</string>
+
+    <string name="task_delete_or_edit">Delete or edit?</string>
+    <string name="task_delete_recurring">This is a recurring Task.\nDelete this Task or all occurrences?</string>
+    <string name="task_edit_recurring">This is a recurring Task.\nEdit this Task or all occurrences?</string>
+
+    <string name="task_title_only">Title only</string>
+    <string name="task_title_and_info">Title and info</string>
+    <string name="task_title_hint">Title</string>
+    <string name="task_info_hint">Info</string>
+
+    <string name="task_at_time">At time</string>
+    <string name="task_all_day">All day</string>
+    <string name="task_hide_end_date">Hide end date</string>
+    <string name="task_show_end_date">Show end date</string>
+    <string name="task_hide_end_time">Hide end time</string>
+    <string name="task_show_end_time">Show end time</string>
+    <string name="task_date_in_past">Date cannot be in the past</string>
+
+    <string name="task_dont_repeat">Don\'t repeat</string>
+    <string name="task_repeat_weekly">Repeat weekly</string>
+    <string name="task_repeat_monthly">Repeat monthly</string>
+    <string name="task_select_months">Select months</string>
+    <string name="task_all_months">All months</string>
+    <string name="task_select_weeks">Select weeks</string>
+    <string name="task_all_weeks">All weeks</string>
+    <string name="task_select_days">Select days</string>
+    <string name="task_all_days">All days</string>
+    <string name="task_last_of_month">Last of month</string>
+    <string name="task_repeat_every">Every</string>
+    <string name="task_repeat_weeks">weeks</string>
+
+    <string name="task_dont_remind_me">Don\'t remind me</string>
+    <string name="task_remind_me">Remind me</string>
+    <string name="task_add_reminder">Add reminder</string>
+    <string name="task_remove_reminder">Remove reminder</string>
+    <string name="task_before_start">Before start</string>
+    <string name="task_before_end">Before end</string>
+    <string name="task_snooze_options">Snooze options</string>
+
+    <string name="task_alarm_off">Alarm off</string>
+    <string name="task_alarm_once">Alarm once</string>
+    <string name="task_alarm_continuous">Alarm continuous</string>
+    <string name="task_select_alarm">Select alarm</string>
+    <string name="task_create_alarm">Create alarm +</string>
+
+    <string name="task_vibrate_off">Vibrate off</string>
+    <string name="task_vibrate_once">Vibrate once</string>
+    <string name="task_vibrate_continuous">Vibrate continuous</string>
+
+    <string name="task_note_off">Note off</string>
+    <string name="task_note_on">Note on</string>
+
+    <string name="task_no_location">No location</string>
+    <string name="task_with_location">With Location</string>
+    <string name="task_add_location">Add location</string>
+    <string name="task_remove_location">Remove location</string>
+    <string name="task_unnamed_location">unnamed location</string>
+
+    <string name="task_no_image">No image</string>
+    <string name="task_with_image">With image</string>
+    <string name="task_camera_permission_required">Camera permission required to capture photo</string>
+    <string name="task_select_library">Select from library</string>
+    <string name="task_capture_camera">Capture with camera</string>
+    <string name="task_add_image">Add image</string>
+    <string name="task_error_adding_image">Error adding image</string>
+    <string name="task_no_image_selected">No image selected</string>
+    <string name="task_image_preview">Task image preview</string>
+    <string name="task_close_image">Close image</string>
+    <string name="task_task_image">Task image</string>
+    <string name="task_captured_image">Captured image</string>
+    <string name="task_image_default_name">Image</string>
+
+    <string name="task_default_color">Default color</string>
+    <string name="task_custom_color">Custom color</string>
+    <string name="task_select_color">Select color</string>
+    <string name="task_add_color">Add color +</string>
+
+    <string name="task_">xx</string>
+</resources>

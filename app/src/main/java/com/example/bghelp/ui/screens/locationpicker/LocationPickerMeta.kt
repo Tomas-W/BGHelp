@@ -25,19 +25,6 @@ object LocationPickerConstants {
     )
 }
 
-object LocationPickerStrings {
-    const val ADD_MARKER = "Add marker"
-    const val SAVE_LOCATION = "Save location"
-    const val SAVE_LOCATIONS = "Save locations"
-    const val SEARCH_PLACEHOLDER = "Search address or place"
-    const val SEARCH_ICON_DESCRIPTION = "Search"
-    const val CLEAR_SEARCH_DESCRIPTION = "Clear search"
-    const val EMPTY_LOCATIONS_HINT =
-        "Tap Add marker to create a location, then tap the map or choose a suggestion to place it."
-    const val DELETE_LOCATION_DESCRIPTION = "Delete location"
-    const val NAME_PLACEHOLDER = "Name"
-}
-
 object LocationNavigationKeys {
     const val RESULT = "location_picker_result"
     const val INITIAL_LOCATIONS = "location_picker_initial_locations"

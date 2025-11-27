@@ -212,7 +212,7 @@ fun BottomNavigationBar(
                 icon = {
                     Image(
                         painter = painterResource(optionsIconRes),
-                        contentDescription = stringResource(R.string.navigation_options),
+                        contentDescription = stringResource(R.string.extra_options),
                         modifier = Modifier.size(Sizes.Icon.L),
                         colorFilter = ColorFilter.tint(
                             if (isOptionsRouteActive) MaterialTheme.colorScheme.onSurface
@@ -222,7 +222,7 @@ fun BottomNavigationBar(
                 },
                 label = {
                     Text(
-                        text = stringResource(R.string.navigation_options),
+                        text = stringResource(R.string.extra_options),
                         color = if (isOptionsRouteActive) MaterialTheme.colorScheme.onSurface
                                 else MaterialTheme.colorScheme.onTertiary,
                         fontWeight = if (isOptionsRouteActive) FontWeight.Bold

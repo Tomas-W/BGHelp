@@ -6,12 +6,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.bghelp.R
 import com.example.bghelp.ui.components.OutlinedStringInput
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.TitleInputType
 import com.example.bghelp.ui.theme.lTextSemi
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
 @Composable
 fun TitleSelection(
@@ -24,7 +25,7 @@ fun TitleSelection(
         modifier = Modifier.fillMaxWidth(),
         value = titleText,
         onValueChange = { viewModel.setTitleText(it) },
-        hint = STR.TITLE_HINT,
+        hint = stringResource(R.string.task_info_hint),
         textStyle = MaterialTheme.typography.lTextSemi,
         minLines = CONST.TITLE_MIN_LINES,
         maxLines = CONST.TITLE_MAX_LINES,

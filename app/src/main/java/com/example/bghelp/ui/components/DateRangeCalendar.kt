@@ -33,14 +33,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.lTextBold
 import com.example.bghelp.ui.theme.lTextDefault
@@ -54,6 +52,7 @@ import java.time.format.TextStyle
 import java.time.temporal.TemporalAdjusters
 import java.util.Locale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun DateRangeCalendar(
@@ -130,7 +129,7 @@ private fun CalendarDismissRow(onDismissRequest: (() -> Unit)?, showDismissButto
     ) {
         TextButton(onClick = onDismissRequest) {
             Text(
-                text = AddTaskStrings.HIDE_CALENDAR,
+                text = stringResource(R.string.hide_calendar),
                 style = MaterialTheme.typography.xsTextBold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -183,7 +182,7 @@ private fun CalendarMonthNavigation(
         Row {
             CalendarNavigationButton(
                 iconRes = R.drawable.navigation_arrow_left,
-                contentDescription = AddTaskStrings.PREVIOUS_MONTH
+                contentDescription = stringResource(R.string.next_month)
             ) {
                 onMonthChanged(currentMonth.minusMonths(1))
             }
@@ -192,7 +191,7 @@ private fun CalendarMonthNavigation(
 
             CalendarNavigationButton(
                 iconRes = R.drawable.navigation_arrow_right,
-                contentDescription = AddTaskStrings.NEXT_MONTH
+                contentDescription = stringResource(R.string.next_month)
             ) {
                 onMonthChanged(currentMonth.plusMonths(1))
             }

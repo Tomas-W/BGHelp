@@ -17,8 +17,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.bghelp.R
 import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.Coordinate
 import com.example.bghelp.domain.model.CreateTarget
@@ -89,7 +91,7 @@ fun TargetScreen(targetViewModel: TargetViewModel = hiltViewModel()) {
 
 @Composable
 fun EmptyTarget() {
-    Text("No targets for this day")
+    Text(stringResource(R.string.target_no_targets))
 }
 
 @Composable

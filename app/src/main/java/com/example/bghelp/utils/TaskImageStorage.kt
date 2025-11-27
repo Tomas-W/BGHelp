@@ -4,9 +4,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
+import com.example.bghelp.R
 import com.example.bghelp.domain.model.TaskImageAttachment
 import com.example.bghelp.domain.model.TaskImageSourceOption
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 import com.example.bghelp.ui.screens.task.add.TaskImageData
 import com.example.bghelp.ui.screens.task.add.TaskImageSource
 import kotlinx.coroutines.Dispatchers
@@ -154,8 +154,7 @@ object TaskImageStorage {
                     else -> return@withContext null
                 }
 
-                val storedDisplayName = imageData.displayName
-                    .takeUnless { it.isBlank() || it == AddTaskStrings.NO_IMAGE_SELECTED }
+                val storedDisplayName = context.getString(R.string.task_image_default_name)
                 TaskImageAttachment(
                     uri = buildRelativePath(targetFile.name),
                     displayName = storedDisplayName,

@@ -30,10 +30,12 @@ import androidx.compose.runtime.setValue
 import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.bghelp.R
 import com.example.bghelp.domain.model.Task
 import com.example.bghelp.ui.components.CollapsibleDateSelector
 import com.example.bghelp.ui.components.LazyColumnContainer
@@ -50,11 +52,6 @@ enum class DeletionType {
     BASE_TASK_MARK_DELETED,
     DELETE_ALL,
     REGULAR_TASK
-}
-
-private enum class RecurringActionType {
-    DELETE,
-    EDIT
 }
 
 private enum class ModalState {
@@ -319,7 +316,7 @@ fun TaskScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Add,
-                        contentDescription = "Add task"
+                        contentDescription = stringResource(R.string.task_add_task)
                     )
                 }
             }
@@ -341,9 +338,9 @@ fun TaskScreen(
         onDismissRequest = { dismissModal() },
         dismissOnAction = false,
         title = when (modalState) {
-            ModalState.INITIAL -> "Delete or edit?"
-            ModalState.DELETE_RECURRING -> "This is a recurring Task.\nDelete this Task or all occurrences?"
-            ModalState.EDIT_RECURRING -> "This is a recurring Task.\nEdit this Task or all occurrences?"
+            ModalState.INITIAL -> stringResource(R.string.task_delete_or_edit)
+            ModalState.DELETE_RECURRING -> stringResource(R.string.task_delete_recurring)
+            ModalState.EDIT_RECURRING -> stringResource(R.string.task_edit_recurring)
         },
         content = {
             modalTask?.let { task ->
@@ -351,8 +348,8 @@ fun TaskScreen(
             }
         },
         secondLabel = when (modalState) {
-            ModalState.INITIAL -> "Delete"
-            ModalState.DELETE_RECURRING, ModalState.EDIT_RECURRING -> "This Task"
+            ModalState.INITIAL -> stringResource(R.string.button_delete)
+            ModalState.DELETE_RECURRING, ModalState.EDIT_RECURRING -> stringResource(R.string.button_this_task)
         },
         secondOnClick = {
             when (modalState) {
@@ -362,8 +359,8 @@ fun TaskScreen(
             }
         },
         firstLabel = when (modalState) {
-            ModalState.INITIAL -> "Edit"
-            ModalState.DELETE_RECURRING, ModalState.EDIT_RECURRING -> "All Tasks"
+            ModalState.INITIAL -> stringResource(R.string.button_edit)
+            ModalState.DELETE_RECURRING, ModalState.EDIT_RECURRING -> stringResource(R.string.button_all_tasks)
         },
         firstOnClick = {
             when (modalState) {
@@ -390,5 +387,5 @@ fun TaskScreen(
 
 @Composable
 fun EmptyTask() {
-    Text("No tasks for this day")
+    Text(stringResource(R.string.task_no_tasks))
 }

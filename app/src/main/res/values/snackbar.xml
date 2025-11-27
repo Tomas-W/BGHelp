@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="snackbar_color_name_length">Name must be at least 3 characters</string>
+    <string name="snackbar_color_name_regex">Name may only contain letters, numbers, and spaces</string>
+
+    <string name="snackbar_title_invalid">Title cannot be empty</string>
+    <string name="snackbar_start_time_invalid">Start time cannot be in the past</string>
+    <string name="snackbar_end_time_invalid">End time must be after start time</string>
+    <string name="snackbar_repeat_days_invalid">Repeats require a 1 day minimum</string>
+    <string name="snackbar_repeat_months_invalid">Repeats require a 1 month minimum</string>
+    <string name="snackbar_reminder_invalid">Reminders cannot be in the past</string>
+    <string name="snackbar_save_task_failed">Failed to save task. Please try again</string>
+    <string name="snackbar_add_image_failed">Error adding image</string>
+
+</resources>

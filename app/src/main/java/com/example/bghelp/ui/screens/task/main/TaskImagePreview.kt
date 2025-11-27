@@ -41,10 +41,12 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.bghelp.R
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.utils.TaskImageStorage
 import kotlinx.coroutines.Dispatchers
@@ -86,7 +88,7 @@ fun TaskImagePreview(
             val painter = remember(previewImage) { BitmapPainter(previewImage!!) }
             Image(
                 painter = painter,
-                contentDescription = displayName ?: "Task image preview",
+                contentDescription = displayName ?: stringResource(R.string.task_image_preview),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -132,7 +134,7 @@ private fun TaskImageModal(
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Close image",
+                    contentDescription = stringResource(R.string.task_close_image),
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
@@ -155,7 +157,7 @@ private fun TaskImageModal(
 
             Image(
                 painter = painter,
-                contentDescription = displayName ?: "Task image",
+                contentDescription = displayName ?: stringResource(R.string.task_task_image),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .align(Alignment.Center)

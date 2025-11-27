@@ -1,7 +1,6 @@
 package com.example.bghelp.utils
 
 import com.example.bghelp.ui.screens.task.add.RepeatMonthlyDaySelection
-import com.example.bghelp.ui.screens.task.add.UserDateSelection
 import com.example.bghelp.ui.screens.task.add.UserRepeatSelection
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -15,7 +14,6 @@ object RepeatRuleBuilder {
         monthlyMonths: Set<Int>,
         monthlyDaySelection: RepeatMonthlyDaySelection,
         monthlyDays: Set<Int>,
-        startDate: LocalDate,
         endDate: LocalDate? = null,
         isEndDateVisible: Boolean = false
     ): String? {

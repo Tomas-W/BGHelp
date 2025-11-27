@@ -14,7 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.bghelp.R
 import com.example.bghelp.ui.components.CustomDropdown
 import com.example.bghelp.ui.components.DropdownItem
 import com.example.bghelp.ui.components.deselectedDropdownStyle
@@ -23,7 +25,6 @@ import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.lTextDefault
 import com.example.bghelp.ui.utils.clickableDismissFocus
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
 @Composable
 fun ImageSelection(
@@ -36,7 +37,7 @@ fun ImageSelection(
     onCapturePhoto: () -> Unit
 ) {
     val hasImage = selectedImage != null
-    val imageLabel = selectedImage?.displayName ?: STR.NO_IMAGE_SELECTED
+    val imageLabel = selectedImage?.displayName ?: stringResource(R.string.task_no_image_selected)
 
     Column(
         verticalArrangement = Arrangement.spacedBy(Sizes.Size.S),
@@ -46,7 +47,7 @@ fun ImageSelection(
             Text(
                 modifier = Modifier
                     .clickableDismissFocus { onAddImageClick() },
-                text = STR.ADD_IMAGE,
+                text = stringResource(R.string.task_add_image),
                 style = MaterialTheme.typography.lTextDefault
             )
 
@@ -55,7 +56,7 @@ fun ImageSelection(
                 onDismissRequest = onDismissMenu
             ) {
                 DropdownItem(
-                    label = STR.IMAGE_FROM_LIBRARY,
+                    label = stringResource(R.string.task_select_library),
                     onClick = {
                         onSelectFromLibrary()
                         onDismissMenu()
@@ -64,7 +65,7 @@ fun ImageSelection(
                     spacing = Sizes.Icon.S
                 )
                 DropdownItem(
-                    label = STR.IMAGE_FROM_CAMERA,
+                    label = stringResource(R.string.task_capture_camera),
                     onClick = {
                         onCapturePhoto()
                         onDismissMenu()

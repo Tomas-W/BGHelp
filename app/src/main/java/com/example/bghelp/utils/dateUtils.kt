@@ -3,6 +3,10 @@ package com.example.bghelp.utils
 import android.icu.text.MeasureFormat
 import android.icu.util.Measure
 import android.icu.util.MeasureUnit
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.res.stringResource
+import com.example.bghelp.R
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -33,17 +37,18 @@ fun getEpochRange(date: LocalDateTime = LocalDateTime.now(ZoneId.systemDefault()
     return Pair(startOfDay, endOfDay)
 }
 
+@Composable
 fun LocalDateTime.toDayHeader(): String {
     val date = this.toLocalDate()
     val today = getToday()  // Use cached today instead of LocalDate.now()
     val locale = Locale.getDefault()
-    val monthDayFormatter = DateTimeFormatter.ofPattern("MMM dd", locale)
-    val weekdayFormatter = DateTimeFormatter.ofPattern("EEEE", locale)
+    val monthDayFormatter = remember(locale) { DateTimeFormatter.ofPattern("MMM dd", locale) }
+    val weekdayFormatter = remember(locale) { DateTimeFormatter.ofPattern("EEEE", locale) }
 
     val prefix = when (date) {
-        today.minusDays(1) -> "Yesterday"
-        today -> "Today"
-        today.plusDays(1) -> "Tomorrow"
+        today.minusDays(1) -> stringResource(R.string.yesterday)
+        today -> stringResource(R.string.today)
+        today.plusDays(1) -> stringResource(R.string.tomorrow)
         else -> date.format(weekdayFormatter)
     }
 

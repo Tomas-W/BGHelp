@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="extra_options">Options</string>
+    <string name="extra_color_name">Name</string>
+    <string name="extra_color_default">Default</string>
+    <string name="extra_color_red">Red</string>
+    <string name="extra_color_green">Green</string>
+    <string name="extra_color_blue">Blue</string>
+    <string name="extra_color_yellow">Yelow</string>
+    <string name="extra_color_cyan">Cyan</string>
+    <string name="extra_color_magenta">Magenta</string>
+
+    <string name="extra_no_locations_hint">Tap Add marker to create a location, then tap the map place it.\nOr search for a location through the search bar and select one from the dropdown.</string>
+    <string name="extra_delete_location">Delete location</string>
+    <string name="extra_save_location">Save location</string>
+    <string name="extra_save_locations">Save locations</string>
+    <string name="extra_add_marker">Add marker</string>
+    <string name="extra_search_placeholder">Search address or place</string>
+    <string name="extra_clear_search">Clear search</string>
+    <string name="extra_location_name">Name</string>
+</resources>

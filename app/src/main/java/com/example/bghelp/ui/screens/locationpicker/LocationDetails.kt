@@ -31,15 +31,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.bghelp.R
 import com.example.bghelp.ui.screens.task.add.TaskLocation
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.mTextDefault
 import com.example.bghelp.ui.theme.mTextItalic
 import com.example.bghelp.ui.theme.mTextSemi
-import com.example.bghelp.ui.screens.locationpicker.LocationPickerStrings as STR
-
 
 @Composable
 fun LocationDetails(
@@ -54,7 +54,7 @@ fun LocationDetails(
         Text(
             modifier = modifier
                 .fillMaxWidth(),
-            text = STR.EMPTY_LOCATIONS_HINT,
+            text = stringResource(R.string.extra_no_locations_hint),
             style = MaterialTheme.typography.mTextDefault,
         )
     } else {
@@ -126,7 +126,7 @@ private fun LocationDetailsItem(
                         onRemove()
                     },
                 imageVector = Icons.Default.Close,
-                contentDescription = STR.DELETE_LOCATION_DESCRIPTION
+                contentDescription = stringResource(R.string.extra_delete_location)
             )
         }
         Text(
@@ -157,7 +157,7 @@ private fun LocationNameField(
         Box {
             if (value.isEmpty()) {
                 Text(
-                    text = STR.NAME_PLACEHOLDER,
+                    text = stringResource(R.string.extra_location_name),
                     style = MaterialTheme.typography.mTextItalic
                 )
             }

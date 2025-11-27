@@ -105,10 +105,6 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
-    // DateTimePicker
-    implementation(libs.material.dialogs.datetime)
-    coreLibraryDesugaring(libs.desugar.jdk.libs)
-
     // AndroidX core + lifecycle
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -11,17 +11,4 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateAlarmViewModel @Inject constructor() : ViewModel() {
-    private val _selectedDate = MutableStateFlow<LocalDate>(LocalDate.now())
-    val selectedDate: StateFlow<LocalDate> = _selectedDate.asStateFlow()
-
-    private val _selectedTime = MutableStateFlow<LocalTime>(LocalTime.of(17, 30))
-    val selectedTime: StateFlow<LocalTime> = _selectedTime.asStateFlow()
-
-    fun updateSelectedDate(date: LocalDate) {
-        _selectedDate.value = date
-    }
-
-    fun updateSelectedTime(time: LocalTime) {
-        _selectedTime.value = time
-    }
 }

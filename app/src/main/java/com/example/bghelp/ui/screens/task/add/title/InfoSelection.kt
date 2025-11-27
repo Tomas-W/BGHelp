@@ -6,13 +6,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.bghelp.R
 import com.example.bghelp.ui.components.OutlinedStringInput
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.TitleInputType
 import com.example.bghelp.ui.theme.lTextItalic
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
 @Composable
 fun InfoSelection(
@@ -27,7 +28,7 @@ fun InfoSelection(
         modifier = Modifier.fillMaxWidth(),
         value = infoText,
         onValueChange = { viewModel.setInfoText(it) },
-        hint = STR.INFO_HINT,
+        hint = stringResource(R.string.task_title_hint),
         textStyle = MaterialTheme.typography.lTextItalic,
         minLines = CONST.INFO_MIN_LINES,
         maxLines = CONST.INFO_MAX_LINES,

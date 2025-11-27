@@ -11,14 +11,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import com.example.bghelp.R
 import com.example.bghelp.ui.components.CustomDropdown
 import com.example.bghelp.ui.components.DropdownItem
 import com.example.bghelp.ui.components.deselectedDropdownStyle
 import com.example.bghelp.ui.components.selectedDropdownStyle
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.lTextDefault
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
 @Composable
 fun NoteSelection(
@@ -31,10 +32,9 @@ fun NoteSelection(
     var isExpanded by remember { mutableStateOf(false) }
 
     val noteOptions = remember { listOf("item1", "item2", "item3") }
+    val defaultNoteName = stringResource(R.string.note_select_note)
     val displayText = remember(selectedNote) {
-        selectedNote.ifEmpty {
-            STR.SELECT_NOTE
-        }
+        selectedNote.ifEmpty { defaultNoteName }
     }
 
     Box(
@@ -58,7 +58,7 @@ fun NoteSelection(
             onDismissRequest = { isExpanded = false }
         ) {
             DropdownItem(
-                label = STR.SELECT_NOTE,
+                label = stringResource(R.string.note_select_note),
                 onClick = {
                     onNoteSelected("")
                     isExpanded = false
@@ -71,7 +71,7 @@ fun NoteSelection(
                 spacing = Sizes.Icon.M
             )
             DropdownItem(
-                label = STR.CREATE_NOTE,
+                label = stringResource(R.string.note_create_note),
                 onClick = {
                     onNoteSelected("CREATE")
                     isExpanded = false

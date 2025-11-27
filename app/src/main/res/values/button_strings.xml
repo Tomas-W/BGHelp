@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="button_save">Save</string>
+    <string name="button_saving">Saving..</string>
+    <string name="button_save_task">Save task</string>
+    <string name="button_save_color">Save color</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="button_confirm">Confirm</string>
+    <string name="button_confirming">Confirming..</string>
+    <string name="button_delete">Delete</string>
+    <string name="button_edit">Edit</string>
+    <string name="button_edit_task">Edit task</string>
+    <string name="button_editing">Editing..</string>
+    <string name="button_this_task">This task</string>
+    <string name="button_all_tasks">All tasks</string>
+</resources>

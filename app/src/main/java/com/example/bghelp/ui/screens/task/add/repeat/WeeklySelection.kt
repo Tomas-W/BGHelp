@@ -30,9 +30,11 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.bghelp.R
 import com.example.bghelp.ui.components.WithRipple
 import com.example.bghelp.ui.components.clickableRipple
 import com.example.bghelp.ui.components.deselectedTextColor
@@ -41,8 +43,8 @@ import com.example.bghelp.ui.components.selectedTextColor
 import com.example.bghelp.ui.components.selectedTextStyle
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerMedium
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
+import com.example.bghelp.ui.screens.task.add.getDayAbbreviations
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.lTextDefault
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
@@ -74,7 +76,7 @@ private fun DaySelection(
     selectedDays: Set<Int>,
     onDayToggle: (Int) -> Unit
 ) {
-    val days = listOf("M", "T", "W", "T", "F", "S", "S")
+    val dayAbbreviations = getDayAbbreviations()
     val dayNumbers = listOf(1, 2, 3, 4, 5, 6, 7)
 
     Row(
@@ -83,12 +85,12 @@ private fun DaySelection(
             .padding(end = CONST.START_PADDING.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        days.forEachIndexed { i, day ->
-            val isSelected = selectedDays.contains(dayNumbers[i])
+        dayNumbers.forEach { dayNumber ->
+            val isSelected = selectedDays.contains(dayNumber)
             Text(
                 modifier = Modifier
-                    .clickable { onDayToggle(dayNumbers[i]) },
-                text = day,
+                    .clickable { onDayToggle(dayNumber) },
+                text = dayAbbreviations[dayNumber] ?: "",
                 style = if (isSelected) {
                     selectedTextStyle()
                 } else {
@@ -108,7 +110,7 @@ private fun WeekSelection(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = AddTaskStrings.EVERY,
+            text = stringResource(R.string.task_repeat_every),
             style = MaterialTheme.typography.lTextDefault
         )
 
@@ -124,7 +126,7 @@ private fun WeekSelection(
         Spacer(modifier = Modifier.width(Sizes.Icon.S))
 
         Text(
-            text = AddTaskStrings.REPEAT_WEEKS,
+            text = stringResource(R.string.task_repeat_weeks),
             style = MaterialTheme.typography.lTextDefault
         )
     }

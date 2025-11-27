@@ -14,6 +14,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.bghelp.R
 import com.example.bghelp.ui.components.deselectedTextStyle
 import com.example.bghelp.ui.components.selectedTextStyle
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerLarge
@@ -26,7 +28,6 @@ import com.example.bghelp.ui.theme.lTextDefault
 import java.time.Month
 import java.time.format.TextStyle
 import java.util.Locale
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
 @Composable
 fun MonthlySelection(
@@ -74,14 +75,14 @@ private fun MonthSelection(
             Text(
                 modifier = Modifier
                     .clickable { viewModel.selectAllMonthlySelectedMonths() },
-                text = STR.SELECT_ALL,
+                text = stringResource(R.string.task_select_all),
                 style = MaterialTheme.typography.lTextDefault
             )
 
             Text(
                 modifier = Modifier
                     .clickable { viewModel.deselectAllMonthlySelectedMonths() },
-                text = STR.DESELECT_ALL,
+                text = stringResource(R.string.task_deselect_all),
                 style = MaterialTheme.typography.lTextDefault
             )
         }
@@ -136,7 +137,7 @@ private fun DaySelection(
             Text(
                 modifier = Modifier
                     .clickable { viewModel.toggleMonthlyDaySelection(RepeatMonthlyDaySelection.ALL) },
-                text = STR.ALL_DAYS,
+                text = stringResource(R.string.task_all_days),
                 style = if (monthlyDaySelection == RepeatMonthlyDaySelection.ALL) {
                     selectedTextStyle()
                 } else {
@@ -149,7 +150,7 @@ private fun DaySelection(
                     .clickable {
                         viewModel.toggleMonthlyDaySelection(RepeatMonthlyDaySelection.SELECT)
                     },
-                text = STR.SELECT_DAYS,
+                text = stringResource(R.string.task_select_days),
                 style = if (monthlyDaySelection == RepeatMonthlyDaySelection.SELECT) {
                     selectedTextStyle()
                 } else {
@@ -160,7 +161,7 @@ private fun DaySelection(
             Text(
                 modifier = Modifier
                     .clickable { viewModel.toggleMonthlyDaySelection(RepeatMonthlyDaySelection.LAST) },
-                text = STR.LAST_OF_MONTH,
+                text = stringResource(R.string.task_last_of_month),
                 style = if (monthlyDaySelection == RepeatMonthlyDaySelection.LAST) {
                     selectedTextStyle()
                 } else {
@@ -207,14 +208,14 @@ private fun DaySelection(
                 Text(
                     modifier = Modifier
                         .clickable { viewModel.selectAllMonthlySelectedDays() },
-                    text = STR.SELECT_ALL,
+                    text = stringResource(R.string.task_select_all),
                     style = MaterialTheme.typography.lTextDefault
                 )
 
                 Text(
                     modifier = Modifier
                         .clickable { viewModel.deselectAllMonthlySelectedDays() },
-                    text = STR.DESELECT_ALL,
+                    text = stringResource(R.string.task_deselect_all),
                     style = MaterialTheme.typography.lTextDefault
                 )
 

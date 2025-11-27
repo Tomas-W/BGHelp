@@ -24,7 +24,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
+import com.example.bghelp.R
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.add.Header
 import com.example.bghelp.ui.screens.task.add.SubContainer
@@ -32,7 +34,6 @@ import com.example.bghelp.ui.screens.task.add.UserImageSelection
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
 @Composable
 fun Image(
@@ -42,6 +43,7 @@ fun Image(
     val userImageSelection = viewModel.userImageSelection.collectAsState().value
     val selectedImageState = viewModel.selectedImage.collectAsState()
     val selectedImageData = selectedImageState.value
+    val cameraRequiredMessage = stringResource(R.string.task_camera_permission_required)
 
     var isMenuExpanded by remember { mutableStateOf(false) }
     var launchCamera by remember { mutableStateOf(false) }
@@ -74,7 +76,7 @@ fun Image(
         } else {
             Toast.makeText(
                 context,
-                STR.CAMERA_PERMISSION_REQUIRED,
+                cameraRequiredMessage,
                 Toast.LENGTH_SHORT
             ).show()
         }

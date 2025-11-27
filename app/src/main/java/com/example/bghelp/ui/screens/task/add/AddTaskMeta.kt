@@ -2,8 +2,13 @@ package com.example.bghelp.ui.screens.task.add
 
 import android.graphics.Bitmap
 import android.net.Uri
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.res.stringResource
 import com.example.bghelp.R
 import java.io.Serializable
+import java.time.DayOfWeek
+import java.time.format.TextStyle
 
 object AddTaskConstants {
     // Misc
@@ -35,136 +40,23 @@ object AddTaskConstants {
     const val IMAGE_SIZE = 120
 }
 
-object AddTaskStrings {
-    // Title
-    const val TITLE_HINT = "Title"
-    const val INFO_HINT = "Info"
-    const val TITLE_ONLY = "Title only"
-    const val TITLE_AND_INFO = "Title and info"
-
-    // Date
-    const val DATE_CANNOT_BE_IN_PAST = "Date cannot be in the past"
-    const val AT_TIME = "At time"
-    const val ALL_DAY = "All day"
-
-    // Repeat
-    const val DONT_REPEAT = "Don't repeat"
-    const val REPEAT_WEEKLY = "Repeat weekly"
-    const val REPEAT_MONTHLY = "Repeat monthly"
-    const val EVERY = "Every"
-    const val REPEAT_WEEKS = "weeks"
-    const val ALL_DAYS = "All days"
-    const val SELECT_DAYS = "Select days"
-    const val LAST_OF_MONTH = "Last of month"
-
-    // Remind
-    const val BEFORE_START = "Before start"
-    const val BEFORE_END = "Before end"
-    const val DONT_REMIND_ME = "Don't remind me"
-    const val REMIND_ME = "Remind me"
-    const val ADD_REMINDER = "Add reminder"
-    const val REMOVE_REMINDER = "Remove reminder"
-
-    // Sound
-    const val SELECT_ALARM = "Select alarm"
-    const val CREATE_ALARM = "Create alarm +"
-    const val ALARM_OFF = "Alarm off"
-    const val ALARM_ONCE = "Alarm once"
-    const val ALARM_CONTINUOUS = "Alarm continuous"
-
-    // Vibrate
-    const val VIBRATE_OFF = "Vibrate off"
-    const val VIBRATE_ONCE = "Vibrate once"
-    const val VIBRATE_CONTINUOUS = "Vibrate continuous"
-
-    // Snooze
-    const val SNOOZE_TIME = "Snooze options"
-
-    // Note
-    const val SELECT_NOTE = "Select note"
-    const val CREATE_NOTE = "Create note +"
-    const val NOTE_OFF = "Note off"
-    const val NOTE_ON = "Note on"
-
-    // Image
-    const val ADD_IMAGE = "Add image"
-    const val NO_IMAGE_SELECTED = "No image selected"
-    const val IMAGE_FROM_LIBRARY = "Select from library"
-    const val IMAGE_FROM_CAMERA = "Capture photo"
-    const val CAPTURED_IMAGE = "Captured image"
-    const val CAMERA_PERMISSION_REQUIRED = "Camera permission required to capture photo"
-    const val NO_IMAGE = "No image"
-    const val WITH_IMAGE = "With image"
-
-    // Color
-    const val SELECT_COLOR = "Select color"
-    const val DEFAULT = "Default"
-    const val RED = "Red"
-    const val GREEN = "Green"
-    const val YELLOW = "Yellow"
-    const val CYAN = "Cyan"
-    const val MAGENTA = "Magenta"
-    const val DEFAULT_COLOR = "Default color"
-    const val CUSTOM_COLOR = "Custom color"
-
-    // Location
-    const val ADD_LOCATION = "Add location"
-    const val REMOVE_LOCATION = "Remove location"
-    const val UNNAMED_LOCATION = "unnamed"
-    const val NO_LOCATION = "No location"
-    const val WITH_LOCATION = "With Location"
-
-    // Misc
-    const val MINUTES = "Minutes"
-    const val HOURS = "Hours"
-    const val DAYS = "Days"
-    const val WEEKS = "Weeks"
-    const val MONTHS = "Months"
-    const val SELECT_ALL = "Select all"
-    const val DESELECT_ALL = "Deselect all"
-
-    // Content description
-    const val SHOW_END_DATE = "Show end date"
-    const val HIDE_END_DATE = "Hide end date"
-    const val SHOW_END_TIME = "Show end time"
-    const val HIDE_END_TIME = "Hide end time"
-    const val PREVIOUS_MONTH = "Previous month"
-    const val NEXT_MONTH = "Next month"
-    const val HIDE_CALENDAR = "Hide calendar"
-    const val RESET_FORM_DESC = "Reset form"
-    const val UNDO_RESET_FORM_DESC = "Undo reset"
-
-    // Actions
-    const val CANCEL = "Cancel"
-    const val SAVING = "Saving..."
-    const val SAVE_TASK = "Save"
-    const val EDIT_TASK = "Edit"
-    const val RESET_FORM = "Reset form"
-    const val UNDO_RESET_FORM = "Undo reset"
-
-    // Validation errors
-    const val VALIDATION_TITLE_EMPTY = "Title cannot be empty"
-    const val VALIDATION_START_TIME_PAST = "Start time cannot be in the past"
-    const val VALIDATION_END_TIME_BEFORE_START = "End time must be after start time"
-    const val VALIDATION_REPEAT_MIN_DAYS = "Repeats require a 1 day minimum"
-    const val VALIDATION_REPEAT_MIN_MONTHS = "Repeats require a 1 month minimum"
-    const val VALIDATION_REMINDERS_PAST = "Reminders cannot be in the past"
-    const val ERROR_SAVE_FAILED = "Failed to save task. Please try again"
-    const val ERROR_ADDING_IMAGE = "Error adding image"
+interface SectionMeta {
+    val headerTextRes: Int
+    val iconRes: Int
 }
 
-interface SectionMeta {
-    val headerText: String
-    val iconRes: Int
+@Composable
+fun SectionMeta.getHeaderText(): String {
+    return stringResource(headerTextRes)
 }
 
 // Title
 enum class UserTitleSelection(
-    override val headerText: String,
+    override val headerTextRes: Int,
     override val iconRes: Int
 ) : SectionMeta {
-    OFF(AddTaskStrings.TITLE_ONLY, R.drawable.title_off),
-    ON(AddTaskStrings.TITLE_AND_INFO, R.drawable.title_on);
+    OFF(R.string.task_title_only, R.drawable.title_off),
+    ON(R.string.task_title_and_info, R.drawable.title_on);
 
     fun toggle(): UserTitleSelection = when (this) {
         OFF -> ON
@@ -176,11 +68,11 @@ enum class TitleInputType { TITLE, INFO }
 
 // Date
 enum class UserDateSelection(
-    override val headerText: String,
+    override val headerTextRes: Int,
     override val iconRes: Int
 ) : SectionMeta {
-    OFF(AddTaskStrings.AT_TIME, R.drawable.date_off),
-    ON(AddTaskStrings.ALL_DAY, R.drawable.date_on);
+    OFF(R.string.task_at_time, R.drawable.date_off),
+    ON(R.string.task_all_day, R.drawable.date_on);
 
     fun toggle(): UserDateSelection = when (this) {
         OFF -> ON
@@ -194,12 +86,12 @@ enum class TimeSegment { HOUR, MINUTE }
 
 // Repeat
 enum class UserRepeatSelection(
-    override val headerText: String,
+    override val headerTextRes: Int,
     override val iconRes: Int
 ) : SectionMeta {
-    OFF(AddTaskStrings.DONT_REPEAT, R.drawable.repeat_off),
-    WEEKLY(AddTaskStrings.REPEAT_WEEKLY, R.drawable.repeat_weekly),
-    MONTHLY(AddTaskStrings.REPEAT_MONTHLY, R.drawable.repeat_monthly);
+    OFF(R.string.task_dont_repeat, R.drawable.repeat_off),
+    WEEKLY(R.string.task_repeat_weekly, R.drawable.repeat_weekly),
+    MONTHLY(R.string.task_repeat_monthly, R.drawable.repeat_monthly);
 
     fun toggle(): UserRepeatSelection = when (this) {
         OFF -> WEEKLY
@@ -212,11 +104,11 @@ enum class RepeatMonthlyDaySelection { ALL, SELECT, LAST }
 
 // Remind
 enum class UserRemindSelection(
-    override val headerText: String,
+    override val headerTextRes: Int,
     override val iconRes: Int
 ) : SectionMeta {
-    OFF(AddTaskStrings.DONT_REMIND_ME, R.drawable.remind_off),
-    ON(AddTaskStrings.REMIND_ME, R.drawable.remind_on);
+    OFF(R.string.task_dont_remind_me, R.drawable.remind_off),
+    ON(R.string.task_remind_me, R.drawable.remind_on);
 
     fun toggle(): UserRemindSelection = when (this) {
         OFF -> ON
@@ -234,14 +126,45 @@ enum class RemindType { START, END }
 enum class TimeUnit { MINUTES, HOURS, DAYS, WEEKS, MONTHS }
 data class ActiveReminderInput(val type: RemindType, val id: Int, val snoozeIndex: Int? = null)
 
+@Composable
+fun getTimeUnitMap(): Map<TimeUnit, String> {
+    val minutes = stringResource(R.string.minutes)
+    val hours = stringResource(R.string.hours)
+    val days = stringResource(R.string.days)
+    val weeks = stringResource(R.string.weeks)
+    val months = stringResource(R.string.months)
+    return mapOf(
+        TimeUnit.MINUTES to minutes,
+        TimeUnit.HOURS to hours,
+        TimeUnit.DAYS to days,
+        TimeUnit.WEEKS to weeks,
+        TimeUnit.MONTHS to months
+    )
+}
+
+@Composable
+fun getDayAbbreviations(): Map<Int, String> {
+    val locale = java.util.Locale.getDefault()
+    return mapOf(
+        1 to DayOfWeek.MONDAY.getDisplayName(TextStyle.NARROW, locale),
+        2 to DayOfWeek.TUESDAY.getDisplayName(TextStyle.NARROW, locale),
+        3 to DayOfWeek.WEDNESDAY.getDisplayName(TextStyle.NARROW, locale),
+        4 to DayOfWeek.THURSDAY.getDisplayName(TextStyle.NARROW, locale),
+        5 to DayOfWeek.FRIDAY.getDisplayName(TextStyle.NARROW, locale),
+        6 to DayOfWeek.SATURDAY.getDisplayName(TextStyle.NARROW, locale),
+        7 to DayOfWeek.SUNDAY.getDisplayName(TextStyle.NARROW, locale)
+    )
+}
+
+
 // Sound
 enum class UserSoundSelection(
-    override val headerText: String,
+    override val headerTextRes: Int,
     override val iconRes: Int
 ) : SectionMeta {
-    OFF(AddTaskStrings.ALARM_OFF, R.drawable.sound_off),
-    ONCE(AddTaskStrings.ALARM_ONCE, R.drawable.sound_once),
-    CONTINUOUS(AddTaskStrings.ALARM_CONTINUOUS, R.drawable.sound_continuous);
+    OFF(R.string.task_alarm_off, R.drawable.sound_off),
+    ONCE(R.string.task_alarm_once, R.drawable.sound_once),
+    CONTINUOUS(R.string.task_alarm_continuous, R.drawable.sound_continuous);
 
     fun toggle(): UserSoundSelection = when (this) {
         OFF -> ONCE
@@ -251,11 +174,11 @@ enum class UserSoundSelection(
 }
 
 enum class UserNoteSelection(
-    override val headerText: String,
+    override val headerTextRes: Int,
     override val iconRes: Int
 ) : SectionMeta {
-    OFF(AddTaskStrings.NOTE_OFF, R.drawable.note_off),
-    ON(AddTaskStrings.NOTE_ON, R.drawable.note_on);
+    OFF(R.string.task_note_off, R.drawable.note_off),
+    ON(R.string.task_note_on, R.drawable.note_on);
 
     fun toggle(): UserNoteSelection = when (this) {
         OFF -> ON
@@ -265,12 +188,12 @@ enum class UserNoteSelection(
 
 //Vibrate
 enum class UserVibrateSelection(
-    override val headerText: String,
+    override val headerTextRes: Int,
     override val iconRes: Int
 ) : SectionMeta {
-    OFF(AddTaskStrings.VIBRATE_OFF, R.drawable.vibrate_off),
-    ONCE(AddTaskStrings.VIBRATE_ONCE, R.drawable.vibrate_once),
-    CONTINUOUS(AddTaskStrings.VIBRATE_CONTINUOUS, R.drawable.vibrate_continuous);
+    OFF(R.string.task_vibrate_off, R.drawable.vibrate_off),
+    ONCE(R.string.task_vibrate_once, R.drawable.vibrate_once),
+    CONTINUOUS(R.string.task_vibrate_continuous, R.drawable.vibrate_continuous);
 
     fun toggle(): UserVibrateSelection = when (this) {
         OFF -> ONCE
@@ -281,11 +204,11 @@ enum class UserVibrateSelection(
 
 // Location
 enum class UserLocationSelection(
-    override val headerText: String,
+    override val headerTextRes: Int,
     override val iconRes: Int
 ) : SectionMeta {
-    OFF(AddTaskStrings.NO_LOCATION, R.drawable.location_off),
-    ON(AddTaskStrings.WITH_LOCATION, R.drawable.location_on);
+    OFF(R.string.task_no_location, R.drawable.location_off),
+    ON(R.string.task_with_location, R.drawable.location_on);
 
     fun toggle(): UserLocationSelection = when (this) {
         OFF -> ON
@@ -311,11 +234,11 @@ enum class TaskImageSource { GALLERY, CAMERA }
 
 // Image
 enum class UserImageSelection(
-    override val headerText: String,
+    override val headerTextRes: Int,
     override val iconRes: Int
 ) : SectionMeta {
-    OFF(AddTaskStrings.NO_IMAGE, R.drawable.image_off),
-    ON(AddTaskStrings.WITH_IMAGE, R.drawable.image_on);
+    OFF(R.string.task_no_image, R.drawable.image_off),
+    ON(R.string.task_with_image, R.drawable.image_on);
 
     fun toggle(): UserImageSelection = when (this) {
         OFF -> ON
@@ -325,11 +248,11 @@ enum class UserImageSelection(
 
 // Color
 enum class UserColorSelection(
-    override val headerText: String,
+    override val headerTextRes: Int,
     override val iconRes: Int
 ) : SectionMeta {
-    OFF(AddTaskStrings.DEFAULT_COLOR, R.drawable.color_off),
-    ON(AddTaskStrings.CUSTOM_COLOR, R.drawable.color_on);
+    OFF(R.string.task_default_color, R.drawable.color_off),
+    ON(R.string.task_custom_color, R.drawable.color_on);
 
     fun toggle(): UserColorSelection = when (this) {
         OFF -> ON

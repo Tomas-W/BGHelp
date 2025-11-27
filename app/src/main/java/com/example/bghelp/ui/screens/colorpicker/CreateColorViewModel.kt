@@ -1,12 +1,16 @@
 package com.example.bghelp.ui.screens.colorpicker
 
+import android.content.Context
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bghelp.R
 import com.example.bghelp.data.repository.ColorRepository
 import com.example.bghelp.domain.model.CreateFeatureColor
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateColorViewModel @Inject constructor(
-    private val colorRepository: ColorRepository
+    private val colorRepository: ColorRepository,
+    @ApplicationContext private val appContext: Context
 ) : ViewModel() {
     private val _selectedColor = MutableStateFlow(Color(0xFF2196F3))
     val selectedColor: StateFlow<Color> = _selectedColor.asStateFlow()
@@ -76,10 +81,10 @@ class CreateColorViewModel @Inject constructor(
 
     private fun validateColorName(name: String): String? {
         if (name.length < 3) {
-            return "Name must be at least 3 characters"
+            return appContext.getString(R.string.snackbar_color_name_length)
         }
         if (!name.matches(Regex("^[a-zA-Z0-9 ]+$"))) {
-            return "Name may only contain letters, numbers, and spaces"
+            return appContext.getString(R.string.snackbar_color_name_regex)
         }
         return null
     }

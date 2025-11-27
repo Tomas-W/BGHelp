@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="target_locations_colon">Locations:</string>
+    <string name="target_alert_distance_colon">Alert distance:</string>
+    <string name="target_no_targets">No targets for this day</string>
+
+    <string name="target_">target</string>
+
+</resources>

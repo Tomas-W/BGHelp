@@ -33,6 +33,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -55,10 +56,10 @@ import com.example.bghelp.ui.screens.task.add.RemindType
 import com.example.bghelp.ui.screens.task.add.Reminder
 import com.example.bghelp.ui.screens.task.add.TimeUnit
 import com.example.bghelp.ui.screens.task.add.UserDateSelection
+import com.example.bghelp.ui.screens.task.add.getTimeUnitMap
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.lTextDefault
 import com.example.bghelp.ui.screens.task.add.AddTaskConstants as CONST
-import com.example.bghelp.ui.screens.task.add.AddTaskStrings as STR
 
 @Composable
 fun BeforeSelection(
@@ -114,10 +115,13 @@ private fun AddReminder(
     onClick: () -> Unit,
     viewModel: AddTaskViewModel
 ) {
+    val startText = stringResource(R.string.task_before_start)
+    val endText = stringResource(R.string.task_before_end)
+
     val remindTypeChoices = remember {
         mapOf(
-            RemindType.START to STR.BEFORE_START,
-            RemindType.END to STR.BEFORE_END
+            RemindType.START to startText,
+            RemindType.END to endText
         )
     }
 
@@ -150,7 +154,7 @@ private fun AddReminder(
                 Icon(
                     modifier = Modifier.size(Sizes.Icon.S),
                     painter = painterResource(R.drawable.add),
-                    contentDescription = STR.ADD_REMINDER
+                    contentDescription = stringResource(R.string.task_add_reminder)
                 )
             }
         }
@@ -217,7 +221,7 @@ private fun ReminderItem(
                 Icon(
                     modifier = Modifier.size(Sizes.Icon.M),
                     painter = painterResource(R.drawable.delete),
-                    contentDescription = STR.REMOVE_REMINDER
+                    contentDescription = stringResource(R.string.task_remove_reminder)
                 )
             }
         }
@@ -335,16 +339,9 @@ private fun TimeDropdown(
     onDropdownClick: () -> Unit = {}
 ) {
     var isExpanded by remember { mutableStateOf(false) }
+
     val units = remember { TimeUnit.entries }
-    val unitLabels = remember {
-        mapOf(
-            TimeUnit.MINUTES to STR.MINUTES,
-            TimeUnit.HOURS to STR.HOURS,
-            TimeUnit.DAYS to STR.DAYS,
-            TimeUnit.WEEKS to STR.WEEKS,
-            TimeUnit.MONTHS to STR.MONTHS
-        )
-    }
+    val unitLabels = getTimeUnitMap()
 
     Box(modifier = modifier) {
         Text(

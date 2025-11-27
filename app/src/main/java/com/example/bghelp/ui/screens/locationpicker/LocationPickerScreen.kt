@@ -28,9 +28,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.bghelp.R
 import com.example.bghelp.ui.components.ButtonRow
 import com.example.bghelp.ui.navigation.Screen
 import com.example.bghelp.ui.screens.task.add.TaskLocation
@@ -48,7 +50,6 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.flow.collectLatest
 import com.example.bghelp.ui.screens.locationpicker.LocationPickerConstants as CONST
-import com.example.bghelp.ui.screens.locationpicker.LocationPickerStrings as STR
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
@@ -243,9 +244,9 @@ private fun BottomButtonRow(
         isValid = canSave,
         isLoading = false,
         firstLabel = if (selectedLocations.size <= 1) {
-            STR.SAVE_LOCATION
+            stringResource(R.string.extra_save_location)
         } else {
-            STR.SAVE_LOCATIONS
+            stringResource(R.string.extra_save_locations)
         },
         firstOnClick = {
             navController.previousBackStackEntry
@@ -256,7 +257,7 @@ private fun BottomButtonRow(
                 )
             navController.popBackStack()
         },
-        secondLabel = STR.ADD_MARKER,
+        secondLabel = stringResource(R.string.extra_add_marker),
         secondOnClick = {
             val target = cameraPositionState.position.target
             viewModel.onAddMarker(target)

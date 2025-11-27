@@ -17,8 +17,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.bghelp.R
 import com.example.bghelp.ui.components.ButtonRow
 import com.example.bghelp.ui.components.MainContentContainer
 import com.example.bghelp.ui.components.ReusableSnackbarHost
@@ -54,6 +56,7 @@ fun AddTaskScreen(
         }
     }
 
+    val saveFailedMessage = stringResource(R.string.task_save_failed)
     LaunchedEffect(saveState) {
         when (saveState) {
             is SaveTaskState.Success -> {
@@ -62,7 +65,7 @@ fun AddTaskScreen(
             }
 
             is SaveTaskState.Error -> {
-                viewModel.showSnackbar(AddTaskStrings.ERROR_SAVE_FAILED)
+                viewModel.showSnackbar(saveFailedMessage)
                 viewModel.consumeSaveState()
             }
 
@@ -100,17 +103,17 @@ fun AddTaskScreen(
                 // Reset / Undo reset
                 if (showUndoReset) {
                     FormResetComponent(
-                        label = AddTaskStrings.UNDO_RESET_FORM,
+                        label = stringResource(R.string.task_undo_reset),
                         imageVector = Icons.Default.Refresh,
                         onClick = { viewModel.undoResetForm() },
-                        contentDescription = AddTaskStrings.UNDO_RESET_FORM_DESC
+                        contentDescription = stringResource(R.string.task_undo_reset)
                     )
                 } else {
                     FormResetComponent(
-                        label = AddTaskStrings.RESET_FORM,
+                        label = stringResource(R.string.task_reset_form),
                         imageVector = Icons.Default.Refresh,
                         onClick = { viewModel.resetForm() },
-                        contentDescription = AddTaskStrings.UNDO_RESET_FORM_DESC
+                        contentDescription = stringResource(R.string.task_reset_form)
                     )
                 }
 
@@ -154,7 +157,10 @@ fun AddTaskScreen(
 
                 AddTaskDivider()
 
-                Color(viewModel = viewModel)
+                Color(
+                    viewModel = viewModel,
+                    navController = navController
+                )
 
                 AddTaskSpacerLarge()
             }
@@ -163,9 +169,9 @@ fun AddTaskScreen(
                 isValid = isValid,
                 isLoading = saveState is SaveTaskState.Saving,
                 firstLabel = when {
-                    saveState is SaveTaskState.Saving -> AddTaskStrings.SAVING
-                    isEditing -> AddTaskStrings.EDIT_TASK
-                    else -> AddTaskStrings.SAVE_TASK
+                    saveState is SaveTaskState.Saving -> stringResource(R.string.button_saving)
+                    isEditing -> stringResource(R.string.button_edit_task)
+                    else -> stringResource(R.string.button_save_task)
                 },
                 firstOnClick = {
                     if (isValid && saveState !is SaveTaskState.Saving) {
@@ -175,7 +181,7 @@ fun AddTaskScreen(
                         errorMessage?.let { viewModel.showSnackbar(it) }
                     }
                 },
-                secondLabel = "Cancel",
+                secondLabel = stringResource(R.string.button_cancel),
                 secondOnClick = { navController.popBackStack() },
             )
         }

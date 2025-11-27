@@ -36,7 +36,6 @@ import com.example.bghelp.ui.components.selectedTextColor
 import com.example.bghelp.ui.components.selectedTextStyle
 import com.example.bghelp.ui.screens.task.add.TimeField
 import com.example.bghelp.ui.screens.task.add.TimeSegment
-import com.example.bghelp.ui.theme.lTextBold
 import com.example.bghelp.ui.theme.lTextDefault
 import java.time.LocalTime
 import java.util.Locale

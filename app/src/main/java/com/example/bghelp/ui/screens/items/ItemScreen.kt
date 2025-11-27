@@ -20,8 +20,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.bghelp.R
 import com.example.bghelp.domain.model.CreateItem
 import com.example.bghelp.ui.components.HighlightedContainerSmall
 import com.example.bghelp.ui.components.LazyColumnContainer
@@ -32,8 +34,8 @@ import com.example.bghelp.ui.theme.lTextDefault
 @SuppressLint("FrequentlyChangingValue")
 @Composable
 fun ItemScreen(
-    viewModel: ItemViewModel = hiltViewModel(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: ItemViewModel = hiltViewModel()
 ) {
     val flattenedItems by viewModel.flattenedItems.collectAsState()
 
@@ -105,7 +107,7 @@ fun ItemScreen(
                                     modifier = Modifier.clickable { viewModel.deleteItem(item) },
                                     imageVector = Icons.Default.Delete,
                                     tint = MaterialTheme.colorScheme.error,
-                                    contentDescription = "Delete",
+                                    contentDescription = stringResource(R.string.button_delete),
                                 )
                             }
                         }

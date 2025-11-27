@@ -1,6 +1,7 @@
 package com.example.bghelp.ui.screens.task.add
 
 import android.content.Context
+import com.example.bghelp.R
 import com.example.bghelp.data.repository.ColorRepository
 import com.example.bghelp.data.repository.TaskRepository
 import com.example.bghelp.domain.model.FeatureColor
@@ -50,31 +51,31 @@ class SaveTaskHandler(
 
             val assembleResult = AddTaskAssembler.buildOrError(
                 title = formState.title,
+                description = formState.info.takeIf { it.isNotBlank() },
                 dateSelection = formState.dateSelection,
                 startDate = startDate,
                 startTime = startTime,
+                isEndDateVisible = endDateVisible,
+                endDate = endDate,
+                isEndTimeVisible = endTimeVisible,
+                endTime = endTime,
+                rrule = formState.repeatRRule,
                 remindSelection = formState.remindSelection,
                 startReminders = formState.startReminders,
                 endReminders = formState.endReminders,
-                endDate = endDate,
-                isEndDateVisible = endDateVisible,
-                endTime = endTime,
-                isEndTimeVisible = endTimeVisible,
-                rrule = formState.repeatRRule,
-                alarmName = formState.selectedAudioFile.takeIf { it.isNotBlank() },
                 soundMode = with(TaskMapper) { formState.soundSelection.toAlarmMode() },
-                vibrateMode = with(TaskMapper) { formState.vibrateSelection.toAlarmMode() },
+                alarmName = formState.selectedAudioFile.takeIf { it.isNotBlank() },
                 soundUri = formState.selectedAudioFile.takeIf { it.isNotBlank() },
+                vibrateMode = with(TaskMapper) { formState.vibrateSelection.toAlarmMode() },
                 snoozeValue1 = formState.snoozeValue1,
                 snoozeUnit1 = formState.snoozeUnit1,
                 snoozeValue2 = formState.snoozeValue2,
                 snoozeUnit2 = formState.snoozeUnit2,
-                color = selectedColor,
-                image = imageAttachment,
-                description = formState.info.takeIf { it.isNotBlank() },
                 note = if (formState.noteSelection == UserNoteSelection.ON)
                     formState.note.takeIf { it.isNotBlank() } else null,
-                locations = formState.selectedLocations
+                locations = formState.selectedLocations,
+                image = imageAttachment,
+                color = selectedColor
             )
 
             when (assembleResult) {
@@ -126,31 +127,31 @@ class SaveTaskHandler(
 
             val assembleResult = AddTaskAssembler.buildOrError(
                 title = formState.title,
+                description = formState.info.takeIf { it.isNotBlank() },
                 dateSelection = formState.dateSelection,
                 startDate = startDate,
                 startTime = startTime,
+                isEndDateVisible = endDateVisible,
+                endDate = endDate,
+                isEndTimeVisible = endTimeVisible,
+                endTime = endTime,
+                rrule = formState.repeatRRule,
                 remindSelection = formState.remindSelection,
                 startReminders = formState.startReminders,
                 endReminders = formState.endReminders,
-                endDate = endDate,
-                isEndDateVisible = endDateVisible,
-                endTime = endTime,
-                isEndTimeVisible = endTimeVisible,
-                rrule = formState.repeatRRule,
-                alarmName = formState.selectedAudioFile.takeIf { it.isNotBlank() },
                 soundMode = with(TaskMapper) { formState.soundSelection.toAlarmMode() },
-                vibrateMode = with(TaskMapper) { formState.vibrateSelection.toAlarmMode() },
+                alarmName = formState.selectedAudioFile.takeIf { it.isNotBlank() },
                 soundUri = formState.selectedAudioFile.takeIf { it.isNotBlank() },
+                vibrateMode = with(TaskMapper) { formState.vibrateSelection.toAlarmMode() },
                 snoozeValue1 = formState.snoozeValue1,
                 snoozeUnit1 = formState.snoozeUnit1,
                 snoozeValue2 = formState.snoozeValue2,
                 snoozeUnit2 = formState.snoozeUnit2,
-                color = selectedColor,
-                image = imageAttachment,
-                description = formState.info.takeIf { it.isNotBlank() },
                 note = if (formState.noteSelection == UserNoteSelection.ON)
                     formState.note.takeIf { it.isNotBlank() } else null,
-                locations = formState.selectedLocations
+                locations = formState.selectedLocations,
+                image = imageAttachment,
+                color = selectedColor
             )
 
             when (assembleResult) {
@@ -162,27 +163,27 @@ class SaveTaskHandler(
                     val createTask = assembleResult.task
                     val updatedTask = Task(
                         id = taskId,
-                        date = createTask.startDate,
                         title = createTask.title,
-                        description = createTask.info,
+                        info = createTask.info,
+                        allDay = createTask.allDay,
+                        date = createTask.startDate,
+                        endDate = createTask.endDate,
                         expired = existingTask.expired,
-                        alarmName = createTask.alarmName,
+                        rrule = createTask.rrule,
+                        reminders = createTask.reminders,
                         sound = createTask.sound,
+                        alarmName = createTask.alarmName,
+                        soundUri = createTask.soundUri,
                         vibrate = createTask.vibrate,
                         snoozeSeconds = existingTask.snoozeSeconds,
                         snoozeValue1 = createTask.snoozeValue1,
                         snoozeUnit1 = createTask.snoozeUnit1,
                         snoozeValue2 = createTask.snoozeValue2,
                         snoozeUnit2 = createTask.snoozeUnit2,
-                        endDate = createTask.endDate,
-                        allDay = createTask.allDay,
                         note = createTask.note,
-                        rrule = createTask.rrule,
-                        soundUri = createTask.soundUri,
-                        color = createTask.color,
-                        image = createTask.image,
-                        reminders = createTask.reminders,
                         locations = createTask.locations,
+                        image = createTask.image,
+                        color = createTask.color,
                         createdAt = existingTask.createdAt,
                         updatedAt = LocalDateTime.now(ZoneId.systemDefault())
                     )
@@ -205,7 +206,7 @@ class SaveTaskHandler(
         return colorRepository.getColorById(colorId)
             ?: FeatureColor(
                 id = 1,
-                name = AddTaskStrings.DEFAULT,
+                name = appContext.getString(R.string.extra_color_default),
                 red = (TaskDefault.red * 255).toInt(),
                 green = (TaskDefault.green * 255).toInt(),
                 blue = (TaskDefault.blue * 255).toInt(),

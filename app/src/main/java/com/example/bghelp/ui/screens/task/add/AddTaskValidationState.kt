@@ -1,5 +1,6 @@
 package com.example.bghelp.ui.screens.task.add
 
+import android.content.Context
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -9,12 +10,13 @@ import kotlinx.coroutines.flow.stateIn
 
 class AddTaskValidationState(
     formState: StateFlow<AddTaskFormState>,
-    scope: CoroutineScope
+    scope: CoroutineScope,
+    private val context: Context
 ) {
     private val viewModelScope = scope
 
     val isTitleValid: StateFlow<Boolean> = formState
-        .map { state -> AddTaskValidator.validateTitle(state.title) == null }
+        .map { state -> AddTaskValidator.validateTitle(state.title, context) == null }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -30,7 +32,8 @@ class AddTaskValidationState(
                 endDate = state.endDate,
                 isEndDateVisible = state.isEndDateVisible,
                 endTime = state.endTime,
-                isEndTimeVisible = state.isEndTimeVisible
+                isEndTimeVisible = state.isEndTimeVisible,
+                context = context
             ) == null
         }
         .stateIn(
@@ -46,7 +49,8 @@ class AddTaskValidationState(
                 weeklyDays = state.weeklySelectedDays,
                 monthlyMonths = state.monthlySelectedMonths,
                 monthlyDaySelection = state.monthlyDaySelection,
-                monthlyDays = state.monthlySelectedDays
+                monthlyDays = state.monthlySelectedDays,
+                context = context
             ) == null
         }
         .stateIn(
@@ -67,7 +71,8 @@ class AddTaskValidationState(
                 endDate = state.endDate,
                 isEndDateVisible = state.isEndDateVisible,
                 endTime = state.endTime,
-                isEndTimeVisible = state.isEndTimeVisible
+                isEndTimeVisible = state.isEndTimeVisible,
+                context = context
             ) == null
         }
         .stateIn(
@@ -90,7 +95,7 @@ class AddTaskValidationState(
     )
 
     fun validateForm(state: AddTaskFormState): String? {
-        val titleError = AddTaskValidator.validateTitle(state.title)
+        val titleError = AddTaskValidator.validateTitle(state.title, context)
         if (titleError != null) return titleError
 
         val dateTimeError = AddTaskValidator.validateDateTime(
@@ -100,7 +105,8 @@ class AddTaskValidationState(
             endDate = state.endDate,
             isEndDateVisible = state.isEndDateVisible,
             endTime = state.endTime,
-            isEndTimeVisible = state.isEndTimeVisible
+            isEndTimeVisible = state.isEndTimeVisible,
+            context = context
         )
         if (dateTimeError != null) return dateTimeError
 
@@ -109,7 +115,8 @@ class AddTaskValidationState(
             weeklyDays = state.weeklySelectedDays,
             monthlyMonths = state.monthlySelectedMonths,
             monthlyDaySelection = state.monthlyDaySelection,
-            monthlyDays = state.monthlySelectedDays
+            monthlyDays = state.monthlySelectedDays,
+            context = context
         )
         if (repeatError != null) return repeatError
 
@@ -123,7 +130,8 @@ class AddTaskValidationState(
             endDate = state.endDate,
             isEndDateVisible = state.isEndDateVisible,
             endTime = state.endTime,
-            isEndTimeVisible = state.isEndTimeVisible
+            isEndTimeVisible = state.isEndTimeVisible,
+            context = context
         )
         if (reminderError != null) return reminderError
 

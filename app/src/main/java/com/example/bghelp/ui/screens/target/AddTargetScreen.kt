@@ -9,16 +9,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.bghelp.R
 import com.example.bghelp.ui.components.ButtonRow
 
 @Composable
 fun AddTargetScreen(
+    modifier: Modifier = Modifier,
     viewModel: AddTargetViewModel,
     onTargetCreated: () -> Unit,
-    navController: NavController? = null,
-    modifier: Modifier = Modifier
+    navController: NavController? = null
 ) {
     Box(
         modifier = modifier.fillMaxSize()
@@ -37,9 +39,9 @@ fun AddTargetScreen(
             modifier = Modifier.align(Alignment.BottomCenter),
             isValid = true,
             isLoading = false,
-            firstLabel = "Save",
+            firstLabel = stringResource(R.string.button_save),
             firstOnClick = onTargetCreated,
-            secondLabel = "Cancel",
+            secondLabel = stringResource(R.string.button_cancel),
             secondOnClick = { navController?.popBackStack() ?: onTargetCreated() }
         )
     }

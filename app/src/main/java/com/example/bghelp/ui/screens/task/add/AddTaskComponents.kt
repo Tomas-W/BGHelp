@@ -43,7 +43,7 @@ fun <T> Header(
                     toggleSection()
                 },
             painter = painterResource(userSectionSelection.iconRes),
-            contentDescription = userSectionSelection.headerText
+            contentDescription = userSectionSelection.getHeaderText()
         )
 
         Spacer(modifier = Modifier.width(Sizes.Icon.M))
@@ -55,7 +55,7 @@ fun <T> Header(
                     viewModel.clearAllInputSelections()
                     toggleSection()
                 },
-            text = userSectionSelection.headerText,
+            text = userSectionSelection.getHeaderText(),
             style = MaterialTheme.typography.lTextBold
         )
     }

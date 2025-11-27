@@ -1,14 +1,16 @@
 package com.example.bghelp.ui.screens.task.add
 
+import android.content.Context
+import com.example.bghelp.R
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 
 object AddTaskValidator {
-    fun validateTitle(title: String): String? {
+    fun validateTitle(title: String, context: Context): String? {
         if (title.isBlank()) {
-            return AddTaskStrings.VALIDATION_TITLE_EMPTY
+            return context.getString(R.string.snackbar_title_invalid)
         }
         return null
     }
@@ -20,20 +22,21 @@ object AddTaskValidator {
         endDate: LocalDate?,
         isEndDateVisible: Boolean,
         endTime: LocalTime?,
-        isEndTimeVisible: Boolean
+        isEndTimeVisible: Boolean,
+        context: Context
     ): String? {
         val allDay = dateSelection == UserDateSelection.ON
         val today = LocalDate.now()
 
         if (allDay) {
             if (startDate.isBefore(today)) {
-                return AddTaskStrings.VALIDATION_START_TIME_PAST
+                return context.getString(R.string.snackbar_start_time_invalid)
             }
         } else {
             val startDateTime = LocalDateTime.of(startDate, startTime)
             val now = LocalDateTime.now(ZoneId.systemDefault())
             if (startDateTime.isBefore(now)) {
-                return AddTaskStrings.VALIDATION_START_TIME_PAST
+                return context.getString(R.string.snackbar_start_time_invalid)
             }
         }
 
@@ -50,7 +53,7 @@ object AddTaskValidator {
                 LocalDateTime.of(effectiveEndDate, endTime)
             }
             if (!endDateTime.isAfter(startDateTime)) {
-                return AddTaskStrings.VALIDATION_END_TIME_BEFORE_START
+                return context.getString(R.string.snackbar_end_time_invalid)
             }
         }
 
@@ -62,26 +65,27 @@ object AddTaskValidator {
         weeklyDays: Set<Int>,
         monthlyMonths: Set<Int>,
         monthlyDaySelection: RepeatMonthlyDaySelection,
-        monthlyDays: Set<Int>
+        monthlyDays: Set<Int>,
+        context: Context
     ): String? {
         if (repeatSelection == UserRepeatSelection.WEEKLY) {
             val normalizedDays = weeklyDays.mapNotNull { day ->
                 runCatching { java.time.DayOfWeek.of(day) }.getOrNull()
             }
             if (normalizedDays.isEmpty()) {
-                return AddTaskStrings.VALIDATION_REPEAT_MIN_DAYS
+                return context.getString(R.string.snackbar_repeat_days_invalid)
             }
         }
 
         if (repeatSelection == UserRepeatSelection.MONTHLY) {
             val validMonths = monthlyMonths.filter { it in 1..12 }
             if (validMonths.isEmpty()) {
-                return AddTaskStrings.VALIDATION_REPEAT_MIN_MONTHS
+                return context.getString(R.string.snackbar_repeat_months_invalid)
             }
             if (monthlyDaySelection == RepeatMonthlyDaySelection.SELECT) {
                 val normalizedDays = monthlyDays.filter { it in 1..31 }
                 if (normalizedDays.isEmpty()) {
-                    return AddTaskStrings.VALIDATION_REPEAT_MIN_DAYS
+                    return context.getString(R.string.snackbar_repeat_days_invalid)
                 }
             }
         }
@@ -99,7 +103,8 @@ object AddTaskValidator {
         endDate: LocalDate?,
         isEndDateVisible: Boolean,
         endTime: LocalTime?,
-        isEndTimeVisible: Boolean
+        isEndTimeVisible: Boolean,
+        context: Context
     ): String? {
         if (remindSelection != UserRemindSelection.ON) return null
 
@@ -114,7 +119,7 @@ object AddTaskValidator {
         for (reminder in startReminders) {
             val reminderTime = calculateReminderTime(startDateTime, reminder)
             if (reminderTime.isBefore(now)) {
-                return AddTaskStrings.VALIDATION_REMINDERS_PAST
+                return context.getString(R.string.snackbar_reminder_invalid)
             }
         }
 
@@ -134,7 +139,7 @@ object AddTaskValidator {
             for (reminder in endReminders) {
                 val reminderTime = calculateReminderTime(endDateTime, reminder)
                 if (reminderTime.isBefore(now)) {
-                    return AddTaskStrings.VALIDATION_REMINDERS_PAST
+                    return context.getString(R.string.snackbar_reminder_invalid)
                 }
             }
         }
