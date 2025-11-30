@@ -108,6 +108,10 @@ object AddTaskValidator {
     ): String? {
         if (remindSelection != UserRemindSelection.ON) return null
 
+        if (startReminders.isEmpty() && endReminders.isEmpty()) {
+            return context.getString(R.string.snackbar_no_reminders_selected)
+        }
+
         val allDay = dateSelection == UserDateSelection.ON
         val startDateTime = if (allDay) {
             LocalDateTime.of(startDate, LocalTime.MIDNIGHT)
@@ -144,6 +148,61 @@ object AddTaskValidator {
             }
         }
 
+        return null
+    }
+
+    fun validateNote(
+        noteSelection: UserNoteSelection,
+        note: String,
+        context: Context
+    ): String? {
+        if (noteSelection == UserNoteSelection.ON && note.isBlank()) {
+            return context.getString(R.string.snackbar_no_note_selected)
+        }
+        return null
+    }
+
+    fun validateLocation(
+        locationSelection: UserLocationSelection,
+        selectedLocations: List<TaskLocation>,
+        context: Context
+    ): String? {
+        if (locationSelection == UserLocationSelection.ON && selectedLocations.isEmpty()) {
+            return context.getString(R.string.snackbar_no_location_selected)
+        }
+        return null
+    }
+
+    fun validateImage(
+        imageSelection: UserImageSelection,
+        selectedImage: TaskImageData?,
+        context: Context
+    ): String? {
+        if (imageSelection == UserImageSelection.ON && selectedImage == null) {
+            return context.getString(R.string.snackbar_no_image_selected)
+        }
+        return null
+    }
+
+    fun validateSound(
+        soundSelection: UserSoundSelection,
+        selectedAudioFile: String,
+        context: Context
+    ): String? {
+        if ((soundSelection == UserSoundSelection.ONCE || soundSelection == UserSoundSelection.CONTINUOUS) && selectedAudioFile.isBlank()) {
+            return context.getString(R.string.snackbar_no_alarm_selected)
+        }
+        return null
+    }
+
+    fun validateColor(
+        colorSelection: UserColorSelection,
+        selectedColorId: Int?,
+        context: Context
+    ): String? {
+        if (colorSelection == UserColorSelection.ON && selectedColorId == null) {
+            return context.getString(R.string.snackbar_no_color_selected)
+        }
         return null
     }
 

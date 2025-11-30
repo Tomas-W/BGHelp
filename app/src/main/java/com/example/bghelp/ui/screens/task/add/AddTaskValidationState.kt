@@ -81,13 +81,108 @@ class AddTaskValidationState(
             initialValue = true
         )
 
-    val isFormValid: StateFlow<Boolean> = combine(
+    val isSoundValid: StateFlow<Boolean> = formState
+        .map { state ->
+            AddTaskValidator.validateSound(
+                soundSelection = state.soundSelection,
+                selectedAudioFile = state.selectedAudioFile,
+                context = context
+            ) == null
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = true
+        )
+
+    val isNoteValid: StateFlow<Boolean> = formState
+        .map { state ->
+            AddTaskValidator.validateNote(
+                noteSelection = state.noteSelection,
+                note = state.note,
+                context = context
+            ) == null
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = true
+        )
+
+    val isLocationValid: StateFlow<Boolean> = formState
+        .map { state ->
+            AddTaskValidator.validateLocation(
+                locationSelection = state.locationSelection,
+                selectedLocations = state.selectedLocations,
+                context = context
+            ) == null
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = true
+        )
+
+    val isImageValid: StateFlow<Boolean> = formState
+        .map { state ->
+            AddTaskValidator.validateImage(
+                imageSelection = state.imageSelection,
+                selectedImage = state.selectedImage,
+                context = context
+            ) == null
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = true
+        )
+
+    val isColorValid: StateFlow<Boolean> = formState
+        .map { state ->
+            AddTaskValidator.validateColor(
+                colorSelection = state.colorSelection,
+                selectedColorId = state.selectedColorId,
+                context = context
+            ) == null
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = true
+        )
+
+    private val firstGroupValid: StateFlow<Boolean> = combine(
         isTitleValid,
         isDateTimeValid,
         isRepeatValid,
-        isRemindersValid
-    ) { titleValid, dateTimeValid, repeatValid, remindersValid ->
-        titleValid && dateTimeValid && repeatValid && remindersValid
+        isRemindersValid,
+        isSoundValid
+    ) { titleValid, dateTimeValid, repeatValid, remindersValid, soundValid ->
+        titleValid && dateTimeValid && repeatValid && remindersValid && soundValid
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = false
+    )
+
+    private val secondGroupValid: StateFlow<Boolean> = combine(
+        isNoteValid,
+        isLocationValid,
+        isImageValid,
+        isColorValid
+    ) { noteValid, locationValid, imageValid, colorValid ->
+        noteValid && locationValid && imageValid && colorValid
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = true
+    )
+
+    val isFormValid: StateFlow<Boolean> = combine(
+        firstGroupValid,
+        secondGroupValid
+    ) { firstGroup, secondGroup ->
+        firstGroup && secondGroup
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -134,6 +229,41 @@ class AddTaskValidationState(
             context = context
         )
         if (reminderError != null) return reminderError
+
+        val soundError = AddTaskValidator.validateSound(
+            soundSelection = state.soundSelection,
+            selectedAudioFile = state.selectedAudioFile,
+            context = context
+        )
+        if (soundError != null) return soundError
+
+        val noteError = AddTaskValidator.validateNote(
+            noteSelection = state.noteSelection,
+            note = state.note,
+            context = context
+        )
+        if (noteError != null) return noteError
+
+        val locationError = AddTaskValidator.validateLocation(
+            locationSelection = state.locationSelection,
+            selectedLocations = state.selectedLocations,
+            context = context
+        )
+        if (locationError != null) return locationError
+
+        val imageError = AddTaskValidator.validateImage(
+            imageSelection = state.imageSelection,
+            selectedImage = state.selectedImage,
+            context = context
+        )
+        if (imageError != null) return imageError
+
+        val colorError = AddTaskValidator.validateColor(
+            colorSelection = state.colorSelection,
+            selectedColorId = state.selectedColorId,
+            context = context
+        )
+        if (colorError != null) return colorError
 
         return null
     }

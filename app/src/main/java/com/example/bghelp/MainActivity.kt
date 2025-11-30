@@ -38,15 +38,11 @@ class MainActivity : ComponentActivity() {
 
 // TODO: Swipe to navigate days with tasks
 
-// TODO: Implement strings.xml
-
 // TODO: Loading indicators
 
 // TODO: Rename table columns for clarity and sync them around
 
 // TODO: Back button on LocationPickerScreen
-
-// TODO: Open LocationPickerScreen when selecting a location on AddTaskScreen?
 
 // TODO: Deleting multiple tasks not possible now since the undo is a singleton
 

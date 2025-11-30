@@ -65,6 +65,8 @@
     <string name="task_no_location">No location</string>
     <string name="task_with_location">With Location</string>
     <string name="task_add_location">Add location</string>
+    <string name="task_edit_location">Edit location</string>
+    <string name="task_edit_locations">Edit locations</string>
     <string name="task_remove_location">Remove location</string>
     <string name="task_unnamed_location">unnamed location</string>
 

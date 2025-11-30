@@ -371,10 +371,6 @@ class AddTaskViewModel @Inject constructor(
         formStateHolder.updateReminder(reminderType, reminderId, value, timeUnit)
     }
 
-    fun updateSnooze(snoozeIndex: Int, value: Int? = null, timeUnit: TimeUnit? = null) {
-        formStateHolder.updateSnooze(snoozeIndex, value, timeUnit)
-    }
-
     fun setActiveSnoozeInput(snoozeIndex: Int) {
         _activeReminderInput.value = ActiveReminderInput(RemindType.START, -1, snoozeIndex)
         setCalendarVisible(false)
@@ -393,6 +389,10 @@ class AddTaskViewModel @Inject constructor(
 
     fun clearReminderInputSelection() {
         _activeReminderInput.value = null
+    }
+
+    fun updateSnooze(snoozeIndex: Int, value: Int? = null, timeUnit: TimeUnit? = null) {
+        formStateHolder.updateSnooze(snoozeIndex, value, timeUnit)
     }
     // REMIND
 
