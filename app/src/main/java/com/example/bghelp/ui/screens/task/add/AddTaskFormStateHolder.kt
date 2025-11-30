@@ -6,10 +6,11 @@ import androidx.core.net.toUri
 import com.example.bghelp.R
 import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.ReminderKind
-import com.example.bghelp.domain.model.ReminderOffsetUnit
 import com.example.bghelp.domain.model.Task
 import com.example.bghelp.domain.model.TaskImageSourceOption
+import com.example.bghelp.domain.model.TimeUnit
 import com.example.bghelp.domain.service.RecurrenceCalculator
+import com.example.bghelp.utils.TimeUnitMapper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -413,22 +414,126 @@ class AddTaskFormStateHolder(
     }
 
     fun loadFromTask(task: Task) {
+        val dateTimeInfo = parseDateTimeInfo(task)
+        val repeatInfo = parseRepeatInfo(task.rrule)
+        val reminderInfo = parseReminderInfo(task.reminders)
+        val locationInfo = parseLocationInfo(task.locations)
+        val imageInfo = parseImageInfo(task.image)
+
+        _formState.value = AddTaskFormState(
+            title = task.title,
+            info = task.info ?: "",
+
+            dateSelection = dateTimeInfo.dateSelection,
+            startDate = dateTimeInfo.startDate,
+            endDate = dateTimeInfo.endDate,
+            isEndDateVisible = dateTimeInfo.isEndDateVisible,
+            startTime = dateTimeInfo.startTime,
+            endTime = dateTimeInfo.endTime,
+            isEndTimeVisible = dateTimeInfo.isEndTimeVisible,
+
+            repeatSelection = repeatInfo.selection,
+            weeklySelectedDays = repeatInfo.weeklyDays,
+            weeklyIntervalWeeks = repeatInfo.weeklyInterval,
+            monthlySelectedMonths = repeatInfo.monthlyMonths,
+            monthlyDaySelection = repeatInfo.monthlyDaySelection,
+            monthlySelectedDays = repeatInfo.monthlyDays,
+            repeatRRule = task.rrule,
+
+            remindSelection = reminderInfo.selection,
+            startReminders = reminderInfo.startReminders,
+            endReminders = reminderInfo.endReminders,
+            soundSelection = task.sound.toUserSoundSelection(),
+            selectedAudioFile = task.soundUri ?: "",
+            vibrateSelection = task.vibrate.toUserVibrateSelection(),
+            snoozeValue1 = task.snoozeValue1,
+            snoozeUnit1 = task.snoozeUnit1.toTimeUnit(),
+            snoozeValue2 = task.snoozeValue2,
+            snoozeUnit2 = task.snoozeUnit2.toTimeUnit(),
+
+            noteSelection = if (task.note != null && task.note.isNotBlank()) UserNoteSelection.ON else UserNoteSelection.OFF,
+            note = task.note ?: "",
+
+            locationSelection = locationInfo.selection,
+            selectedLocations = locationInfo.locations,
+
+            imageSelection = imageInfo.selection,
+            selectedImage = imageInfo.image,
+
+            colorSelection = if (task.color.id != 1) UserColorSelection.ON else UserColorSelection.OFF,
+            selectedColorId = task.color.id
+        )
+        onRepeatRuleChanged()
+    }
+
+    private data class DateTimeInfo(
+        val dateSelection: UserDateSelection,
+        val startDate: LocalDate,
+        val endDate: LocalDate?,
+        val isEndDateVisible: Boolean,
+        val startTime: LocalTime,
+        val endTime: LocalTime?,
+        val isEndTimeVisible: Boolean
+    )
+
+    private data class RepeatInfo(
+        val selection: UserRepeatSelection,
+        val weeklyDays: Set<Int>,
+        val weeklyInterval: Int,
+        val monthlyMonths: Set<Int>,
+        val monthlyDaySelection: RepeatMonthlyDaySelection,
+        val monthlyDays: Set<Int>
+    )
+
+    private data class ReminderInfo(
+        val selection: UserRemindSelection,
+        val startReminders: List<Reminder>,
+        val endReminders: List<Reminder>
+    )
+
+    private data class LocationInfo(
+        val selection: UserLocationSelection,
+        val locations: List<TaskLocation>
+    )
+
+    private data class ImageInfo(
+        val selection: UserImageSelection,
+        val image: TaskImageData?
+    )
+
+    private fun parseDateTimeInfo(task: Task): DateTimeInfo {
         val date = task.date.toLocalDate()
         val time = task.date.toLocalTime()
         val endDate = task.endDate?.toLocalDate()
         val endTime = task.endDate?.toLocalTime()
+        return DateTimeInfo(
+            dateSelection = if (task.allDay) UserDateSelection.ON else UserDateSelection.OFF,
+            startDate = date,
+            endDate = endDate,
+            isEndDateVisible = endDate != null,
+            startTime = time,
+            endTime = endTime,
+            isEndTimeVisible = endTime != null
+        )
+    }
 
-        val dateSelection = if (task.allDay) UserDateSelection.ON else UserDateSelection.OFF
-        val isEndDateVisible = endDate != null
-        val isEndTimeVisible = endTime != null
+    private fun parseRepeatInfo(rrule: String?): RepeatInfo {
+        val selection = parseRepeatSelection(rrule)
+        val (weeklyDays, weeklyInterval) = parseWeeklyRepeat(rrule)
+        val (monthlyMonths, monthlyDaySelection, monthlyDays) = parseMonthlyRepeat(rrule)
+        return RepeatInfo(
+            selection = selection,
+            weeklyDays = weeklyDays,
+            weeklyInterval = weeklyInterval,
+            monthlyMonths = monthlyMonths,
+            monthlyDaySelection = monthlyDaySelection,
+            monthlyDays = monthlyDays
+        )
+    }
 
-        val repeatSelection = parseRepeatSelection(task.rrule)
-        val (weeklyDays, weeklyInterval) = parseWeeklyRepeat(task.rrule)
-        val (monthlyMonths, monthlyDaySelection, monthlyDays) = parseMonthlyRepeat(task.rrule)
-
-        val remindSelection =
-            if (task.reminders.isNotEmpty()) UserRemindSelection.ON else UserRemindSelection.OFF
-        val startReminders = task.reminders
+    private fun parseReminderInfo(reminders: List<com.example.bghelp.domain.model.TaskReminderEntry>): ReminderInfo {
+        val selection = if (reminders.isNotEmpty()) UserRemindSelection.ON else UserRemindSelection.OFF
+        val startReminders = reminders
             .filter { it.type == ReminderKind.START }
             .mapIndexed { index, entry ->
                 Reminder(
@@ -437,7 +542,7 @@ class AddTaskFormStateHolder(
                     timeUnit = entry.offsetUnit.toTimeUnit()
                 )
             }
-        val endReminders = task.reminders
+        val endReminders = reminders
             .filter { it.type == ReminderKind.END }
             .mapIndexed { index, entry ->
                 Reminder(
@@ -446,16 +551,16 @@ class AddTaskFormStateHolder(
                     timeUnit = entry.offsetUnit.toTimeUnit()
                 )
             }
+        return ReminderInfo(
+            selection = selection,
+            startReminders = startReminders,
+            endReminders = endReminders
+        )
+    }
 
-        val soundSelection = task.sound.toUserSoundSelection()
-        val vibrateSelection = task.vibrate.toUserVibrateSelection()
-
-        val noteSelection =
-            if (task.note != null && task.note.isNotBlank()) UserNoteSelection.ON else UserNoteSelection.OFF
-
-        val locationSelection =
-            if (task.locations.isNotEmpty()) UserLocationSelection.ON else UserLocationSelection.OFF
-        val selectedLocations = task.locations.map { entry ->
+    private fun parseLocationInfo(locations: List<com.example.bghelp.domain.model.TaskLocationEntry>): LocationInfo {
+        val selection = if (locations.isNotEmpty()) UserLocationSelection.ON else UserLocationSelection.OFF
+        val taskLocations = locations.map { entry ->
             TaskLocation(
                 latitude = entry.latitude,
                 longitude = entry.longitude,
@@ -463,61 +568,29 @@ class AddTaskFormStateHolder(
                 name = entry.name
             )
         }
+        return LocationInfo(
+            selection = selection,
+            locations = taskLocations
+        )
+    }
 
-        val imageSelection =
-            if (task.image != null) UserImageSelection.ON else UserImageSelection.OFF
-        val selectedImage = task.image?.let { image ->
+    private fun parseImageInfo(image: com.example.bghelp.domain.model.TaskImageAttachment?): ImageInfo {
+        val selection = if (image != null) UserImageSelection.ON else UserImageSelection.OFF
+        val taskImage = image?.let { img ->
             TaskImageData(
-                displayName = image.displayName ?: context.getString(R.string.task_no_image_selected),
-                uri = image.uri?.toUri(),
+                displayName = img.displayName ?: context.getString(R.string.task_no_image_selected),
+                uri = img.uri?.toUri(),
                 bitmap = null,
-                source = when (image.source) {
+                source = when (img.source) {
                     TaskImageSourceOption.GALLERY -> TaskImageSource.GALLERY
                     TaskImageSourceOption.CAMERA -> TaskImageSource.CAMERA
                 }
             )
         }
-
-        val colorSelection =
-            if (task.color.id != 1) UserColorSelection.ON else UserColorSelection.OFF
-
-        _formState.value = AddTaskFormState(
-            title = task.title,
-            info = task.info ?: "",
-            dateSelection = dateSelection,
-            startDate = date,
-            endDate = endDate,
-            isEndDateVisible = isEndDateVisible,
-            startTime = time,
-            endTime = endTime,
-            isEndTimeVisible = isEndTimeVisible,
-            repeatSelection = repeatSelection,
-            weeklySelectedDays = weeklyDays,
-            weeklyIntervalWeeks = weeklyInterval,
-            monthlySelectedMonths = monthlyMonths,
-            monthlyDaySelection = monthlyDaySelection,
-            monthlySelectedDays = monthlyDays,
-            repeatRRule = task.rrule,
-            remindSelection = remindSelection,
-            startReminders = startReminders,
-            endReminders = endReminders,
-            soundSelection = soundSelection,
-            selectedAudioFile = task.soundUri ?: "",
-            vibrateSelection = vibrateSelection,
-            snoozeValue1 = task.snoozeValue1,
-            snoozeUnit1 = task.snoozeUnit1.toTimeUnit(),
-            snoozeValue2 = task.snoozeValue2,
-            snoozeUnit2 = task.snoozeUnit2.toTimeUnit(),
-            noteSelection = noteSelection,
-            note = task.note ?: "",
-            locationSelection = locationSelection,
-            selectedLocations = selectedLocations,
-            imageSelection = imageSelection,
-            selectedImage = selectedImage,
-            colorSelection = colorSelection,
-            selectedColorId = task.color.id
+        return ImageInfo(
+            selection = selection,
+            image = taskImage
         )
-        onRepeatRuleChanged()
     }
 
     private fun parseRepeatSelection(rrule: String?): UserRepeatSelection {
@@ -583,12 +656,8 @@ class AddTaskFormStateHolder(
         AlarmMode.CONTINUOUS -> UserVibrateSelection.CONTINUOUS
     }
 
-    private fun ReminderOffsetUnit.toTimeUnit(): TimeUnit = when (this) {
-        ReminderOffsetUnit.MINUTES -> TimeUnit.MINUTES
-        ReminderOffsetUnit.HOURS -> TimeUnit.HOURS
-        ReminderOffsetUnit.DAYS -> TimeUnit.DAYS
-        ReminderOffsetUnit.WEEKS -> TimeUnit.WEEKS
-        ReminderOffsetUnit.MONTHS -> TimeUnit.MONTHS
+    private fun com.example.bghelp.domain.model.ReminderOffsetUnit.toTimeUnit(): TimeUnit {
+        return with(TimeUnitMapper) { this@toTimeUnit.toTimeUnit() }
     }
 }
 

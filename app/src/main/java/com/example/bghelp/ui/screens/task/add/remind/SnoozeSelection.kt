@@ -49,10 +49,10 @@ import com.example.bghelp.ui.components.deselectedTextStyle
 import com.example.bghelp.ui.components.selectedDropdownStyle
 import com.example.bghelp.ui.components.selectedTextColor
 import com.example.bghelp.ui.components.selectedTextStyle
+import com.example.bghelp.domain.model.TimeUnit
 import com.example.bghelp.ui.screens.task.add.ActiveReminderInput
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
-import com.example.bghelp.ui.screens.task.add.TimeUnit
 import com.example.bghelp.ui.screens.task.add.getTimeUnitMap
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.lTextBold

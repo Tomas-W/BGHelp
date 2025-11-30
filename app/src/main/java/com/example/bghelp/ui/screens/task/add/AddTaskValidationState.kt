@@ -13,12 +13,11 @@ class AddTaskValidationState(
     scope: CoroutineScope,
     private val context: Context
 ) {
-    private val viewModelScope = scope
 
     val isTitleValid: StateFlow<Boolean> = formState
         .map { state -> AddTaskValidator.validateTitle(state.title, context) == null }
         .stateIn(
-            scope = viewModelScope,
+            scope = scope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = false
         )
@@ -37,7 +36,7 @@ class AddTaskValidationState(
             ) == null
         }
         .stateIn(
-            scope = viewModelScope,
+            scope = scope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = false
         )
@@ -54,7 +53,7 @@ class AddTaskValidationState(
             ) == null
         }
         .stateIn(
-            scope = viewModelScope,
+            scope = scope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = true
         )
@@ -76,7 +75,7 @@ class AddTaskValidationState(
             ) == null
         }
         .stateIn(
-            scope = viewModelScope,
+            scope = scope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = true
         )
@@ -90,7 +89,7 @@ class AddTaskValidationState(
             ) == null
         }
         .stateIn(
-            scope = viewModelScope,
+            scope = scope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = true
         )
@@ -104,7 +103,7 @@ class AddTaskValidationState(
             ) == null
         }
         .stateIn(
-            scope = viewModelScope,
+            scope = scope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = true
         )
@@ -118,7 +117,7 @@ class AddTaskValidationState(
             ) == null
         }
         .stateIn(
-            scope = viewModelScope,
+            scope = scope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = true
         )
@@ -132,7 +131,7 @@ class AddTaskValidationState(
             ) == null
         }
         .stateIn(
-            scope = viewModelScope,
+            scope = scope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = true
         )
@@ -146,7 +145,7 @@ class AddTaskValidationState(
             ) == null
         }
         .stateIn(
-            scope = viewModelScope,
+            scope = scope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = true
         )
@@ -160,7 +159,7 @@ class AddTaskValidationState(
     ) { titleValid, dateTimeValid, repeatValid, remindersValid, soundValid ->
         titleValid && dateTimeValid && repeatValid && remindersValid && soundValid
     }.stateIn(
-        scope = viewModelScope,
+        scope = scope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = false
     )
@@ -173,7 +172,7 @@ class AddTaskValidationState(
     ) { noteValid, locationValid, imageValid, colorValid ->
         noteValid && locationValid && imageValid && colorValid
     }.stateIn(
-        scope = viewModelScope,
+        scope = scope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = true
     )
@@ -184,16 +183,28 @@ class AddTaskValidationState(
     ) { firstGroup, secondGroup ->
         firstGroup && secondGroup
     }.stateIn(
-        scope = viewModelScope,
+        scope = scope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = false
     )
 
     fun validateForm(state: AddTaskFormState): String? {
-        val titleError = AddTaskValidator.validateTitle(state.title, context)
-        if (titleError != null) return titleError
+        return validateTitle(state) 
+            ?: validateDateTime(state)
+            ?: validateRepeat(state)
+            ?: validateReminders(state)
+            ?: validateSound(state)
+            ?: validateNote(state)
+            ?: validateLocation(state)
+            ?: validateImage(state)
+            ?: validateColor(state)
+    }
 
-        val dateTimeError = AddTaskValidator.validateDateTime(
+    private fun validateTitle(state: AddTaskFormState): String? =
+        AddTaskValidator.validateTitle(state.title, context)
+
+    private fun validateDateTime(state: AddTaskFormState): String? =
+        AddTaskValidator.validateDateTime(
             dateSelection = state.dateSelection,
             startDate = state.startDate,
             startTime = state.startTime,
@@ -203,9 +214,9 @@ class AddTaskValidationState(
             isEndTimeVisible = state.isEndTimeVisible,
             context = context
         )
-        if (dateTimeError != null) return dateTimeError
 
-        val repeatError = AddTaskValidator.validateRepeat(
+    private fun validateRepeat(state: AddTaskFormState): String? =
+        AddTaskValidator.validateRepeat(
             repeatSelection = state.repeatSelection,
             weeklyDays = state.weeklySelectedDays,
             monthlyMonths = state.monthlySelectedMonths,
@@ -213,9 +224,9 @@ class AddTaskValidationState(
             monthlyDays = state.monthlySelectedDays,
             context = context
         )
-        if (repeatError != null) return repeatError
 
-        val reminderError = AddTaskValidator.validateReminders(
+    private fun validateReminders(state: AddTaskFormState): String? =
+        AddTaskValidator.validateReminders(
             remindSelection = state.remindSelection,
             dateSelection = state.dateSelection,
             startDate = state.startDate,
@@ -228,44 +239,40 @@ class AddTaskValidationState(
             isEndTimeVisible = state.isEndTimeVisible,
             context = context
         )
-        if (reminderError != null) return reminderError
 
-        val soundError = AddTaskValidator.validateSound(
+    private fun validateSound(state: AddTaskFormState): String? =
+        AddTaskValidator.validateSound(
             soundSelection = state.soundSelection,
             selectedAudioFile = state.selectedAudioFile,
             context = context
         )
-        if (soundError != null) return soundError
 
-        val noteError = AddTaskValidator.validateNote(
+    private fun validateNote(state: AddTaskFormState): String? =
+        AddTaskValidator.validateNote(
             noteSelection = state.noteSelection,
             note = state.note,
             context = context
         )
-        if (noteError != null) return noteError
 
-        val locationError = AddTaskValidator.validateLocation(
+    private fun validateLocation(state: AddTaskFormState): String? =
+        AddTaskValidator.validateLocation(
             locationSelection = state.locationSelection,
             selectedLocations = state.selectedLocations,
             context = context
         )
-        if (locationError != null) return locationError
 
-        val imageError = AddTaskValidator.validateImage(
+    private fun validateImage(state: AddTaskFormState): String? =
+        AddTaskValidator.validateImage(
             imageSelection = state.imageSelection,
             selectedImage = state.selectedImage,
             context = context
         )
-        if (imageError != null) return imageError
 
-        val colorError = AddTaskValidator.validateColor(
+    private fun validateColor(state: AddTaskFormState): String? =
+        AddTaskValidator.validateColor(
             colorSelection = state.colorSelection,
             selectedColorId = state.selectedColorId,
             context = context
         )
-        if (colorError != null) return colorError
-
-        return null
-    }
 }
 

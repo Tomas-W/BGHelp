@@ -1,19 +1,14 @@
-package com.example.bghelp.utils
+package com.example.bghelp.ui.screens.task.add
 
 import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.ReminderKind
-import com.example.bghelp.domain.model.ReminderOffsetUnit
 import com.example.bghelp.domain.model.TaskLocationEntry
 import com.example.bghelp.domain.model.TaskReminderEntry
-import com.example.bghelp.ui.screens.task.add.Reminder
-import com.example.bghelp.ui.screens.task.add.TaskLocation
-import com.example.bghelp.ui.screens.task.add.TimeUnit
-import com.example.bghelp.ui.screens.task.add.UserSoundSelection
-import com.example.bghelp.ui.screens.task.add.UserVibrateSelection
+import com.example.bghelp.utils.TimeUnitMapper
 
 object TaskMapper {
     fun Reminder.toDomain(type: ReminderKind): TaskReminderEntry? {
-        val unit = timeUnit.toDomainUnit() ?: return null
+        val unit = with(TimeUnitMapper) { timeUnit.toReminderOffsetUnit() }
         return TaskReminderEntry(
             type = type,
             offsetValue = value,
@@ -47,14 +42,6 @@ object TaskMapper {
         UserVibrateSelection.OFF -> AlarmMode.OFF
         UserVibrateSelection.ONCE -> AlarmMode.ONCE
         UserVibrateSelection.CONTINUOUS -> AlarmMode.CONTINUOUS
-    }
-
-    private fun TimeUnit.toDomainUnit(): ReminderOffsetUnit? = when (this) {
-        TimeUnit.MINUTES -> ReminderOffsetUnit.MINUTES
-        TimeUnit.HOURS -> ReminderOffsetUnit.HOURS
-        TimeUnit.DAYS -> ReminderOffsetUnit.DAYS
-        TimeUnit.WEEKS -> ReminderOffsetUnit.WEEKS
-        TimeUnit.MONTHS -> ReminderOffsetUnit.MONTHS
     }
 }
 

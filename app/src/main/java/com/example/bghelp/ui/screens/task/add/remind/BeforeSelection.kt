@@ -52,9 +52,9 @@ import com.example.bghelp.ui.components.selectedTextStyle
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerMedium
 import com.example.bghelp.ui.screens.task.add.AddTaskSpacerSmall
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
+import com.example.bghelp.domain.model.TimeUnit
 import com.example.bghelp.ui.screens.task.add.RemindType
 import com.example.bghelp.ui.screens.task.add.Reminder
-import com.example.bghelp.ui.screens.task.add.TimeUnit
 import com.example.bghelp.ui.screens.task.add.UserDateSelection
 import com.example.bghelp.ui.screens.task.add.getTimeUnitMap
 import com.example.bghelp.ui.theme.Sizes

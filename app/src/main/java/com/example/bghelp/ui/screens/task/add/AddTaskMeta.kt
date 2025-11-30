@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.example.bghelp.R
+import com.example.bghelp.domain.model.TimeUnit
 import java.io.Serializable
 import java.time.DayOfWeek
 import java.time.format.TextStyle
@@ -122,7 +123,6 @@ data class Reminder(
 )
 
 enum class RemindType { START, END }
-enum class TimeUnit { MINUTES, HOURS, DAYS, WEEKS, MONTHS }
 data class ActiveReminderInput(val type: RemindType, val id: Int, val snoozeIndex: Int? = null)
 
 @Composable
