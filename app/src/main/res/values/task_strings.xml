@@ -59,8 +59,8 @@
     <string name="task_vibrate_once">Vibrate once</string>
     <string name="task_vibrate_continuous">Vibrate continuous</string>
 
-    <string name="task_note_off">Note off</string>
-    <string name="task_note_on">Note on</string>
+    <string name="task_note_off">No note</string>
+    <string name="task_note_on">With note</string>
 
     <string name="task_no_location">No location</string>
     <string name="task_with_location">With Location</string>
