@@ -234,19 +234,27 @@ fun TaskScreen(
     }
 
     // Scroll to task after save/edit
+    // Re-triggers untill task is found in the list
     LaunchedEffect(scrollToTaskId, selectedTasks) {
         scrollToTaskId?.let { taskId ->
-            if (selectedTasks.isNotEmpty()) {
-                val taskIndex = selectedTasks.indexOfFirst { task -> task.id == taskId }
-                if (taskIndex >= 0) {
-                    delay(100) // Wait for UI to settle
-                    listState.scrollToItem(taskIndex)
-                    taskViewModel.clearScrollToTaskId()
-                } else {
-                    // Task not found, clear the scroll target
-                    taskViewModel.clearScrollToTaskId()
+            // Check if task in  list
+            val taskIndex = selectedTasks.indexOfFirst { task -> task.id == taskId }
+            
+            if (taskIndex >= 0) {
+                // Task found, wait for UI
+                var attempts = 0
+                while (attempts < 10 && listState.layoutInfo.totalItemsCount <= taskIndex) {
+                    delay(25)
+                    attempts++
                 }
+                // Additional delay for smooth scrolling
+                delay(75)
+                if (listState.layoutInfo.totalItemsCount > taskIndex) {
+                    listState.scrollToItem(taskIndex)
+                }
+                taskViewModel.clearScrollToTaskId()
             }
+            // If task not found, LaunchedEffect re-triggers when selectedTasks updates
         }
     }
 
