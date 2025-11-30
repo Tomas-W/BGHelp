@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,10 +29,13 @@ import com.example.bghelp.ui.components.DropdownItem
 import com.example.bghelp.ui.components.deselectedDropdownStyle
 import com.example.bghelp.ui.components.selectedDropdownStyle
 import com.example.bghelp.ui.navigation.Screen
+import com.example.bghelp.ui.screens.colorpicker.ColorNavigationKeys
 import com.example.bghelp.ui.screens.colorpicker.defaultColorNames
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
+import com.example.bghelp.ui.screens.task.add.UserColorSelection
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.lTextDefault
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun ColorSelection(
@@ -40,6 +44,24 @@ fun ColorSelection(
 ) {
     val selectedColorId by viewModel.selectedColorId.collectAsState()
     val allColors by viewModel.allColors.collectAsState()
+
+    // Handle color picker result
+    LaunchedEffect(navController) {
+        navController.currentBackStackEntryFlow.collectLatest { entry ->
+            val route = entry.destination.route
+            if (route != null && route.startsWith(Screen.Tasks.Add.route)) {
+                val result = entry.savedStateHandle
+                    .get<Int>(ColorNavigationKeys.RESULT)
+                if (result != null) {
+                    viewModel.setSelectedColorId(result)
+                    if (viewModel.formState.value.colorSelection == UserColorSelection.OFF) {
+                        viewModel.toggleColorSelection()
+                    }
+                    entry.savedStateHandle.remove<Int>(ColorNavigationKeys.RESULT)
+                }
+            }
+        }
+    }
 
     ColorDropdown(
         colors = allColors,

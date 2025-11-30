@@ -12,6 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import kotlinx.coroutines.flow.collectLatest
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,13 +54,18 @@ fun CreateColorScreen(
     val selectedColor by viewModel.selectedColor.collectAsState()
     val saving by viewModel.saving.collectAsState()
     val saved by viewModel.saved.collectAsState()
+    val createdColorId by viewModel.createdColorId.collectAsState()
     val isExampleExpanded by viewModel.isExampleExpanded.collectAsState()
     val colorName by viewModel.colorName.collectAsState()
     val isColorNameActive by viewModel.isColorNameActive.collectAsState()
     val isColorNameValid by viewModel.isColorNameValid.collectAsState()
 
-    LaunchedEffect(saved) {
-        if (saved) {
+    // Handle color creation result
+    LaunchedEffect(saved, createdColorId) {
+        if (saved && createdColorId != null) {
+            navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.set(ColorNavigationKeys.RESULT, createdColorId)
             navController.popBackStack()
         }
     }

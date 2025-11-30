@@ -34,6 +34,9 @@ class CreateColorViewModel @Inject constructor(
     private val _saved = MutableStateFlow(false)
     val saved: StateFlow<Boolean> = _saved.asStateFlow()
 
+    private val _createdColorId = MutableStateFlow<Int?>(null)
+    val createdColorId: StateFlow<Int?> = _createdColorId.asStateFlow()
+
     private val _isExampleExpanded = MutableStateFlow(false)
     val isExampleExpanded: StateFlow<Boolean> = _isExampleExpanded.asStateFlow()
 
@@ -108,7 +111,7 @@ class CreateColorViewModel @Inject constructor(
         _saving.value = true
         viewModelScope.launch {
             try {
-                colorRepository.addColor(
+                val colorId = colorRepository.addColor(
                     CreateFeatureColor(
                         name = _colorName.value.trim(),
                         red = red,
@@ -117,7 +120,8 @@ class CreateColorViewModel @Inject constructor(
                         alpha = alpha,
                         isDefault = false
                     )
-                )
+                ).toInt()
+                _createdColorId.value = colorId
                 _saved.value = true
             } finally {
                 _saving.value = false
