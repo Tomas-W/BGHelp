@@ -106,22 +106,22 @@ class LocationPickerViewModel @Inject constructor(
                     suggestion.placeId,
                     listOf(
                         Field.ID,
-                        Field.NAME,
-                        Field.ADDRESS,
-                        Field.LAT_LNG
+                        Field.DISPLAY_NAME,
+                        Field.FORMATTED_ADDRESS,
+                        Field.LOCATION
                     )
                 )
                 placesClient.fetchPlace(request).await().place
             }.onSuccess { place ->
                 sessionToken = AutocompleteSessionToken.newInstance()
                 _suggestions.value = emptyList()
-                place.latLng?.let { latLng ->
-                    val address = place.address ?: place.name ?: formatCoordinatePair(latLng)
+                place.location?.let { latLng ->
+                    val address = place.formattedAddress ?: place.displayName ?: formatCoordinatePair(latLng)
                     applySearchSuggestionLocation(
                         latLng = latLng,
                         address = address
                     )
-                    _query.value = place.name ?: address
+                    _query.value = place.displayName ?: address
                 }
             }.onFailure { throwable ->
                 Log.e("LocationPicker", "Failed to fetch place", throwable)
