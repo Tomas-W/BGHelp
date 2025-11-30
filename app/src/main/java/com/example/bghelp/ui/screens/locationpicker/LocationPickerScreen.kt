@@ -30,7 +30,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.bghelp.R
 import com.example.bghelp.ui.components.ButtonRow
@@ -221,7 +221,6 @@ fun LocationPickerScreen(
                     viewModel = viewModel,
                     navController = navController,
                     cameraPositionState = cameraPositionState,
-                    allowMultiple = allowMultiple,
                     selectedLocations = selectedLocations
                 )
             }
@@ -234,7 +233,6 @@ private fun BottomButtonRow(
     viewModel: LocationPickerViewModel,
     navController: NavController,
     cameraPositionState: CameraPositionState,
-    allowMultiple: Boolean,
     selectedLocations: List<TaskLocation>
 ) {
     val canSave = selectedLocations.isNotEmpty() &&

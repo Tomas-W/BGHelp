@@ -63,14 +63,12 @@ fun LocalDateTime.toTaskTime(): String {
     return formatTime(this.toLocalTime())
 }
 
-// Centralized date/time formatting helpers
-
 fun formatTime(time: LocalTime, locale: Locale = Locale.getDefault()): String {
     val formatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale)
     return time.format(formatter)
 }
 
-fun formatDuration(hours: Int, minutes: Int, locale: Locale = Locale.getDefault()): String {
+fun secondsToTimeUnit(hours: Int, minutes: Int, locale: Locale = Locale.getDefault()): String {
     val measures = buildList {
         if (hours > 0) add(Measure(hours, MeasureUnit.HOUR))
         if (minutes > 0) add(Measure(minutes, MeasureUnit.MINUTE))
@@ -79,7 +77,7 @@ fun formatDuration(hours: Int, minutes: Int, locale: Locale = Locale.getDefault(
     return formatter.formatMeasures(*measures.toTypedArray())
 }
 
-fun formatDuration(totalSeconds: Int, locale: Locale = Locale.getDefault()): String {
+fun secondsToTimeUnit(totalSeconds: Int, locale: Locale = Locale.getDefault()): String {
     val safeSeconds = totalSeconds.coerceAtLeast(0)
     val (value, unit) = when {
         safeSeconds < 60 -> safeSeconds to MeasureUnit.SECOND
@@ -94,6 +92,6 @@ fun formatDuration(totalSeconds: Int, locale: Locale = Locale.getDefault()): Str
 }
 
 fun Int.formatSnoozeDuration(locale: Locale = Locale.getDefault()): String {
-    return formatDuration(this, locale)
+    return secondsToTimeUnit(this, locale)
 }
 

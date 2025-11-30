@@ -1,8 +1,10 @@
 package com.example.bghelp.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,8 +33,13 @@ fun MainScreen() {
     // Bottom nav
     val shouldHideBottomNav = currentScreen in Screen.noBottomNavScreens
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
             bottomBar = {
                 if (!shouldHideBottomNav) {
                     BottomNavigationBar(

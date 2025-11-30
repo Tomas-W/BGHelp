@@ -37,7 +37,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TaskViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
-    @ApplicationContext private val appContext: Context
+    @param:ApplicationContext private val appContext: Context
 ) : ViewModel() {
     private val isoWeekFields = WeekFields.ISO
 

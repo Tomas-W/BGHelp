@@ -32,7 +32,7 @@ class AddTaskViewModel @Inject constructor(
     val audioManager: AudioManager,
     private val taskRepository: TaskRepository,
     private val colorRepository: ColorRepository,
-    @ApplicationContext private val appContext: Context
+    @param:ApplicationContext private val appContext: Context
 ) : ViewModel() {
     // STATES & HANDLERS
     private val formStateHolder = AddTaskFormStateHolder(
@@ -114,14 +114,6 @@ class AddTaskViewModel @Inject constructor(
 
     val isEndTimeVisible: StateFlow<Boolean> = formState.map { it.isEndTimeVisible }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
-
-    val allMonthDaysSelected: StateFlow<Boolean> = formState
-        .map { it.monthlySelectedDays.size == 31 }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = true
-        )
 
     private var hiddenDateEndValue: LocalDate? = null // Saves when endDate is off
     private var hiddenTimeEndValue: LocalTime? = null // Saves when endTime is off
@@ -480,10 +472,6 @@ class AddTaskViewModel @Inject constructor(
         formStateHolder.setSelectedLocations(locations)
     }
 
-    fun appendSelectedLocations(locations: List<TaskLocation>) {
-        formStateHolder.appendSelectedLocations(locations)
-    }
-
     fun removeSelectedLocation(location: TaskLocation) {
         formStateHolder.removeSelectedLocation(location)
     }
@@ -610,7 +598,6 @@ class AddTaskViewModel @Inject constructor(
     val saveState: StateFlow<SaveTaskState> = _saveState.asStateFlow()
 
     private val _editingTaskId = MutableStateFlow<Int?>(null)
-    val editingTaskId: StateFlow<Int?> = _editingTaskId.asStateFlow()
     val isEditing: StateFlow<Boolean> = _editingTaskId.map { it != null }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
     // SAVE TASK

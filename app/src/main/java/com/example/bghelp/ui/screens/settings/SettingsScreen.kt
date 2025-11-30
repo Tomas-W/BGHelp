@@ -13,8 +13,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SettingsScreen(
-    modifier: Modifier = Modifier,
-    onNavigateToCreateAlarm: () -> Unit = {}
+    modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier

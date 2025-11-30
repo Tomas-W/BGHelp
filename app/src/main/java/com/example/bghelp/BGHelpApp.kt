@@ -28,6 +28,7 @@ class BGHelpApp : Application() {
         // Key injected from env in gradle
         val apiKey = getString(R.string.google_maps_key)
         if (apiKey.isNotBlank() && !Places.isInitialized()) {
+            @Suppress("DEPRECATION")
             Places.initialize(applicationContext, apiKey)
         }
     }

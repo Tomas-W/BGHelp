@@ -89,20 +89,6 @@ sealed class Screen(
             Notes.Add.route
         )
 
-        val bottomNavScreens = listOf(
-            Tasks.Main,
-            Targets.Main,
-            Items.Main,
-            Notes.Main
-        )
-
-        val addScreens = listOf(
-            Tasks.Add,
-            Targets.Add,
-            Items.Add,
-            Notes.Add
-        )
-
         val optionsScreens = listOf(
             Options.Settings,
             Options.CreateAlarm,
@@ -112,17 +98,6 @@ sealed class Screen(
         val noBottomNavScreens = listOf(
             LocationPicker,
             Options.ColorPicker
-        )
-
-        val weekNavigationScreens = listOf(
-            Tasks.Main
-        )
-
-        val featureMains = listOf(
-            Tasks.Main,
-            Targets.Main,
-            Items.Main,
-            Notes.Main
         )
     }
 }

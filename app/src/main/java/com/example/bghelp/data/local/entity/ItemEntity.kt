@@ -1,5 +1,6 @@
 package com.example.bghelp.data.local.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.bghelp.constants.DatabaseConstants as DB
@@ -8,7 +9,8 @@ import com.example.bghelp.constants.DatabaseConstants as DB
 data class ItemEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val item_group: String,
+    @ColumnInfo(name = "item_group")
+    val itemGroup: String,
     val name: String,
     val quantity: Float?,
     val unit: String?,

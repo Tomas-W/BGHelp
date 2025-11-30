@@ -2,7 +2,7 @@ package com.example.bghelp.ui.screens.createalarm
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.bghelp.ui.components.MainContentContainer
 
 @Composable

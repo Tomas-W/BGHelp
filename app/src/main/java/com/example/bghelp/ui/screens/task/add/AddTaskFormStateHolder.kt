@@ -339,19 +339,6 @@ class AddTaskFormStateHolder(
         }
     }
 
-    fun appendSelectedLocations(locations: List<TaskLocation>) {
-        if (locations.isEmpty()) return
-        _formState.update { state ->
-            val merged = (state.selectedLocations + locations).distinctBy { location ->
-                location.latitude to location.longitude
-            }
-            state.copy(
-                selectedLocations = merged,
-                locationSelection = if (merged.isEmpty()) UserLocationSelection.OFF else UserLocationSelection.ON
-            )
-        }
-    }
-
     fun removeSelectedLocation(location: TaskLocation) {
         _formState.update { state ->
             val updatedLocations = state.selectedLocations.filterNot { it == location }

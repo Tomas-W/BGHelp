@@ -1,7 +1,6 @@
 package com.example.bghelp.domain.model
 
 import java.time.LocalDateTime
-import java.time.ZoneId
 
 data class CreateTarget(
     val date: LocalDateTime,
@@ -28,7 +27,4 @@ data class Target(
     val sound: AlarmMode,
     val vibrate: AlarmMode,
     val snoozeTime: Int
-) {
-    val hasAlarm: Boolean
-        get() = sound != AlarmMode.OFF || vibrate != AlarmMode.OFF
-}
+)

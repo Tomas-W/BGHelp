@@ -163,6 +163,7 @@ fun BottomNavigationBar(
             .fillMaxWidth()
             .height(totalHeight)
             .topBorder(),
+        containerColor = MaterialTheme.colorScheme.background,
         windowInsets = WindowInsets(
             bottom = navigationBarHeight,
             top = 12.dp

@@ -7,6 +7,5 @@ object DatabaseConstants {
     const val TASK_LOCATION_TABLE = "task_location_table"
     const val TARGET_TABLE = "target_table"
     const val ITEM_TABLE = "item_table"
-    const val EVENT_TABLE = "event_table"
     const val COLOR_TABLE = "color_table"
 }

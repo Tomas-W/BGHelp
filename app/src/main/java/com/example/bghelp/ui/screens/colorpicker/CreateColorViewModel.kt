@@ -2,7 +2,6 @@ package com.example.bghelp.ui.screens.colorpicker
 
 import android.content.Context
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bghelp.R
@@ -23,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateColorViewModel @Inject constructor(
     private val colorRepository: ColorRepository,
-    @ApplicationContext private val appContext: Context
+    @param:ApplicationContext private val appContext: Context
 ) : ViewModel() {
     private val _selectedColor = MutableStateFlow(Color(0xFF2196F3))
     val selectedColor: StateFlow<Color> = _selectedColor.asStateFlow()

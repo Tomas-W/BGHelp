@@ -50,7 +50,7 @@ class ItemRepositoryImpl(private val itemDao: ItemDao) : ItemRepository {
     private fun ItemEntity.toDomain(): Item {
         return Item(
             id = id,
-            itemGroup = item_group,
+            itemGroup = itemGroup,
             name = name,
             quantity = quantity,
             unit = unit,
@@ -62,7 +62,7 @@ class ItemRepositoryImpl(private val itemDao: ItemDao) : ItemRepository {
     private fun Item.toEntity(): ItemEntity {
         return ItemEntity(
             id = id,
-            item_group = itemGroup,
+            itemGroup = itemGroup,
             name = name,
             quantity = quantity,
             unit = unit,
@@ -74,7 +74,7 @@ class ItemRepositoryImpl(private val itemDao: ItemDao) : ItemRepository {
     private fun CreateItem.toEntity(): ItemEntity {
         return ItemEntity(
             id = 0, // db will auto-generate
-            item_group = itemGroup,
+            itemGroup = itemGroup,
             name = name,
             quantity = quantity,
             unit = unit,

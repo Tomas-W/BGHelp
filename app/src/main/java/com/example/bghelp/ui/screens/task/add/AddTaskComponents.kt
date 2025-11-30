@@ -27,7 +27,6 @@ import com.example.bghelp.ui.utils.clickableDismissFocus
 fun <T> Header(
     viewModel: AddTaskViewModel,
     userSectionSelection: T,
-    hasToggle: Boolean = true,
     toggleSection: () -> Unit
 ) where T : Enum<T>, T : SectionMeta {
     Row(
