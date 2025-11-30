@@ -122,6 +122,9 @@ dependencies {
     // Color picker (skydoves/colorpicker-compose)
     implementation(libs.colorpicker.compose)
 
+    // Coil for image loading and caching
+    implementation(libs.coil.compose)
+
     // Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

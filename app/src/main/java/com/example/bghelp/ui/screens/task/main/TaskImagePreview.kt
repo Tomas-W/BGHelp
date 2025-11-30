@@ -1,8 +1,6 @@
 package com.example.bghelp.ui.screens.task.main
 
-import android.graphics.BitmapFactory
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.rememberTransformableState
@@ -25,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -34,10 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -46,11 +40,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.bghelp.R
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.utils.TaskImageStorage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import java.io.File
 
 @Composable
 fun TaskImagePreview(
@@ -59,19 +54,13 @@ fun TaskImagePreview(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val previewImage by produceState<ImageBitmap?>(initialValue = null, imagePath) {
-        value = withContext(Dispatchers.IO) {
-            val file = TaskImageStorage.resolveFile(context, imagePath)
-            if (!file.exists()) {
-                return@withContext null
-            }
-            BitmapFactory.decodeFile(file.absolutePath)?.asImageBitmap()
-        }
+    val imageFile = remember(imagePath) {
+        TaskImageStorage.resolveFile(context, imagePath)
     }
-
+    
     var showModal by rememberSaveable { mutableStateOf(false) }
 
-    if (previewImage != null) {
+    if (imageFile.exists()) {
         Column(
             modifier = modifier,
             horizontalAlignment = Alignment.Start
@@ -85,9 +74,11 @@ fun TaskImagePreview(
                 )
                 Spacer(modifier = Modifier.height(Sizes.Size.XS))
             }
-            val painter = remember(previewImage) { BitmapPainter(previewImage!!) }
-            Image(
-                painter = painter,
+            AsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(imageFile)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = displayName ?: stringResource(R.string.task_image_preview),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -95,15 +86,18 @@ fun TaskImagePreview(
                     .clip(RoundedCornerShape(Sizes.Corner.S))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .pointerInput(Unit) {
-                        detectTapGestures(onTap = { showModal = true })
+                        detectTapGestures(onTap = { 
+                            // Load image for modal
+                            showModal = true
+                        })
                     }
             )
         }
     }
 
-    if (showModal && previewImage != null) {
+    if (showModal) {
         TaskImageModal(
-            image = previewImage!!,
+            imageFile = imageFile,
             displayName = displayName,
             onDismiss = { showModal = false }
         )
@@ -113,10 +107,12 @@ fun TaskImagePreview(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TaskImageModal(
-    image: ImageBitmap,
+    imageFile: File,
     displayName: String?,
     onDismiss: () -> Unit
 ) {
+    val context = LocalContext.current
+    
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -153,10 +149,11 @@ private fun TaskImageModal(
                 offset += appliedPan
             }
 
-            val painter = remember(image) { BitmapPainter(image) }
-
-            Image(
-                painter = painter,
+            // Use AsyncImage with transformable gestures
+            AsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(imageFile)
+                    .build(),
                 contentDescription = displayName ?: stringResource(R.string.task_task_image),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
