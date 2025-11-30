@@ -28,7 +28,7 @@ fun InfoSelection(
         modifier = Modifier.fillMaxWidth(),
         value = infoText,
         onValueChange = { viewModel.setInfoText(it) },
-        hint = stringResource(R.string.task_title_hint),
+        hint = stringResource(R.string.task_info_hint),
         textStyle = MaterialTheme.typography.lTextItalic,
         minLines = CONST.INFO_MIN_LINES,
         maxLines = CONST.INFO_MAX_LINES,

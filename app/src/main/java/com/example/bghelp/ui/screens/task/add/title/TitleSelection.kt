@@ -25,7 +25,7 @@ fun TitleSelection(
         modifier = Modifier.fillMaxWidth(),
         value = titleText,
         onValueChange = { viewModel.setTitleText(it) },
-        hint = stringResource(R.string.task_info_hint),
+        hint = stringResource(R.string.task_title_hint),
         textStyle = MaterialTheme.typography.lTextSemi,
         minLines = CONST.TITLE_MIN_LINES,
         maxLines = CONST.TITLE_MAX_LINES,
