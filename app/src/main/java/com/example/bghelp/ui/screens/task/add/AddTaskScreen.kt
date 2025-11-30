@@ -34,7 +34,9 @@ import com.example.bghelp.ui.screens.task.add.repeat.Repeat
 import com.example.bghelp.ui.screens.task.add.title.Title
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.utils.dismissKeyboardOnTap
+import com.example.bghelp.ui.screens.task.main.TaskNavigationKeys
 import kotlinx.coroutines.delay
+import java.time.ZoneId
 
 @Composable
 fun AddTaskScreen(
@@ -57,9 +59,25 @@ fun AddTaskScreen(
     }
 
     val saveFailedMessage = stringResource(R.string.task_save_failed)
+    val savedTaskInfo by viewModel.savedTaskInfo.collectAsState()
+    
+    // Save task and pass the date and ID back through SavedStateHandle
     LaunchedEffect(saveState) {
         when (saveState) {
             is SaveTaskState.Success -> {
+                savedTaskInfo?.let { (taskId, taskDate) ->
+                    val taskDateMillis = taskDate.atZone(ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli()
+                    navController.previousBackStackEntry?.savedStateHandle?.set(
+                        TaskNavigationKeys.TASK_DATE_TO_NAVIGATE_TO,
+                        taskDateMillis
+                    )
+                    navController.previousBackStackEntry?.savedStateHandle?.set(
+                        TaskNavigationKeys.TASK_ID_TO_SCROLL_TO,
+                        taskId
+                    )
+                }
                 navController.popBackStack()
                 viewModel.consumeSaveState()
             }

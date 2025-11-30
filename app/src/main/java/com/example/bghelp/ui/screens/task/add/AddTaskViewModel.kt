@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.YearMonth
 import javax.inject.Inject
@@ -567,6 +568,7 @@ class AddTaskViewModel @Inject constructor(
 
             when (result) {
                 is SaveTaskResult.Success -> {
+                    _savedTaskInfo.value = result.taskId to result.taskDate
                     _saveState.value = SaveTaskState.Success
                     if (taskId != null) {
                         _editingTaskId.value = null
@@ -593,10 +595,14 @@ class AddTaskViewModel @Inject constructor(
 
     fun consumeSaveState() {
         _saveState.value = SaveTaskState.Idle
+        _savedTaskInfo.value = null
     }
 
     private val _saveState = MutableStateFlow<SaveTaskState>(SaveTaskState.Idle)
     val saveState: StateFlow<SaveTaskState> = _saveState.asStateFlow()
+
+    private val _savedTaskInfo = MutableStateFlow<Pair<Int, LocalDateTime>?>(null)
+    val savedTaskInfo: StateFlow<Pair<Int, LocalDateTime>?> = _savedTaskInfo.asStateFlow()
 
     private val _editingTaskId = MutableStateFlow<Int?>(null)
     val isEditing: StateFlow<Boolean> = _editingTaskId.map { it != null }

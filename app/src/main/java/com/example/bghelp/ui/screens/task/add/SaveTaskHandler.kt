@@ -52,8 +52,8 @@ class SaveTaskHandler(
                 }
 
                 is AddTaskAssembler.BuildResult.Success -> {
-                    taskRepository.addTask(assembleResult.task)
-                    SaveTaskResult.Success
+                    val taskId = taskRepository.addTask(assembleResult.task)
+                    SaveTaskResult.Success(taskId, assembleResult.task.startDate)
                 }
             }
         } catch (t: Throwable) {
@@ -125,7 +125,7 @@ class SaveTaskHandler(
                         updatedAt = LocalDateTime.now(ZoneId.systemDefault())
                     )
                     taskRepository.updateTask(updatedTask)
-                    SaveTaskResult.Success
+                    SaveTaskResult.Success(taskId, createTask.startDate)
                 }
             }
         } catch (t: Throwable) {
@@ -153,7 +153,7 @@ class SaveTaskHandler(
 }
 
 sealed interface SaveTaskResult {
-    data object Success : SaveTaskResult
+    data class Success(val taskId: Int, val taskDate: LocalDateTime) : SaveTaskResult
     data class ValidationError(val message: String) : SaveTaskResult
     data class Error(val throwable: Throwable) : SaveTaskResult
 }

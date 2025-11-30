@@ -71,10 +71,34 @@ fun TaskScreen(
     taskViewModel: TaskViewModel = hiltViewModel(),
     overlayNavController: NavHostController? = null
 ) {
+    // Check for navigation to task date from AddTaskScreen
+    LaunchedEffect(overlayNavController) {
+        overlayNavController?.currentBackStackEntry
+            ?.savedStateHandle
+            ?.getStateFlow<Long?>(TaskNavigationKeys.TASK_DATE_TO_NAVIGATE_TO, null)
+            ?.collect { taskDateMillis ->
+                taskDateMillis?.let { millis ->
+                    val taskDate = java.time.Instant.ofEpochMilli(millis)
+                        .atZone(java.time.ZoneId.systemDefault())
+                        .toLocalDateTime()
+                    taskViewModel.goToDay(taskDate.toLocalDate())
+                    // Get the task ID to scroll to
+                    overlayNavController.currentBackStackEntry?.savedStateHandle
+                        ?.get<Int>(TaskNavigationKeys.TASK_ID_TO_SCROLL_TO)?.let { taskId ->
+                            taskViewModel.setScrollToTaskId(taskId)
+                            overlayNavController.currentBackStackEntry?.savedStateHandle?.remove<Int>(TaskNavigationKeys.TASK_ID_TO_SCROLL_TO)
+                        }
+                    // Clear the result so we don't navigate again
+                    overlayNavController.currentBackStackEntry?.savedStateHandle?.remove<Long>(TaskNavigationKeys.TASK_DATE_TO_NAVIGATE_TO)
+                }
+            }
+    }
+
     // Task items
     val selectedTasks by taskViewModel.tasksInRange.collectAsState(initial = emptyList())
     val selectedDate by taskViewModel.selectedDate.collectAsState()
     val expandedTaskIds by taskViewModel.expandedTaskIds.collectAsState()
+    val scrollToTaskId by taskViewModel.scrollToTaskId.collectAsState()
     // Track deletion and editing
     var taskPendingEdit by remember { mutableStateOf<Task?>(null) }
     var pendingDeletions by remember { mutableStateOf<Map<String, PendingDeletion>>(emptyMap()) }
@@ -209,9 +233,26 @@ fun TaskScreen(
         taskViewModel.updateWeekNavHeight(height)
     }
 
+    // Scroll to task after save/edit
+    LaunchedEffect(scrollToTaskId, selectedTasks) {
+        scrollToTaskId?.let { taskId ->
+            if (selectedTasks.isNotEmpty()) {
+                val taskIndex = selectedTasks.indexOfFirst { task -> task.id == taskId }
+                if (taskIndex >= 0) {
+                    delay(100) // Wait for UI to settle
+                    listState.scrollToItem(taskIndex)
+                    taskViewModel.clearScrollToTaskId()
+                } else {
+                    // Task not found, clear the scroll target
+                    taskViewModel.clearScrollToTaskId()
+                }
+            }
+        }
+    }
+
     // Return to scroll position
     LaunchedEffect(selectedTasks) {
-        if (selectedTasks.isNotEmpty() && savedIndex > 0) {
+        if (selectedTasks.isNotEmpty() && savedIndex > 0 && scrollToTaskId == null) {
             listState.scrollToItem(savedIndex, savedOffset)
         }
     }

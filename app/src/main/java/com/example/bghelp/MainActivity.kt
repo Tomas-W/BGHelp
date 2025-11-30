@@ -56,5 +56,5 @@ class MainActivity : ComponentActivity() {
 
 // TODO: Translate default colors?
 
-// TODO: GO to Task after creating/updating
+// TODO: Highlight Task after creating/updating
 

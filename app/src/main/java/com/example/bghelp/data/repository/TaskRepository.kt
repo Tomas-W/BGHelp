@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 interface TaskRepository {
-    suspend fun addTask(createTask: CreateTask)
+    suspend fun addTask(createTask: CreateTask): Int
     suspend fun updateTask(task: Task)
     suspend fun deleteTask(task: Task)
     suspend fun deleteRecurringTaskOccurrence(task: Task)
@@ -34,9 +34,9 @@ interface TaskRepository {
 }
 
 class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
-    override suspend fun addTask(createTask: CreateTask) {
+    override suspend fun addTask(createTask: CreateTask): Int {
         val persistence = createTask.toPersistenceBundle()
-        taskDao.addTask(
+        return taskDao.addTask(
             task = persistence.task,
             reminders = persistence.reminders,
             locations = persistence.locations

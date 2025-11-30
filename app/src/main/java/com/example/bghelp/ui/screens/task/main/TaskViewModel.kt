@@ -271,6 +271,18 @@ class TaskViewModel @Inject constructor(
             taskRepository.markRecurringTaskBaseAsDeleted(task)
         }
     }
+
+    // Scroll to task after save/edit
+    private val _scrollToTaskId = MutableStateFlow<Int?>(null)
+    val scrollToTaskId: StateFlow<Int?> = _scrollToTaskId.asStateFlow()
+
+    fun setScrollToTaskId(taskId: Int) {
+        _scrollToTaskId.value = taskId
+    }
+
+    fun clearScrollToTaskId() {
+        _scrollToTaskId.value = null
+    }
 }
 
 data class WeekDisplay(
