@@ -123,6 +123,9 @@ abstract class TaskDao {
         """)
     @Transaction
     abstract fun getNextTask(currentTime: Long) : Flow<TaskWithRelations?>
+
+    @Query("SELECT COUNT(*) FROM ${DB.TASK_TABLE} WHERE deleted = 0")
+    abstract suspend fun getTaskCount(): Int
 }
 
 

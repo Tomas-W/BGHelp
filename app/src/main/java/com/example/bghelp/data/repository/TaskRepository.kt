@@ -28,6 +28,7 @@ interface TaskRepository {
     suspend fun deleteRecurringTaskOccurrence(task: Task)
     suspend fun deleteAllRecurringTaskOccurrences(task: Task)
     suspend fun markRecurringTaskBaseAsDeleted(task: Task)
+    suspend fun getTaskCount(): Int
     fun getTaskById(id: Int): Flow<Task?>
     fun getTasksByDateRange(startDate: Long, endDate: Long): Flow<List<Task>>
 }
@@ -95,6 +96,8 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
 
     override fun getTaskById(id: Int): Flow<Task?> =
         taskDao.getTaskById(id).map { it?.toDomain() }
+
+    override suspend fun getTaskCount(): Int = taskDao.getTaskCount()
 
     override fun getTasksByDateRange(startDate: Long, endDate: Long): Flow<List<Task>> {
         val zone = ZoneId.systemDefault()

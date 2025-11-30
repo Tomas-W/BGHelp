@@ -8,16 +8,11 @@ import com.example.bghelp.data.local.dao.ColorDao
 import com.example.bghelp.data.local.dao.ItemDao
 import com.example.bghelp.data.local.dao.TargetDao
 import com.example.bghelp.data.local.dao.TaskDao
-import com.example.bghelp.data.repository.TaskRepositoryImpl
-import com.example.bghelp.utils.initializeDefaultColors
-import com.example.bghelp.utils.initializeDefaultTasks
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import javax.inject.Singleton
 
 @Module
@@ -28,24 +23,13 @@ object DatabaseModule {
     fun provideAppDatabase(
         @ApplicationContext context: Context
     ): AppDatabase {
-        val database = Room.databaseBuilder(
+        return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
             DB.DB_NAME
         )
             .fallbackToDestructiveMigration(true)
             .build()
-        
-        // Initialize colors synchronously to ensure they exist before database is used
-        // This runs during DI setup, so blocking is acceptable
-        runBlocking(Dispatchers.IO) {
-            initializeDefaultColors(database.colorDao())
-            // Initialize tasks after colors are available
-            val taskRepository = TaskRepositoryImpl(database.taskDao())
-            initializeDefaultTasks(taskRepository, database.colorDao())
-        }
-        
-        return database
     }
 
     @Provides
