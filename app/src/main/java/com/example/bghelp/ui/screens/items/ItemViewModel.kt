@@ -45,7 +45,7 @@ class ItemViewModel @Inject constructor(
 
     val itemsGrouped: StateFlow<Map<String, List<Item>>> = allItems
         .map { items ->
-            items.groupBy { it.item_group }
+            items.groupBy { it.itemGroup }
                 .mapValues { (_, itemsInGroup) ->
                     itemsInGroup.sortedBy { it.name }
                 }
