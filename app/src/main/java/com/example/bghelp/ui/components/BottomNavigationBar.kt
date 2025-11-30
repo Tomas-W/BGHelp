@@ -33,6 +33,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.bghelp.R
 import com.example.bghelp.ui.navigation.Screen
+import com.example.bghelp.ui.navigation.getLocalizedTitle
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.utils.topBorder
 import com.example.bghelp.constants.UiConstants as UI
@@ -73,7 +74,7 @@ private fun RowScope.NavigationItem(
         icon = {
             Image(
                 painter = painterResource(iconRes),
-                contentDescription = screen.title,
+                contentDescription = screen.getLocalizedTitle(),
                 modifier = Modifier.size(Sizes.Icon.L),
                 colorFilter = ColorFilter.tint(
                     if (isSelected) MaterialTheme.colorScheme.onSurface
@@ -83,7 +84,7 @@ private fun RowScope.NavigationItem(
         },
         label = {
             Text(
-                text = screen.title,
+                text = screen.getLocalizedTitle(),
                 color = if (isSelected) MaterialTheme.colorScheme.onSurface
                         else MaterialTheme.colorScheme.onTertiary,
                 fontWeight = if (isSelected) FontWeight.Bold

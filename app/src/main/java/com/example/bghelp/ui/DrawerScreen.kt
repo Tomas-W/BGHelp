@@ -32,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.bghelp.R
 import com.example.bghelp.ui.navigation.Screen
+import com.example.bghelp.ui.navigation.getLocalizedTitle
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.lTextBold
 import com.example.bghelp.ui.theme.lTextDefault
@@ -153,14 +154,14 @@ private fun DrawerItem(
         onClick = onClick,
         label = {
             Text(
-                text = screen.title,
+                text = screen.getLocalizedTitle(),
                 style = if (selected) MaterialTheme.typography.lTextBold else MaterialTheme.typography.lTextDefault
             )
         },
         icon = {
             Icon(
                 painter = painterResource(id = iconRes),
-                contentDescription = screen.title,
+                contentDescription = screen.getLocalizedTitle(),
                 modifier = Modifier.size(Sizes.Icon.M)
             )
         },

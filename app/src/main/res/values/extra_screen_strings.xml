@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="extra_settings_title">Settings</string>
+    <string name="extra_create_alarm_title">Create Alarm</string>
+    <string name="extra_color_picker_title">Create Color</string>
+    <string name="extra_location_picker_title">Location Picker</string>
+
     <string name="extra_options">Options</string>
     <string name="extra_color_name">Name</string>
     <string name="extra_color_default">Default</string>

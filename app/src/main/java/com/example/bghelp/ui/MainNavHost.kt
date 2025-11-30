@@ -19,22 +19,17 @@ import androidx.navigation.navArgument
 import com.example.bghelp.ui.navigation.Screen
 import com.example.bghelp.ui.screens.colorpicker.CreateColorScreen
 import com.example.bghelp.ui.screens.createalarm.CreateAlarmScreen
-import com.example.bghelp.ui.screens.home.HomeWallpaperScreen
 import com.example.bghelp.ui.screens.items.AddItemScreen
 import com.example.bghelp.ui.screens.items.AddItemViewModel
 import com.example.bghelp.ui.screens.items.ItemScreen
-import com.example.bghelp.ui.screens.items.ItemWallpaperScreen
 import com.example.bghelp.ui.screens.locationpicker.LocationPickerScreen
 import com.example.bghelp.ui.screens.note.AddNoteScreen
 import com.example.bghelp.ui.screens.note.AddNoteViewModel
 import com.example.bghelp.ui.screens.note.NoteScreen
-import com.example.bghelp.ui.screens.note.NoteWallpaperScreen
 import com.example.bghelp.ui.screens.settings.SettingsScreen
 import com.example.bghelp.ui.screens.target.AddTargetScreen
 import com.example.bghelp.ui.screens.target.AddTargetViewModel
 import com.example.bghelp.ui.screens.target.TargetScreen
-import com.example.bghelp.ui.screens.target.TargetWallpaperScreen
-import com.example.bghelp.ui.screens.task.TaskWallpaperScreen
 import com.example.bghelp.ui.screens.task.add.AddTaskScreen
 import com.example.bghelp.ui.screens.task.add.AddTaskViewModel
 import com.example.bghelp.ui.screens.task.main.TaskScreen
@@ -193,23 +188,6 @@ fun OverlayNavHost(
                 navController = navController,
                 allowMultiple = allowMultiple
             )
-        }
-
-        // Wallpaper screens
-        noTransitionComposable(route = Screen.Home.Wallpaper.route) { _ ->
-            HomeWallpaperScreen()
-        }
-        noTransitionComposable(route = Screen.Tasks.Wallpaper.route) { _ ->
-            TaskWallpaperScreen()
-        }
-        noTransitionComposable(route = Screen.Targets.Wallpaper.route) { _ ->
-            TargetWallpaperScreen()
-        }
-        noTransitionComposable(route = Screen.Items.Wallpaper.route) { _ ->
-            ItemWallpaperScreen()
-        }
-        noTransitionComposable(route = Screen.Notes.Wallpaper.route) { _ ->
-            NoteWallpaperScreen()
         }
     }
 }

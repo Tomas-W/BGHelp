@@ -23,35 +23,6 @@ fun navigateToOptionsScreen(navController: NavController, route: String) {
     }
 }
 
-fun navigateToWallpaperScreen(navController: NavController, currentScreen: Screen) {
-    val wallpaperRoute = when (currentScreen) {
-        is Screen.Home -> Screen.Home.Wallpaper.route
-        is Screen.Tasks -> Screen.Tasks.Wallpaper.route
-        is Screen.Targets -> Screen.Targets.Wallpaper.route
-        is Screen.Items -> Screen.Items.Wallpaper.route
-        is Screen.Notes -> Screen.Notes.Wallpaper.route
-        else -> Screen.Home.Wallpaper.route
-    }
-    navController.navigate(wallpaperRoute) {
-        launchSingleTop = true
-    }
-}
-
-fun navigateToAddScreen(navController: NavController, currentScreen: Screen) {
-    val addRoute = when (currentScreen) {
-        is Screen.Tasks -> Screen.Tasks.Add.route
-        is Screen.Targets -> Screen.Targets.Add.route
-        is Screen.Items -> Screen.Items.Add.route
-        is Screen.Notes -> Screen.Notes.Add.route
-        else -> null
-    }
-    if (addRoute != null) {
-        navController.navigate(addRoute) {
-            launchSingleTop = true
-        }
-    }
-}
-
 fun handleBackNavigation(navController: NavController, currentScreen: Screen) {
     if (currentScreen in Screen.optionsScreens) {
         popAllOptionsScreens(navController)
