@@ -52,7 +52,10 @@ fun MainScreen() {
                         onOptionsClick = {
                             showOptionsMenu = !showOptionsMenu
                         },
-                        isDrawerShown = showOptionsMenu
+                        isDrawerShown = showOptionsMenu,
+                        onDrawerDismiss = {
+                            showOptionsMenu = false
+                        }
                     )
                 }
             }

@@ -112,6 +112,7 @@ fun BottomNavigationBar(
     onRequestNavigateTo: ((String) -> Unit)? = null,
     onOptionsClick: (() -> Unit)? = null,
     isDrawerShown: Boolean = false,
+    onDrawerDismiss: (() -> Unit)? = null,
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     // Track the last known bottom route for highlighting
@@ -129,13 +130,16 @@ fun BottomNavigationBar(
             normalizedOverlayRoute in Screen.optionsScreens.map { it.route }
 
     val currentRoute = when {
-        isDrawerShown -> lastKnownBottomRoute
+        isDrawerShown -> null
         isOptionsRoute -> null
         isOptionsActive -> lastKnownBottomRoute
         else -> bottomRoute
     }
 
     fun navigateTo(route: String) {
+        if (isDrawerShown) {
+            onDrawerDismiss?.invoke()
+        }
         if (isOptionsActive && onRequestNavigateTo != null) {
             onRequestNavigateTo.invoke(route)
             return
