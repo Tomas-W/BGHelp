@@ -1,5 +1,6 @@
 package com.example.bghelp.ui.screens.colorpicker
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,15 +19,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.bghelp.R
 import com.example.bghelp.domain.model.ExampleTask
 import com.example.bghelp.domain.model.FeatureColor
+import com.example.bghelp.domain.model.Task
 import com.example.bghelp.ui.components.ButtonRow
 import com.example.bghelp.ui.components.MainContentContainer
 import com.example.bghelp.ui.components.OutlinedStringInput
+import com.example.bghelp.ui.components.PreviewScreen
 import com.example.bghelp.ui.components.ReusableSnackbarHost
 import com.example.bghelp.ui.screens.task.main.DayComponent
 import com.example.bghelp.ui.theme.lTextDefault
@@ -34,6 +38,8 @@ import com.example.bghelp.ui.utils.dismissKeyboardOnTap
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 val defaultColorNames = listOf(
     "Default",
@@ -69,21 +75,64 @@ fun CreateColorScreen(
         }
     }
 
-    val controller = rememberColorPickerController()
-    val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
-
     val exampleTask = remember(selectedColor) {
         val baseTask = ExampleTask().toTask()
         val featureColor = selectedColor.toFeatureColor()
         baseTask.copy(color = featureColor)
     }
 
+    CreateColorContent(
+        isExampleExpanded = isExampleExpanded,
+        colorName = colorName,
+        isColorNameActive = isColorNameActive,
+        isColorNameValid = isColorNameValid,
+        saving = saving,
+        exampleTask = exampleTask,
+        onColorChanged = { envelope ->
+            viewModel.onColorChanged(envelope)
+            viewModel.clearColorNameInputSelection()
+        },
+        onColorNameChange = viewModel::setColorName,
+        onColorNameActiveChange = viewModel::setColorNameActive,
+        onToggleExpanded = {
+            viewModel.clearColorNameInputSelection()
+            viewModel.toggleExpandExample()
+        },
+        onSaveClick = { viewModel.saveColor() },
+        onCancelClick = { navController.popBackStack() },
+        snackbarMessage = viewModel.snackbarMessage,
+        onSnackbarMessageShown = { viewModel.clearSnackbarMessage() }
+    )
+}
+
+@Composable
+private fun CreateColorContent(
+    isExampleExpanded: Boolean,
+    colorName: String,
+    isColorNameActive: Boolean,
+    isColorNameValid: Boolean,
+    saving: Boolean,
+    exampleTask: Task,
+    onColorChanged: (ColorEnvelope) -> Unit,
+    onColorNameChange: (String) -> Unit,
+    onColorNameActiveChange: (Boolean) -> Unit,
+    onToggleExpanded: () -> Unit,
+    onSaveClick: () -> Unit,
+    onCancelClick: () -> Unit,
+    snackbarMessage: StateFlow<String?>,
+    onSnackbarMessageShown: () -> Unit
+) {
+    val controller = rememberColorPickerController()
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .dismissKeyboardOnTap {
-                viewModel.clearColorNameInputSelection()
+                focusManager.clearFocus()
+                keyboardController?.hide()
             }
     ) {
         Column(
@@ -91,8 +140,7 @@ fun CreateColorScreen(
         ) {
             MainContentContainer(
                 modifier = Modifier
-                    .weight(1f, fill = true)
-                    .padding(top = 32.dp),
+                    .weight(1f, fill = true),
                 spacing = 24
             ) {
                 HsvColorPicker(
@@ -101,23 +149,22 @@ fun CreateColorScreen(
                         .height(360.dp),
                     controller = controller,
                     onColorChanged = { envelope: ColorEnvelope ->
-                        viewModel.onColorChanged(envelope)
+                        onColorChanged(envelope)
                         focusManager.clearFocus()
                         keyboardController?.hide()
-                        viewModel.clearColorNameInputSelection()
                     }
                 )
 
                 OutlinedStringInput(
                     value = colorName,
-                    onValueChange = viewModel::setColorName,
+                    onValueChange = onColorNameChange,
                     hint = stringResource(R.string.extra_color_name),
                     textStyle = MaterialTheme.typography.lTextDefault,
                     isMultiLine = false,
                     minLines = 1,
                     maxLines = 1,
                     isActive = isColorNameActive,
-                    onActiveChange = viewModel::setColorNameActive,
+                    onActiveChange = onColorNameActiveChange,
                     onDone = {}
                 )
 
@@ -127,8 +174,7 @@ fun CreateColorScreen(
                     onToggleExpanded = { _ ->
                         focusManager.clearFocus()
                         keyboardController?.hide()
-                        viewModel.clearColorNameInputSelection()
-                        viewModel.toggleExpandExample()
+                        onToggleExpanded()
                     }
                 )
             }
@@ -137,9 +183,9 @@ fun CreateColorScreen(
                 isValid = isColorNameValid,
                 isLoading = saving,
                 firstLabel = if (saving) stringResource(R.string.button_saving) else stringResource(R.string.button_save_color),
-                firstOnClick = { viewModel.saveColor() },
+                firstOnClick = onSaveClick,
                 secondLabel = stringResource(R.string.button_cancel),
-                secondOnClick = { navController.popBackStack() },
+                secondOnClick = onCancelClick,
             )
         }
 
@@ -151,10 +197,42 @@ fun CreateColorScreen(
             contentAlignment = Alignment.BottomCenter
         ) {
             ReusableSnackbarHost(
-                snackbarMessage = viewModel.snackbarMessage,
-                onMessageShown = { viewModel.clearSnackbarMessage() }
+                snackbarMessage = snackbarMessage,
+                onMessageShown = { onSnackbarMessageShown() }
             )
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun CreateColorScreenPreview() {
+    val selectedColor = Color(0xFF6200EE)
+    val exampleTask = remember(selectedColor) {
+        val baseTask = ExampleTask().toTask()
+        val featureColor = selectedColor.toFeatureColor()
+        baseTask.copy(color = featureColor)
+    }
+
+    val previewSnackbarMessage = remember { MutableStateFlow<String?>(null) }
+
+    PreviewScreen {
+        CreateColorContent(
+            isExampleExpanded = true,
+            colorName = "Example color",
+            isColorNameActive = false,
+            isColorNameValid = true,
+            saving = false,
+            exampleTask = exampleTask,
+            onColorChanged = {},
+            onColorNameChange = {},
+            onColorNameActiveChange = {},
+            onToggleExpanded = {},
+            onSaveClick = {},
+            onCancelClick = {},
+            snackbarMessage = previewSnackbarMessage,
+            onSnackbarMessageShown = {}
+        )
     }
 }
 
