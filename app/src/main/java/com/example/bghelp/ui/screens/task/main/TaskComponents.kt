@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -56,6 +57,8 @@ fun DayComponent(
     isFirst: Boolean = false,
     isLast: Boolean = false
 ) {
+    // Set a color behind the task's color for better color selection
+    val backgroundColor = if (isSystemInDarkTheme()) Color.Black else Color.White
     val taskBackgroundColor = if (!task.expired) {
         task.color.toComposeColor()
     } else {
@@ -75,14 +78,14 @@ fun DayComponent(
     }
     val shape = remember(isFirst, isLast, cornerRadius) {
         when {
-            isFirst && isLast -> RoundedCornerShape(cornerRadius)
+            isFirst && isLast -> RoundedCornerShape(topEnd = cornerRadius, bottomStart = cornerRadius, bottomEnd = cornerRadius)
             isFirst -> RoundedCornerShape(topEnd = cornerRadius)
             isLast -> RoundedCornerShape(bottomStart = cornerRadius, bottomEnd = cornerRadius)
             else -> null
         }
     }
 
-    Box(modifier = modifier) {
+    Box(modifier = modifier.background(backgroundColor)) {
         DayContainer(
             modifier = Modifier
 //                .blur(if (isPendingDeletion) 3.dp else 0.dp)
