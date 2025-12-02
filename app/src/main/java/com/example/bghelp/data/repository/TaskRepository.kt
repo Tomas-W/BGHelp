@@ -172,10 +172,22 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
             FeatureColor(
                 id = it.id,
                 name = it.name,
-                red = it.red,
-                green = it.green,
-                blue = it.blue,
-                alpha = it.alpha
+                lightRed = it.lightRed,
+                lightGreen = it.lightGreen,
+                lightBlue = it.lightBlue,
+                lightAlpha = it.lightAlpha,
+                darkRed = it.darkRed,
+                darkGreen = it.darkGreen,
+                darkBlue = it.darkBlue,
+                darkAlpha = it.darkAlpha,
+                lightTextRed = it.lightTextRed,
+                lightTextGreen = it.lightTextGreen,
+                lightTextBlue = it.lightTextBlue,
+                lightTextAlpha = it.lightTextAlpha,
+                darkTextRed = it.darkTextRed,
+                darkTextGreen = it.darkTextGreen,
+                darkTextBlue = it.darkTextBlue,
+                darkTextAlpha = it.darkTextAlpha
             )
         } ?: ColorSeeds.FallbackTaskColor
 

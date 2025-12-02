@@ -47,10 +47,22 @@ class ColorRepositoryImpl(private val colorDao: ColorDao) : ColorRepository {
         FeatureColor(
             id = id,
             name = name,
-            red = red,
-            green = green,
-            blue = blue,
-            alpha = alpha
+            lightRed = lightRed,
+            lightGreen = lightGreen,
+            lightBlue = lightBlue,
+            lightAlpha = lightAlpha,
+            darkRed = darkRed,
+            darkGreen = darkGreen,
+            darkBlue = darkBlue,
+            darkAlpha = darkAlpha,
+            lightTextRed = lightTextRed,
+            lightTextGreen = lightTextGreen,
+            lightTextBlue = lightTextBlue,
+            lightTextAlpha = lightTextAlpha,
+            darkTextRed = darkTextRed,
+            darkTextGreen = darkTextGreen,
+            darkTextBlue = darkTextBlue,
+            darkTextAlpha = darkTextAlpha
         )
 
     // Domain → Entity
@@ -58,10 +70,22 @@ class ColorRepositoryImpl(private val colorDao: ColorDao) : ColorRepository {
         ColorEntity(
             id = id,
             name = name,
-            red = red,
-            green = green,
-            blue = blue,
-            alpha = alpha,
+            lightRed = lightRed,
+            lightGreen = lightGreen,
+            lightBlue = lightBlue,
+            lightAlpha = lightAlpha,
+            darkRed = darkRed,
+            darkGreen = darkGreen,
+            darkBlue = darkBlue,
+            darkAlpha = darkAlpha,
+            lightTextRed = lightTextRed,
+            lightTextGreen = lightTextGreen,
+            lightTextBlue = lightTextBlue,
+            lightTextAlpha = lightTextAlpha,
+            darkTextRed = darkTextRed,
+            darkTextGreen = darkTextGreen,
+            darkTextBlue = darkTextBlue,
+            darkTextAlpha = darkTextAlpha,
         )
 
     // Create → Entity
@@ -69,10 +93,22 @@ class ColorRepositoryImpl(private val colorDao: ColorDao) : ColorRepository {
         ColorEntity(
             id = 0,
             name = name,
-            red = red,
-            green = green,
-            blue = blue,
-            alpha = alpha,
+            lightRed = lightRed,
+            lightGreen = lightGreen,
+            lightBlue = lightBlue,
+            lightAlpha = lightAlpha,
+            darkRed = darkRed,
+            darkGreen = darkGreen,
+            darkBlue = darkBlue,
+            darkAlpha = darkAlpha,
+            lightTextRed = lightTextRed,
+            lightTextGreen = lightTextGreen,
+            lightTextBlue = lightTextBlue,
+            lightTextAlpha = lightTextAlpha,
+            darkTextRed = darkTextRed,
+            darkTextGreen = darkTextGreen,
+            darkTextBlue = darkTextBlue,
+            darkTextAlpha = darkTextAlpha,
             isDefault = isDefault
         )
 }

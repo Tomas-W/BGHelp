@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import com.example.bghelp.R
 import com.example.bghelp.domain.model.AlarmMode
 import com.example.bghelp.domain.model.Task
+import com.example.bghelp.ui.theme.BackgroundGrey
 import com.example.bghelp.ui.theme.Sizes
 import com.example.bghelp.ui.theme.lTextBold
 import com.example.bghelp.ui.theme.lTextItalic
@@ -49,21 +51,24 @@ import com.example.bghelp.utils.toTaskTime
 fun DayComponent(
     modifier: Modifier = Modifier,
     task: Task,
+    textColor: Color? = null,
     isExpanded: Boolean,
     onToggleExpanded: (Int) -> Unit,
     onLongPress: ((Task) -> Unit)? = null,
     isPendingDeletion: Boolean = false,
     onCancelDeletion: () -> Unit = {},
     isFirst: Boolean = false,
-    isLast: Boolean = false
+    isLast: Boolean = false,
+    enableInteraction: Boolean = true
 ) {
-    // Set a color behind the task's color for better color selection
-    val backgroundColor = if (isSystemInDarkTheme()) Color.Black else Color.White
+    val underlayColor = remember { BackgroundGrey }
+    val isDarkTheme = isSystemInDarkTheme()
     val taskBackgroundColor = if (!task.expired) {
-        task.color.toComposeColor()
+        task.color.backgroundColor(isDarkTheme)
     } else {
         MaterialTheme.colorScheme.tertiary
     }
+    val resolvedTextColor = textColor ?: task.color.textColor(isDarkTheme)
     val toggleCallback = remember(key1 = task.id) { { onToggleExpanded(task.id) } }
     val longPressCallback = remember(key1 = task.id) {
         if (onLongPress != null) {
@@ -85,19 +90,25 @@ fun DayComponent(
         }
     }
 
-    Box(modifier = modifier.background(backgroundColor)) {
+    Box(modifier = modifier
+        .let { if (shape != null) it.clip(shape) else it }
+        .background(underlayColor)
+    ) {
         DayContainer(
             modifier = Modifier
-//                .blur(if (isPendingDeletion) 3.dp else 0.dp)
                 .alpha(if (isPendingDeletion) 0.4f else 1f)
                 .animateContentSize()
                 .let { mod ->
-                    longPressCallback?.let { longPress ->
-                        mod.combinedClickable(
-                            onClick = toggleCallback,
-                            onLongClick = longPress
-                        )
-                    } ?: mod.clickable(onClick = toggleCallback)
+                    if (enableInteraction) {
+                        longPressCallback?.let { longPress ->
+                            mod.combinedClickable(
+                                onClick = toggleCallback,
+                                onLongClick = longPress
+                            )
+                        } ?: mod.clickable(onClick = toggleCallback)
+                    } else {
+                        mod
+                    }
                 },
             backgroundColor = taskBackgroundColor,
             shape = shape
@@ -106,14 +117,21 @@ fun DayComponent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                TimeInfo(task = task)
-                AlarmIcons(task = task)
+                TimeInfo(
+                    task = task,
+                    textColor = resolvedTextColor
+                )
+                AlarmIcons(
+                    task = task,
+                    textColor = resolvedTextColor
+                    )
             }
 
-            TitleAndDescription(
+            TitleAndInfo(
                 title = task.title,
-                description = task.info,
-                isExpanded = isExpanded
+                info = task.info,
+                isExpanded = isExpanded,
+                textColor = resolvedTextColor
             )
             if (isExpanded) {
                 val imageAttachment = task.image
@@ -172,12 +190,16 @@ fun DayContainer(
 }
 
 @Composable
-private fun TimeInfo(task: Task) {
+private fun TimeInfo(
+    task: Task,
+    textColor: Color
+    ) {
     Row {
         Text(
+            modifier = Modifier.padding(end = 8.dp),
             text = task.date.toTaskTime(),
             style = MaterialTheme.typography.lTextBold,
-            modifier = Modifier.padding(end = 8.dp)
+            color = textColor
         )
         if (task.snoozeSeconds > 0) {
             Text(
@@ -190,20 +212,23 @@ private fun TimeInfo(task: Task) {
 }
 
 @Composable
-private fun TitleAndDescription(
+private fun TitleAndInfo(
     title: String,
-    description: String?,
+    info: String?,
+    textColor: Color,
     isExpanded: Boolean
 ) {
     Column {
         Text(
             text = title,
-            style = MaterialTheme.typography.lTextSemi
+            style = MaterialTheme.typography.lTextSemi,
+            color = textColor
         )
-        if (isExpanded && description != null) {
+        if (isExpanded && info != null) {
             Text(
-                text = description,
-                style = MaterialTheme.typography.lTextItalic
+                text = info,
+                style = MaterialTheme.typography.lTextItalic,
+                color = textColor
             )
         } else if (isExpanded) {
             Spacer(modifier = Modifier.height(Sizes.Icon.M))
@@ -213,18 +238,22 @@ private fun TitleAndDescription(
 
 @Composable
 private fun AlarmIcons(
-    task: Task
+    task: Task,
+    textColor: Color
 ) {
     Row {
-        SoundIcon(soundMode = task.sound)
+        SoundIcon(soundMode = task.sound, color = textColor)
         Spacer(modifier = Modifier.width(16.dp))
-        VibrateIcon(vibrateMode = task.vibrate)
+        VibrateIcon(vibrateMode = task.vibrate, color = textColor)
         Spacer(modifier = Modifier.width(8.dp))
     }
 }
 
 @Composable
-private fun SoundIcon(soundMode: AlarmMode) {
+private fun SoundIcon(
+    soundMode: AlarmMode,
+    color: Color
+) {
     val iconRes = when (soundMode) {
         AlarmMode.OFF -> null
         AlarmMode.ONCE -> R.drawable.sound_once
@@ -233,9 +262,10 @@ private fun SoundIcon(soundMode: AlarmMode) {
 
     if (iconRes != null) {
         Image(
+            modifier = Modifier.size(Sizes.Icon.S),
             painter = painterResource(iconRes),
             contentDescription = soundMode.value,
-            modifier = Modifier.size(Sizes.Icon.S)
+            colorFilter = ColorFilter.tint(color = color)
         )
     } else {
         Spacer(modifier = Modifier.size(Sizes.Icon.S))
@@ -243,7 +273,10 @@ private fun SoundIcon(soundMode: AlarmMode) {
 }
 
 @Composable
-private fun VibrateIcon(vibrateMode: AlarmMode) {
+private fun VibrateIcon(
+    vibrateMode: AlarmMode,
+    color: Color
+) {
     val iconRes = when (vibrateMode) {
         AlarmMode.OFF -> null
         AlarmMode.ONCE -> R.drawable.vibrate_once
@@ -252,9 +285,10 @@ private fun VibrateIcon(vibrateMode: AlarmMode) {
 
     if (iconRes != null) {
         Image(
+            modifier = Modifier.size(Sizes.Icon.S),
             painter = painterResource(iconRes),
             contentDescription = vibrateMode.value,
-            modifier = Modifier.size(Sizes.Icon.S)
+            colorFilter = ColorFilter.tint(color = color)
         )
     } else {
         Spacer(modifier = Modifier.size(Sizes.Icon.S))
@@ -262,12 +296,17 @@ private fun VibrateIcon(vibrateMode: AlarmMode) {
 }
 
 @Composable
-fun TaskPreviewComponent(task: Task) {
+fun TaskPreviewComponent(
+    task: Task,
+    textColor: Color? = null
+) {
+    val isDarkTheme = isSystemInDarkTheme()
     val taskBackgroundColor = if (!task.expired) {
-        task.color.toComposeColor()
+        task.color.backgroundColor(isDarkTheme)
     } else {
         MaterialTheme.colorScheme.tertiary
     }
+    val resolvedTextColor = textColor ?: task.color.textColor(isDarkTheme)
 
     DayContainer(
         modifier = Modifier.fillMaxWidth(),
@@ -278,14 +317,18 @@ fun TaskPreviewComponent(task: Task) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            TimeInfo(task = task)
+            TimeInfo(
+                task = task,
+                textColor = resolvedTextColor
+            )
             AlarmIconsPreview(task = task)
         }
 
-        TitleAndDescription(
+        TitleAndInfo(
             title = task.title,
-            description = task.info,
-            isExpanded = false
+            info = task.info,
+            isExpanded = false,
+            textColor = resolvedTextColor
         )
     }
 }
@@ -293,9 +336,9 @@ fun TaskPreviewComponent(task: Task) {
 @Composable
 private fun AlarmIconsPreview(task: Task) {
     Row {
-        SoundIcon(soundMode = task.sound)
+        SoundIcon(soundMode = task.sound, color = Color.White)
         Spacer(modifier = Modifier.width(16.dp))
-        VibrateIcon(vibrateMode = task.vibrate)
+        VibrateIcon(vibrateMode = task.vibrate, color = Color.White)
     }
 }
 

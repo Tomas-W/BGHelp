@@ -100,8 +100,8 @@ data class Task(
 
 data class ExampleTask(
     val id: Int = 0,
-    val title: String = "This is an example title",
-    val info: String? = "This is example info. \n- Example 1\n- Example 2\n- Example 3",
+    val title: String = "",
+    val info: String? = null,
     val allDay: Boolean = false,
     val date: LocalDateTime = LocalDateTime.now(ZoneId.systemDefault()),
     val endDate: LocalDateTime? = LocalDateTime.now(ZoneId.systemDefault()).plusDays(1),
@@ -112,7 +112,7 @@ data class ExampleTask(
     val alarmName: String? = "Alarm name",
     val soundUri: String? = null,
     val vibrate: AlarmMode = AlarmMode.CONTINUOUS,
-    val snoozeSeconds: Int = 15,
+    val snoozeSeconds: Int = 7200,
     val snoozeValue1: Int = 10,
     val snoozeUnit1: ReminderOffsetUnit = ReminderOffsetUnit.MINUTES,
     val snoozeValue2: Int = 1,

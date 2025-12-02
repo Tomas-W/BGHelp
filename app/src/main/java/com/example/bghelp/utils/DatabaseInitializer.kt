@@ -71,10 +71,22 @@ suspend fun initializeDefaultTasks(
             FeatureColor(
                 id = entity.id,
                 name = entity.name,
-                red = entity.red,
-                green = entity.green,
-                blue = entity.blue,
-                alpha = entity.alpha
+                lightRed = entity.lightRed,
+                lightGreen = entity.lightGreen,
+                lightBlue = entity.lightBlue,
+                lightAlpha = entity.lightAlpha,
+                darkRed = entity.darkRed,
+                darkGreen = entity.darkGreen,
+                darkBlue = entity.darkBlue,
+                darkAlpha = entity.darkAlpha,
+                lightTextRed = entity.lightTextRed,
+                lightTextGreen = entity.lightTextGreen,
+                lightTextBlue = entity.lightTextBlue,
+                lightTextAlpha = entity.lightTextAlpha,
+                darkTextRed = entity.darkTextRed,
+                darkTextGreen = entity.darkTextGreen,
+                darkTextBlue = entity.darkTextBlue,
+                darkTextAlpha = entity.darkTextAlpha
             )
         }
     
@@ -106,10 +118,22 @@ private fun CreateFeatureColor.toEntity(): ColorEntity {
     return ColorEntity(
         id = 0, // Will be auto-generated
         name = name,
-        red = red,
-        green = green,
-        blue = blue,
-        alpha = alpha,
+        lightRed = lightRed,
+        lightGreen = lightGreen,
+        lightBlue = lightBlue,
+        lightAlpha = lightAlpha,
+        darkRed = darkRed,
+        darkGreen = darkGreen,
+        darkBlue = darkBlue,
+        darkAlpha = darkAlpha,
+        lightTextRed = lightTextRed,
+        lightTextGreen = lightTextGreen,
+        lightTextBlue = lightTextBlue,
+        lightTextAlpha = lightTextAlpha,
+        darkTextRed = darkTextRed,
+        darkTextGreen = darkTextGreen,
+        darkTextBlue = darkTextBlue,
+        darkTextAlpha = darkTextAlpha,
         isDefault = isDefault
     )
 }

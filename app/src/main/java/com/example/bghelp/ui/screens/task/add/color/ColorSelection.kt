@@ -2,9 +2,11 @@ package com.example.bghelp.ui.screens.task.add.color
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -21,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.navigation.NavController
 import com.example.bghelp.R
 import com.example.bghelp.domain.model.FeatureColor
@@ -88,6 +91,7 @@ fun ColorDropdown(
         selectedColorId?.let { id -> colors.find { it.id == id } }
     }
 
+    val isDarkMode = isSystemInDarkTheme()
     val selectColorText = stringResource(R.string.task_select_color)
     val addColorText = stringResource(R.string.task_add_color)
     
@@ -95,7 +99,7 @@ fun ColorDropdown(
     val displayText = selectedColor?.let { getLocalizedColorName(it.name) } ?: defaultText
     val defaultColor = Color.Transparent
     val displayColor = remember(selectedColor) {
-        selectedColor?.toComposeColor() ?: defaultColor
+        selectedColor?.toComposeColor(isDarkMode) ?: defaultColor
     }
 
     Box(
@@ -154,23 +158,59 @@ fun ColorDropdown(
             )
             colors.forEach { color ->
                 val localizedName = getLocalizedColorName(color.name)
-                DropdownItem(
-                    label = localizedName,
+                ColorDropdownItem(
+                    name = localizedName,
                     onClick = {
                         onColorSelected(color.id)
                         isExpanded = false
                     },
                     textStyle = if (color.id == selectedColorId) {
-                        selectedDropdownStyle()
+                        selectedDropdownStyle().copy(color = color.textColor(isDarkMode))
                     } else {
-                        deselectedDropdownStyle()
+                        deselectedDropdownStyle().copy(color = color.textColor(isDarkMode))
                     },
-                    backgroundColor = color.toComposeColor(),
-                    spacing = Sizes.Icon.M
+                    backgroundColor = color.toComposeColor(isDarkMode),
                 )
+//                DropdownItem(
+//                    label = localizedName,
+//                    onClick = {
+//                        onColorSelected(color.id)
+//                        isExpanded = false
+//                    },
+//                    textStyle = if (color.id == selectedColorId) {
+//                        selectedDropdownStyle().copy(color = color.textColor(isDarkMode))
+//                    } else {
+//                        deselectedDropdownStyle().copy(color = color.textColor(isDarkMode))
+//                    },
+//                    backgroundColor = color.toComposeColor(),
+//                    spacing = Sizes.Icon.M
+//                )
             }
         }
     }
+}
+
+@Composable
+fun ColorDropdownItem(
+    name: String,
+    onClick: () -> Unit,
+    textStyle: TextStyle,
+    backgroundColor: Color
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+    ) {
+        DropdownItem(
+            label = name,
+            onClick = onClick,
+            textStyle = textStyle,
+            backgroundColor = backgroundColor,
+            spacing = Sizes.Icon.M
+        )
+    }
+
 }
 
 @Composable

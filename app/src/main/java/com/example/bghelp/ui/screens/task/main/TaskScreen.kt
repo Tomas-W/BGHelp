@@ -393,7 +393,9 @@ fun TaskScreen(
         },
         content = {
             modalTask?.let { task ->
-                TaskPreviewComponent(task = task)
+                TaskPreviewComponent(
+                    task = task,
+                )
             }
         },
         secondLabel = when (modalState) {

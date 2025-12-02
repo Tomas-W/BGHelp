@@ -144,10 +144,14 @@ class SaveTaskHandler(
             ?: FeatureColor(
                 id = 1,
                 name = appContext.getString(R.string.extra_color_default),
-                red = (TaskDefault.red * 255).toInt(),
-                green = (TaskDefault.green * 255).toInt(),
-                blue = (TaskDefault.blue * 255).toInt(),
-                alpha = TaskDefault.alpha
+                lightRed = (TaskDefault.red * 255).toInt(),
+                lightGreen = (TaskDefault.green * 255).toInt(),
+                lightBlue = (TaskDefault.blue * 255).toInt(),
+                lightAlpha = TaskDefault.alpha,
+                darkRed = (TaskDefault.red * 255).toInt(),
+                darkGreen = (TaskDefault.green * 255).toInt(),
+                darkBlue = (TaskDefault.blue * 255).toInt(),
+                darkAlpha = TaskDefault.alpha
             )
     }
 }

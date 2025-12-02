@@ -89,5 +89,8 @@
     <string name="task_select_color">Select color</string>
     <string name="task_add_color">Add color +</string>
 
+    <string name="task_example_title">This is an example title</string>
+    <string name="task_example_info">This is example info.</string>
+
     <string name="task_">xx</string>
 </resources>

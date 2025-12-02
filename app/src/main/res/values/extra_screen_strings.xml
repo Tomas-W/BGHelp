@@ -14,6 +14,11 @@
     <string name="extra_color_yellow">Yellow</string>
     <string name="extra_color_cyan">Cyan</string>
     <string name="extra_color_magenta">Magenta</string>
+    <string name="extra_color_light_mode">Light mode</string>
+    <string name="extra_color_dark_mode">Dark mode</string>
+    <string name="extra_color_brightness">Brightness</string>
+    <string name="extra_color_alpha">Alpha</string>
+    <string name="extra_color_text">Text</string>
 
     <string name="extra_no_locations_hint">Tap Add marker to create a location, then tap the map place it.\nOr search for a location through the search bar and select one from the dropdown.</string>
     <string name="extra_delete_location">Delete location</string>

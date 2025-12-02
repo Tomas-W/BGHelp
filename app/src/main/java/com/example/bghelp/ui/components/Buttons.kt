@@ -84,7 +84,7 @@ fun ButtonRow(
     thirdLabel: String? = null,
     thirdOnClick: (() -> Unit)? = null
 ) {
-    val defaultColor = MaterialTheme.colorScheme.surface
+    val defaultColor = MaterialTheme.colorScheme.background
     val highlightColor = MaterialTheme.colorScheme.surfaceDim
     val hasSecond = secondLabel != null && secondOnClick != null
     val hasThird = thirdLabel != null && thirdOnClick != null

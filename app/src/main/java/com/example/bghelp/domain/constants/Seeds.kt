@@ -10,23 +10,64 @@ import java.time.LocalDateTime
 object ColorSeeds {
     // Colors used to pre-populate the database on first run
     val DefaultColors: List<CreateFeatureColor> = listOf(
-        // Match DatabaseInitializer set
-        CreateFeatureColor(name = "Default", red = 200, green = 220, blue = 245, alpha = 1.0f, isDefault = true),
-        CreateFeatureColor(name = "Red", red = 255, green = 0, blue = 0, alpha = 0.12f, isDefault = true),
-        CreateFeatureColor(name = "Green", red = 0, green = 255, blue = 0, alpha = 0.12f, isDefault = true),
-        CreateFeatureColor(name = "Yellow", red = 255, green = 255, blue = 0, alpha = 0.12f, isDefault = true),
-        CreateFeatureColor(name = "Cyan", red = 0, green = 255, blue = 255, alpha = 0.12f, isDefault = true),
-        CreateFeatureColor(name = "Magenta", red = 255, green = 0, blue = 255, alpha = 0.12f, isDefault = true)
+        CreateFeatureColor(
+            name = "Default",
+            isDefault = true,
+            lightRed = 200, lightGreen = 220, lightBlue = 245, lightAlpha = 1.0f,
+            darkRed = 200, darkGreen = 220, darkBlue = 245, darkAlpha = 1.0f,
+            lightTextRed = 0, lightTextGreen = 0, lightTextBlue = 0, lightTextAlpha = 1.0f,
+            darkTextRed = 0, darkTextGreen = 0, darkTextBlue = 0, darkTextAlpha = 1.0f
+        ),
+        CreateFeatureColor(
+            name = "Red",
+            isDefault = true,
+            lightRed = 255, lightGreen = 0, lightBlue = 0, lightAlpha = 0.12f,
+            darkRed = 255, darkGreen = 0, darkBlue = 0, darkAlpha = 0.12f,
+            lightTextRed = 0, lightTextGreen = 0, lightTextBlue = 0, lightTextAlpha = 1.0f,
+            darkTextRed = 0, darkTextGreen = 0, darkTextBlue = 0, darkTextAlpha = 1.0f
+        ),
+        CreateFeatureColor(
+            name = "Green",
+            isDefault = true,
+            lightRed = 0, lightGreen = 255, lightBlue = 0, lightAlpha = 0.12f,
+            darkRed = 0, darkGreen = 255, darkBlue = 0, darkAlpha = 0.12f,
+            lightTextRed = 0, lightTextGreen = 0, lightTextBlue = 0, lightTextAlpha = 1.0f,
+            darkTextRed = 0, darkTextGreen = 0, darkTextBlue = 0, darkTextAlpha = 1.0f
+        ),
+        CreateFeatureColor(
+            name = "Yellow",
+            isDefault = true,
+            lightRed = 255, lightGreen = 255, lightBlue = 0, lightAlpha = 0.12f,
+            darkRed = 255, darkGreen = 255, darkBlue = 0, darkAlpha = 0.12f,
+            lightTextRed = 0, lightTextGreen = 0, lightTextBlue = 0, lightTextAlpha = 1.0f,
+            darkTextRed = 0, darkTextGreen = 0, darkTextBlue = 0, darkTextAlpha = 1.0f
+        ),
+        CreateFeatureColor(
+            name = "Cyan",
+            isDefault = true,
+            lightRed = 0, lightGreen = 255, lightBlue = 255, lightAlpha = 0.12f,
+            darkRed = 0, darkGreen = 255, darkBlue = 255, darkAlpha = 0.12f,
+            lightTextRed = 0, lightTextGreen = 0, lightTextBlue = 0, lightTextAlpha = 1.0f,
+            darkTextRed = 0, darkTextGreen = 0, darkTextBlue = 0, darkTextAlpha = 1.0f
+        ),
+        CreateFeatureColor(
+            name = "Magenta",
+            isDefault = true,
+            lightRed = 255, lightGreen = 0, lightBlue = 255, lightAlpha = 0.12f,
+            darkRed = 255, darkGreen = 0, darkBlue = 255, darkAlpha = 0.12f,
+            lightTextRed = 0, lightTextGreen = 0, lightTextBlue = 0, lightTextAlpha = 1.0f,
+            darkTextRed = 0, darkTextGreen = 0, darkTextBlue = 0, darkTextAlpha = 1.0f
+        )
     )
 
     val FallbackTaskColor: FeatureColor = DefaultColors.first().let {
         FeatureColor(
             id = 0,
             name = it.name,
-            red = it.red,
-            green = it.green,
-            blue = it.blue,
-            alpha = it.alpha
+            lightRed = it.lightRed, lightGreen = it.lightGreen, lightBlue = it.lightBlue, lightAlpha = it.lightAlpha,
+            darkRed = it.darkRed, darkGreen = it.darkGreen, darkBlue = it.darkBlue, darkAlpha = it.darkAlpha,
+            lightTextRed = 0, lightTextGreen = 0, lightTextBlue = 0, lightTextAlpha = 1.0f,
+            darkTextRed = 0, darkTextGreen = 0, darkTextBlue = 0, darkTextAlpha = 1.0f
         )
     }
 }
