@@ -181,6 +181,8 @@ fun AddTaskScreen(
                 )
 
                 AddTaskSpacerLarge()
+                AddTaskSpacerLarge()
+                AddTaskSpacerLarge()
             }
 
             ButtonRow(
