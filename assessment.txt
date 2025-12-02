@@ -1,484 +1,116 @@
-# BGHelp Android App - Comprehensive Code Review & Assessment
-
-## ✅ **What You're Doing Well**
-
-### 1. **Architecture & Structure**
-- **Excellent MVVM implementation**: Clean separation of layers (Data → Repository → ViewModel → UI)
-- **Proper Hilt setup**: Correct use of modules, scoping, and dependency injection
-- **Good Repository Pattern**: Interface + Implementation with proper Entity ↔ Domain mapping
-- **Room database**: Well-structured with proper DAOs, Entities, and Relations
-
-### 2. **Data Layer**
-- **Abstract DAOs**: Smart use of `abstract class` for DAOs with protected methods for transactions
-- **Foreign Keys & Indices**: Proper FK constraints and indexing in `TaskEntity`
-- **TypeConverters**: Good use for custom types (enums, lists)
-- **Relations**: Correct `@Relation` usage in `TaskWithRelations`
-
-### 3. **ViewModels**
-- **StateFlow with stateIn**: Proper reactive state management
-- **ViewModelScope**: Correct coroutine handling
-- **Derived state**: Good use of `map`/`flatMapLatest` for transforming flows
-
-### 4. **UI/Compose**
-- **State hoisting**: Properly passing ViewModels and collecting state
-- **Keys in LazyColumn**: Correct implementation in `ItemScreen`
-- **Reusable components**: Good component library
-
----
-
-## ⚠️ **Critical Issues to Fix**
-
-### 1. **Database Initialization in DI Module** ❗ High Priority
-
-**Current Implementation (PROBLEMATIC):**
-```kotlin
-// In DatabaseModule.kt
-fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-    val database = Room.databaseBuilder(...)
-        .fallbackToDestructiveMigration(true)
-        .build()
-    
-    runBlocking(Dispatchers.IO) {
-        initializeDefaultColors(database.colorDao())
-        // ...
-    }
-    return database
-}
-```
-
-**Problems:**
-- `runBlocking` in DI setup blocks app startup
-- Violates single responsibility (DI module shouldn't handle business logic)
-- Synchronous initialization defeats Room's reactive design
-
-**Solution:**
-Create a proper database callback:
-
-```kotlin
-// In DatabaseModule.kt
-@Provides
-@Singleton
-fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-    return Room.databaseBuilder(
-        context,
-        AppDatabase::class.java,
-        DB.DB_NAME
-    )
-        .fallbackToDestructiveMigration(true)
-        .addCallback(DatabaseCallback())
-        .build()
-}
-
-private class DatabaseCallback : RoomDatabase.Callback() {
-    override fun onCreate(db: SupportSQLiteDatabase) {
-        super.onCreate(db)
-        // Trigger initialization in background
-        CoroutineScope(SupervisorJob()).launch(Dispatchers.IO) {
-            // Initialize defaults here
-        }
-    }
-}
-```
-
-Or better yet, inject a DatabaseInitializer that runs on app start:
-
-```kotlin
-// In BGHelpApp.kt
-@HiltAndroidApp
-class BGHelpApp : Application() {
-    @Inject lateinit var databaseInitializer: DatabaseInitializer
-    
-    override fun onCreate() {
-        super.onCreate()
-        lifecycleScope.launch {
-            databaseInitializer.initialize()
-        }
-        // ... Places init
-    }
-}
-```
-
-### 2. **Missing Error Handling** ❗ High Priority
-
-Your ViewModels launch coroutines but don't handle failures:
-
-**Current - NO ERROR HANDLING:**
-```kotlin
-fun deleteItem(item: Item) {
-    viewModelScope.launch {
-        itemRepository.deleteItem(item)
-    }
-}
-```
-
-**Solution - Add proper error handling:**
-
-```kotlin
-fun deleteItem(item: Item) {
-    viewModelScope.launch {
-        try {
-            itemRepository.deleteItem(item)
-        } catch (e: Exception) {
-            _errorState.value = "Failed to delete item: ${e.message}"
-            Log.e("ItemViewModel", "Delete failed", e)
-        }
-    }
-}
-
-// Add to ViewModel:
-private val _errorState = MutableStateFlow<String?>(null)
-val errorState: StateFlow<String?> = _errorState.asStateFlow()
-```
-
-### 3. **`.fallbackToDestructiveMigration(true)` in Production** ⚠️ Medium Priority
-
-This **deletes all user data** on schema changes. Fine for development, but you need migrations for production:
-
-**Solution:**
-```kotlin
-// For production:
-.addMigrations(MIGRATION_1_2, MIGRATION_2_3, ...)
-// Only use fallback in debug:
-.apply {
-    if (BuildConfig.DEBUG) {
-        fallbackToDestructiveMigration()
-    }
-}
-```
-
-### 4. **Loading States Missing** ⚠️ Medium Priority
-
-Your UI doesn't show loading indicators. Add a proper UI state:
-
-**Solution:**
-```kotlin
-sealed class UiState<out T> {
-    object Loading : UiState<Nothing>()
-    data class Success<T>(val data: T) : UiState<T>()
-    data class Error(val message: String) : UiState<Nothing>()
-}
-
-// In ViewModel:
-val itemsUiState: StateFlow<UiState<List<Item>>> = itemRepository.getAllItems()
-    .map<List<Item>, UiState<List<Item>>> { UiState.Success(it) }
-    .catch { emit(UiState.Error(it.message ?: "Unknown error")) }
-    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UiState.Loading)
-```
-
----
-
-## 🔧 **Architecture Improvements**
-
-### 5. **Inconsistent Repository Pattern**
-
-Some repositories have both interface and implementation, but they're in the same file. This is fine, but for consistency:
-
-**Option A** (Recommended for small projects): Keep them together
-**Option B** (Better for larger projects): Split into separate files
-
-```
-data/repository/
-├── ItemRepository.kt (interface only)
-└── impl/
-    └── ItemRepositoryImpl.kt
-```
-
-### 6. **Domain Model Naming**
-
-Your domain models use database naming conventions:
-
-**Current:**
-```kotlin
-data class Item(
-    val item_group: String,  // snake_case is DB convention
-    //...
-)
-```
-
-**Better - use Kotlin conventions in domain:**
-```kotlin
-data class Item(
-    val id: Int,
-    val group: String,  // camelCase for Kotlin
-    val name: String,
-    val quantity: Float?,
-    val unit: String?,
-    val isBought: Boolean  // Kotlin boolean naming
-)
-
-// Map in repository:
-private fun ItemEntity.toDomain(): Item = Item(
-    id = id,
-    group = item_group,  // Map snake_case to camelCase
-    //...
-    isBought = bought
-)
-```
-
-### 7. **DAO Query Efficiency**
-
-Your ItemDao sorts in the database, which is good, but consider pagination for large lists:
-
-**Current:**
-```kotlin
-@Query("SELECT * FROM ${DB.ITEM_TABLE} ORDER BY item_group ASC, name ASC")
-abstract fun getAllItems(): Flow<List<ItemEntity>>
-```
-
-**For large datasets, use Paging 3:**
-```kotlin
-@Query("SELECT * FROM ${DB.ITEM_TABLE} ORDER BY item_group ASC, name ASC")
-abstract fun getAllItemsPaged(): PagingSource<Int, ItemEntity>
-```
-
----
-
-## 🎨 **Compose Best Practices**
-
-### 8. **Missing @Preview Annotations**
-
-I don't see any `@Preview` annotations. These are crucial for development:
-
-**Solution:**
-```kotlin
-@Preview(showBackground = true)
-@Composable
-private fun ItemScreenPreview() {
-    BGHelpTheme {
-        // Use fake data
-        ItemScreen()
-    }
-}
-```
-
-### 9. **ViewModel Injection in Composables**
-
-Good that you're using `hiltViewModel()`, but consider separating state from ViewModel for testing:
-
-**Current - hard to test:**
-```kotlin
-@Composable
-fun ItemScreen(
-    modifier: Modifier = Modifier,
-    viewModel: ItemViewModel = hiltViewModel()
-) {
-    val flattenedItems by viewModel.flattenedItems.collectAsState()
-    // ...
-}
-```
-
-**Better - testable:**
-```kotlin
-@Composable
-fun ItemScreen(
-    items: List<ItemListItem>,
-    onDeleteItem: (Item) -> Unit,
-    onMarkAsBought: (Item) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    // UI only, no ViewModel reference
-}
-
-// Wrapper that connects ViewModel:
-@Composable
-fun ItemScreenRoute(
-    modifier: Modifier = Modifier,
-    viewModel: ItemViewModel = hiltViewModel()
-) {
-    val flattenedItems by viewModel.flattenedItems.collectAsState()
-    
-    ItemScreen(
-        items = flattenedItems,
-        onDeleteItem = viewModel::deleteItem,
-        onMarkAsBought = viewModel::markItemAsBought,
-        modifier = modifier
-    )
-}
-```
-
-### 10. **Hardcoded Strings in UI**
-
-Found in `ItemScreen.kt`:
-
-**Bad:**
-```kotlin
-Text("Add item")
-```
-
-**Good:**
-```kotlin
-Text(stringResource(R.string.button_add_item))
-```
-
-You have TODOs about this - prioritize it for i18n support.
-
----
-
-## 🔒 **Memory & Performance**
-
-### 11. **Image Loading Without Caching**
-
-In `TaskImagePreview.kt`, you load images directly:
-
-**Current:**
-```kotlin
-BitmapFactory.decodeFile(file.absolutePath)?.asImageBitmap()
-```
-
-**Problem**: No memory caching, could cause OOM with large images.
-
-**Solution**: Use Coil or Glide:
-
-```kotlin
-// build.gradle.kts
-implementation("io.coil-kt:coil-compose:2.5.0")
-
-// Usage:
-AsyncImage(
-    model = ImageRequest.Builder(LocalContext.current)
-        .data(file)
-        .crossfade(true)
-        .build(),
-    contentDescription = displayName
-)
-```
-
-### 12. **Scroll State Preservation**
-
-Good that you're saving scroll position, but you could use `rememberSaveable` instead:
-
-**Current approach works, but this is simpler:**
-```kotlin
-val listState = rememberLazyListState()
-// Instead of manual save/restore
-```
-
----
-
-## 📚 **Code Quality**
-
-### 13. **TODOs in MainActivity**
-
-You have many TODOs. Here are priorities:
-
-**High:**
-- ✅ Implement strings.xml (you're partially doing this)
-- ✅ Loading indicators (see #4)
-- ✅ Custom snackbars for error states
-
-**Medium:**
-- Color deletion checks (prevent FK violations)
-- Back button on LocationPickerScreen
-
-**Low:**
-- Swipe navigation (nice-to-have)
-- Use Styles.kt more consistently
-
-### 14. **Suppressed Warnings**
-
-**Current:**
-```kotlin
-@SuppressLint("FrequentlyChangingValue")
-fun ItemScreen(...) // Why is this needed?
-```
-
-Investigate and fix root cause instead of suppressing.
-
-### 15. **Test Coverage**
-
-You have test files but they appear empty/default. Add:
-
-**Unit Tests:**
-```kotlin
-@Test
-fun `test item repository maps entity to domain correctly`() {
-    // Test Entity → Domain mapping
-}
-
-@Test
-fun `test viewModel handles delete error gracefully`() {
-    // Test error handling
-}
-```
-
-**Instrumentation Tests:**
-```kotlin
-@Test
-fun itemScreen_displaysItems() {
-    // Test UI with fake data
-}
-```
-
----
-
-## 🎯 **Priority Recommendations**
-
-### Immediate (This Week):
-1. Fix database initialization (#1)
-2. Add error handling to all ViewModel operations (#2)
-3. Add loading/error states to UI (#4)
-4. Remove `@SuppressLint` and fix issues
-
-### Short Term (This Month):
-5. Add `@Preview` annotations to all screens
-6. Complete strings.xml implementation
-7. Implement proper database migrations
-8. Add Coil for image loading
-9. Domain model naming conventions
-
-### Long Term:
-10. Write unit tests for ViewModels and Repositories
-11. Add UI tests for critical flows
-12. Consider Paging 3 for large lists
-13. Refactor screens to separate state/logic (testability)
-
----
-
-## 🌟 **Overall Assessment**
-
-**Grade: B+ / Very Good**
-
-For a first app, this is **excellent work**! You've:
-- ✅ Correctly implemented MVVM + Repository pattern
-- ✅ Proper Hilt DI setup
-- ✅ Good Room database structure
-- ✅ Solid Compose fundamentals
-- ✅ Clean code organization
-
-The main gaps are typical for beginners:
-- ❌ Error handling
-- ❌ Loading states  
-- ❌ Production-ready DB migrations
-- ❌ Testing
-
-**You're doing things right** - just need to add robustness and polish. Keep going! 🚀
-
----
-
-## 📝 **Additional Notes**
-
-### Code Examples Referenced:
-
-1. **DatabaseModule.kt** - Lines 26-49: Database initialization issue
-2. **TaskRepository.kt** - Lines 35-349: Good repository pattern example
-3. **TaskDao.kt** - Lines 17-126: Excellent abstract DAO pattern
-4. **TaskViewModel.kt** - Lines 37-280: Good ViewModel structure
-5. **ItemRepository.kt** - Lines 20-84: Simple repository pattern
-6. **ItemViewModel.kt** - Lines 24-110: Good reactive state management
-7. **ItemScreen.kt** - Lines 34-124: Good Compose implementation
-8. **MainNavHost.kt** - Lines 56-218: Navigation setup
-9. **Screen.kt** - Lines 7-147: Good sealed class navigation
-
-### Key Files to Review:
-- `app/src/main/java/com/example/bghelp/di/DatabaseModule.kt`
-- `app/src/main/java/com/example/bghelp/ui/screens/items/ItemViewModel.kt`
-- `app/src/main/java/com/example/bghelp/ui/screens/items/ItemScreen.kt`
-- `app/src/main/java/com/example/bghelp/data/repository/TaskRepository.kt`
-- `app/src/main/java/com/example/bghelp/MainActivity.kt` (TODOs)
-
----
-
-**Review Date:** $(date)
-**Reviewer:** AI Code Review Assistant
-**Project:** BGHelp - Android Jetpack Compose App
-
+Task Reminder Tracking System
+Overview
+Implement a continuous monitoring system that tracks upcoming task reminders and task start times, showing a modal popup using the existing OptionsModal when they trigger while the app is open.
+
+Architecture
+1. Domain Model
+Create domain/model/UpcomingReminder.kt:
+
+Simplified data class: taskId: Int, triggerTime: LocalDateTime, reminder: TaskReminderEntry? (null if it's a task start time)
+Unique identifier: combination of taskId + triggerTime for tracking triggered reminders
+2. Reminder Calculation Service
+Create domain/service/ReminderCalculator.kt:
+
+Function: calculateReminderTriggerTime(task: Task, reminder: TaskReminderEntry): LocalDateTime
+For START reminders: task.date - offset (convert ReminderOffsetUnit to Duration)
+For END reminders: task.endDate - offset (if endDate exists)
+Handle all offset units: MINUTES, HOURS, DAYS, WEEKS, MONTHS
+Function: getUpcomingRemindersForTask(task: Task): List<UpcomingReminder>
+If task has reminders: calculate trigger time for each reminder
+Always include task start time as reminder (if task is not all-day)
+Return empty list for all-day tasks (no start time reminder)
+Function: getUpcomingRemindersForRecurringTask(baseTask: Task): List<UpcomingReminder>
+Get first occurrence using RecurrenceCalculator.generateOccurrences() with future window
+For first occurrence: calculate reminders and start time (if not all-day)
+Return list of reminders for that occurrence
+3. Repository Extension
+Extend TaskRepository interface and TaskRepositoryImpl:
+
+Add method: fun getUpcomingReminders(limit: Int = 5): Flow<List<UpcomingReminder>>
+Heavy operation - must handle properly:
+Query all non-deleted tasks (both single and recurring base tasks)
+For each single task: get reminders + start time (if not all-day)
+For each recurring base task: get first occurrence, then get reminders + start time for that occurrence
+Flatten all reminders into single list
+Sort by triggerTime ascending
+Take first limit items
+Return Flow that emits this sorted list
+Use flowOn(Dispatchers.Default) for heavy computation
+Consider caching or debouncing to avoid excessive recalculations
+4. Reminder Tracking ViewModel
+Create ui/screens/reminder/ReminderTrackingViewModel.kt:
+
+Inject TaskRepository
+Observe getUpcomingReminders(limit = 5) Flow
+Track triggered reminders: Set<String> where key is "${taskId}_${triggerTime.toEpochMilli()}"
+StateFlow: triggeredReminder: StateFlow<UpcomingReminder?> (for showing popup)
+StateFlow: triggeredTask: StateFlow<Task?> (full task object for modal)
+Function: checkAndTriggerReminders() - polls once per second
+Compare current time with trigger times of tracked reminders
+When trigger time passes and not yet triggered, emit to triggeredReminder
+Load full task object and emit to triggeredTask
+Function: dismissReminder() - marks reminder as handled, triggers recalculation
+Add to triggered set
+Clear triggeredReminder and triggeredTask
+Repository will automatically recalculate (Flow will emit new list with 5th item)
+Use viewModelScope.launch with while(true) { delay(1000) } for 1-second polling
+5. Reminder Modal Integration
+Reuse existing OptionsModal with TaskPreviewComponent:
+
+In ui/MainScreen.kt or global composable
+Show OptionsModal when triggeredReminder is not null
+Content: TaskPreviewComponent(task = triggeredTask)
+Title: "Reminder" or "Task Starting" based on whether reminder exists
+Buttons:
+First button: "Go to Task" - navigate to TaskScreen with task date
+Second button: "Dismiss" - call dismissReminder()
+6. Integration
+Update ui/MainScreen.kt:
+
+Inject ReminderTrackingViewModel using hiltViewModel()
+Observe triggeredReminder and triggeredTask StateFlows
+Show OptionsModal when reminder triggers
+Start polling when app is in foreground (use LifecycleObserver or DisposableEffect)
+7. Continuous Monitoring
+In ReminderTrackingViewModel:
+
+Launch coroutine in init or when ViewModel is created
+Poll every 1 second: while(true) { checkAndTriggerReminders(); delay(1000) }
+Only check reminders that haven't been triggered yet
+When reminder triggers, pause polling until dismissed (or continue for next reminder)
+Implementation Details
+Reminder Trigger Time Calculation
+// For START reminder: task.date - offset
+// For END reminder: task.endDate - offset
+// Convert ReminderOffsetUnit to Duration:
+// MINUTES -> Duration.ofMinutes(offsetValue)
+// HOURS -> Duration.ofHours(offsetValue)
+// DAYS -> Duration.ofDays(offsetValue)
+// WEEKS -> Duration.ofDays(offsetValue * 7)
+// MONTHS -> use ChronoUnit.MONTHS (approximate)
+Handling Recurring Tasks
+Query all base recurring tasks (rrule IS NOT NULL)
+For each, generate first occurrence using RecurrenceCalculator.generateOccurrences() with window from now to future
+Calculate reminders and start time for that first occurrence only
+This avoids generating all occurrences (performance optimization)
+State Management
+Track triggered reminders using Set of unique keys: "${taskId}_${triggerTime.toEpochMilli()}"
+When reminder is dismissed, add to triggered set
+Repository Flow will automatically emit new list (now includes 5th item since 4 are still tracked)
+ViewModel filters out triggered reminders when checking
+Files to Create
+domain/model/UpcomingReminder.kt
+domain/service/ReminderCalculator.kt
+ui/screens/reminder/ReminderTrackingViewModel.kt
+Files to Modify
+data/repository/TaskRepository.kt - Add getUpcomingReminders() method
+data/repository/TaskRepositoryImpl.kt - Implement getUpcomingReminders() with heavy computation on background thread
+ui/MainScreen.kt - Integrate ReminderTrackingViewModel and show OptionsModal with TaskPreviewComponent
+Testing Considerations
+Test reminder calculation with various offset units (minutes, hours, days, weeks, months)
+Test tasks with no reminders (should still track start time if not all-day)
+Test all-day tasks (should not track start time)
+Test recurring tasks with reminders (first occurrence only)
+Test reminder triggering timing accuracy (1-second polling)
+Test recalculation after dismissal (5th item becomes available)
+Test performance with many tasks (ensure heavy computation is on background thread)

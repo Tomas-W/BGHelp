@@ -71,27 +71,27 @@ fun TaskScreen(
     taskViewModel: TaskViewModel = hiltViewModel(),
     overlayNavController: NavHostController? = null
 ) {
-    // Check for navigation to task date from AddTaskScreen
-    LaunchedEffect(overlayNavController) {
-        overlayNavController?.currentBackStackEntry
-            ?.savedStateHandle
-            ?.getStateFlow<Long?>(TaskNavigationKeys.TASK_DATE_TO_NAVIGATE_TO, null)
-            ?.collect { taskDateMillis ->
-                taskDateMillis?.let { millis ->
-                    val taskDate = java.time.Instant.ofEpochMilli(millis)
-                        .atZone(java.time.ZoneId.systemDefault())
-                        .toLocalDateTime()
-                    taskViewModel.goToDay(taskDate.toLocalDate())
-                    // Get the task ID to scroll to
-                    overlayNavController.currentBackStackEntry?.savedStateHandle
-                        ?.get<Int>(TaskNavigationKeys.TASK_ID_TO_SCROLL_TO)?.let { taskId ->
-                            taskViewModel.setScrollToTaskId(taskId)
-                            overlayNavController.currentBackStackEntry?.savedStateHandle?.remove<Int>(TaskNavigationKeys.TASK_ID_TO_SCROLL_TO)
-                        }
-                    // Clear the result so we don't navigate again
-                    overlayNavController.currentBackStackEntry?.savedStateHandle?.remove<Long>(TaskNavigationKeys.TASK_DATE_TO_NAVIGATE_TO)
+    // Check for navigation to task date from AddTaskScreen or Alert modal
+    val taskDateToNavigateTo by (overlayNavController?.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow<Long?>(TaskNavigationKeys.TASK_DATE_TO_NAVIGATE_TO, null)
+        ?: kotlinx.coroutines.flow.MutableStateFlow<Long?>(null)).collectAsState(initial = null)
+    
+    LaunchedEffect(taskDateToNavigateTo) {
+        taskDateToNavigateTo?.let { millis ->
+            val taskDate = java.time.Instant.ofEpochMilli(millis)
+                .atZone(java.time.ZoneId.systemDefault())
+                .toLocalDateTime()
+            taskViewModel.goToDay(taskDate.toLocalDate())
+            // Get the task ID to scroll to
+            overlayNavController?.currentBackStackEntry?.savedStateHandle
+                ?.get<Int>(TaskNavigationKeys.TASK_ID_TO_SCROLL_TO)?.let { taskId ->
+                    taskViewModel.setScrollToTaskId(taskId)
+                    overlayNavController.currentBackStackEntry?.savedStateHandle?.remove<Int>(TaskNavigationKeys.TASK_ID_TO_SCROLL_TO)
                 }
-            }
+            // Clear the result so we don't navigate again
+            overlayNavController?.currentBackStackEntry?.savedStateHandle?.remove<Long>(TaskNavigationKeys.TASK_DATE_TO_NAVIGATE_TO)
+        }
     }
 
     // Task items

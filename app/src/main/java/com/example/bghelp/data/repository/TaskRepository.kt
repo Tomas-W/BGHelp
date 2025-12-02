@@ -13,6 +13,8 @@ import com.example.bghelp.domain.constants.ColorSeeds
 import com.example.bghelp.domain.service.RecurrenceCalculator
 import com.example.bghelp.domain.model.TaskLocationEntry
 import com.example.bghelp.domain.model.TaskReminderEntry
+import com.example.bghelp.domain.model.UpcomingAlert
+import com.example.bghelp.domain.service.AlertCalculator
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -20,6 +22,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.Dispatchers
 
 interface TaskRepository {
     suspend fun addTask(createTask: CreateTask): Int
@@ -31,6 +35,7 @@ interface TaskRepository {
     suspend fun getTaskCount(): Int
     fun getTaskById(id: Int): Flow<Task?>
     fun getTasksByDateRange(startDate: Long, endDate: Long): Flow<List<Task>>
+    fun getUpcomingAlerts(limit: Int = 5): Flow<List<UpcomingAlert>>
 }
 
 class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
@@ -140,6 +145,30 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
 
             (baseDomain + additional).sortedBy { it.date }
         }
+    }
+
+    override fun getUpcomingAlerts(limit: Int): Flow<List<UpcomingAlert>> {
+        return taskDao.getAllTasks().map { taskEntities ->
+            val allAlerts = mutableListOf<UpcomingAlert>()
+
+            for (taskEntity in taskEntities) {
+                val task = taskEntity.toDomain()
+                
+                if (task.rrule != null) {
+                    // Recurring task: get alerts for first occurrence (even if base task is deleted)
+                    val alerts = AlertCalculator.getUpcomingAlertsForRecurringTask(task)
+                    allAlerts.addAll(alerts)
+                } else {
+                    // Single task: skip if deleted, otherwise get all alerts
+                    if (task.deleted) continue
+                    val alerts = AlertCalculator.getUpcomingAlertsForTask(task)
+                    allAlerts.addAll(alerts)
+                }
+            }
+
+            // Sort by trigger time and take first limit items
+            allAlerts.sortedBy { it.triggerTime }.take(limit)
+        }.flowOn(Dispatchers.Default)
     }
 
     // Entity → Domain
