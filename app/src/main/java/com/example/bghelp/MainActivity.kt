@@ -44,17 +44,7 @@ class MainActivity : ComponentActivity() {
 
 // TODO: Back button on LocationPickerScreen
 
-// TODO: Deleting multiple tasks not possible now since the undo is a singleton
-
-// TODO: Task modal should say if task is recurring, and if so add delete all option
-
 // TODO: Use Styles.kt in components?
-
-// TODO: When not on feature screen, make bottomnav back button?
-
-// TODO: Fix Color(picker) implementation
-
-// TODO: Translate default colors?
 
 // TODO: Highlight Task after creating/updating
 

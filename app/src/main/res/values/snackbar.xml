@@ -9,6 +9,7 @@
     <string name="snackbar_repeat_days_invalid">Repeats require a 1 day minimum</string>
     <string name="snackbar_repeat_months_invalid">Repeats require a 1 month minimum</string>
     <string name="snackbar_reminder_invalid">Reminders cannot be in the past</string>
+    <string name="snackbar_end_reminder_before_start">Before end reminders must be after start time</string>
     <string name="snackbar_no_reminders_selected">No reminders selected</string>
     <string name="snackbar_no_alarm_selected">No alarm selected</string>
     <string name="snackbar_no_note_selected">No note selected</string>

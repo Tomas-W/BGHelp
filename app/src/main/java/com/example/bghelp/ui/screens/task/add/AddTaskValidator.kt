@@ -146,6 +146,9 @@ object AddTaskValidator {
                 if (reminderTime.isBefore(now)) {
                     return context.getString(R.string.snackbar_reminder_invalid)
                 }
+                if (!reminderTime.isAfter(startDateTime)) {
+                    return context.getString(R.string.snackbar_end_reminder_before_start)
+                }
             }
         }
 
