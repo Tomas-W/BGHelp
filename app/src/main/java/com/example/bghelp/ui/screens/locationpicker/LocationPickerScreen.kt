@@ -202,7 +202,7 @@ fun LocationPickerScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
                     .weight(1f, fill = true),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -217,13 +217,13 @@ fun LocationPickerScreen(
                     onRemove = viewModel::removeLocation
                 )
 
-                BottomButtonRow(
-                    viewModel = viewModel,
-                    navController = navController,
-                    cameraPositionState = cameraPositionState,
-                    selectedLocations = selectedLocations
-                )
             }
+            BottomButtonRow(
+                viewModel = viewModel,
+                navController = navController,
+                cameraPositionState = cameraPositionState,
+                selectedLocations = selectedLocations
+            )
         }
     }
 }
