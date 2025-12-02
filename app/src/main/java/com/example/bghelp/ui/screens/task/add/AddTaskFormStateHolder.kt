@@ -466,6 +466,65 @@ class AddTaskFormStateHolder(
         onRepeatRuleChanged()
     }
 
+    fun loadFromTaskAsSingleOccurrence(task: Task) {
+        val dateTimeInfo = parseDateTimeInfo(task)
+        val reminderInfo = parseReminderInfo(task.reminders)
+        val locationInfo = parseLocationInfo(task.locations)
+        val imageInfo = parseImageInfo(task.image)
+
+        // Reset repeat info to default (no repeat)
+        val defaultRepeatInfo = parseRepeatInfo(null)
+
+        // For single occurrence, only keep start reminders, reset end reminders and end date
+        val startRemindersOnly = reminderInfo.startReminders
+        val remindSelection = if (startRemindersOnly.isNotEmpty()) UserRemindSelection.ON else UserRemindSelection.OFF
+
+        _formState.value = AddTaskFormState(
+            title = task.title,
+            info = task.info ?: "",
+
+            dateSelection = dateTimeInfo.dateSelection,
+            startDate = dateTimeInfo.startDate,
+            endDate = null,
+            isEndDateVisible = false,
+            startTime = dateTimeInfo.startTime,
+            endTime = null,
+            isEndTimeVisible = false,
+
+            repeatSelection = defaultRepeatInfo.selection,
+            weeklySelectedDays = defaultRepeatInfo.weeklyDays,
+            weeklyIntervalWeeks = defaultRepeatInfo.weeklyInterval,
+            monthlySelectedMonths = defaultRepeatInfo.monthlyMonths,
+            monthlyDaySelection = defaultRepeatInfo.monthlyDaySelection,
+            monthlySelectedDays = defaultRepeatInfo.monthlyDays,
+            repeatRRule = null,
+
+            remindSelection = remindSelection,
+            startReminders = startRemindersOnly,
+            endReminders = emptyList(),
+            soundSelection = task.sound.toUserSoundSelection(),
+            selectedAudioFile = task.soundUri ?: "",
+            vibrateSelection = task.vibrate.toUserVibrateSelection(),
+            snoozeValue1 = task.snoozeValue1,
+            snoozeUnit1 = task.snoozeUnit1.toTimeUnit(),
+            snoozeValue2 = task.snoozeValue2,
+            snoozeUnit2 = task.snoozeUnit2.toTimeUnit(),
+
+            noteSelection = if (task.note != null && task.note.isNotBlank()) UserNoteSelection.ON else UserNoteSelection.OFF,
+            note = task.note ?: "",
+
+            locationSelection = locationInfo.selection,
+            selectedLocations = locationInfo.locations,
+
+            imageSelection = imageInfo.selection,
+            selectedImage = imageInfo.image,
+
+            colorSelection = if (task.color.id != 1) UserColorSelection.ON else UserColorSelection.OFF,
+            selectedColorId = task.color.id
+        )
+        onRepeatRuleChanged()
+    }
+
     private data class DateTimeInfo(
         val dateSelection: UserDateSelection,
         val startDate: LocalDate,

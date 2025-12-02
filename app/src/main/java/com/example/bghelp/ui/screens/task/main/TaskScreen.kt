@@ -203,7 +203,25 @@ fun TaskScreen(
     // Edit this or all occurrences
     fun handleRecurringEdit(editAll: Boolean) {
         val task = modalTask ?: return
-        taskPendingEdit = task
+        if (editAll) {
+            // Edit all occurrences - edit the base task
+            taskPendingEdit = task
+        } else {
+            // Edit single occurrence - pass occurrence info via SavedStateHandle
+            val occurrenceDateMillis = task.date.atZone(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli()
+            overlayNavController?.currentBackStackEntry?.savedStateHandle?.set(
+                TaskNavigationKeys.BASE_TASK_ID_FOR_OCCURRENCE_EDIT,
+                task.id
+            )
+            overlayNavController?.currentBackStackEntry?.savedStateHandle?.set(
+                TaskNavigationKeys.OCCURRENCE_DATE_FOR_EDIT,
+                occurrenceDateMillis
+            )
+            // Navigate with task ID but mark it as occurrence edit
+            taskPendingEdit = task
+        }
         dismissModal()
     }
 

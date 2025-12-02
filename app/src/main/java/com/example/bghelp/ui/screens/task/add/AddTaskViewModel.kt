@@ -554,16 +554,52 @@ class AddTaskViewModel @Inject constructor(
         }
     }
 
+    fun loadTaskAsSingleOccurrence(taskId: Int, occurrenceDate: LocalDateTime) {
+        viewModelScope.launch {
+            taskRepository.getTaskById(taskId)
+                .first()
+                ?.let { baseTask ->
+                    // Create a task with the occurrence date but base task data
+                    val taskWithOccurrenceDate = baseTask.copy(
+                        date = occurrenceDate,
+                        endDate = baseTask.endDate?.let { endDate ->
+                            val duration = java.time.Duration.between(baseTask.date, endDate)
+                            occurrenceDate.plus(duration)
+                        }
+                    )
+                    // Don't set editingTaskId - we'll save as new task
+                    _editingTaskId.value = null
+                    formStateHolder.loadFromTaskAsSingleOccurrence(taskWithOccurrenceDate)
+                    _currentMonth.value = YearMonth.from(occurrenceDate)
+                }
+        }
+    }
+
     fun saveTask() {
         if (_saveState.value == SaveTaskState.Saving) return
 
         _saveState.value = SaveTaskState.Saving
         viewModelScope.launch {
             val taskId = _editingTaskId.value
-            val result = if (taskId != null) {
-                saveTaskHandler.updateTask(taskId, formState.value, validationState)
-            } else {
-                saveTaskHandler.saveTask(formState.value, validationState)
+            val occurrenceInfo = _editingOccurrenceInfo.value
+            val result = when {
+                occurrenceInfo != null -> {
+                    // Save as single occurrence (new task + exclude from base)
+                    saveTaskHandler.saveTaskAsSingleOccurrence(
+                        baseTaskId = occurrenceInfo.first,
+                        occurrenceDate = occurrenceInfo.second,
+                        formState = formState.value,
+                        validationState = validationState
+                    )
+                }
+                taskId != null -> {
+                    // Regular edit - update existing task
+                    saveTaskHandler.updateTask(taskId, formState.value, validationState)
+                }
+                else -> {
+                    // New task
+                    saveTaskHandler.saveTask(formState.value, validationState)
+                }
             }
 
             when (result) {
@@ -572,6 +608,9 @@ class AddTaskViewModel @Inject constructor(
                     _saveState.value = SaveTaskState.Success
                     if (taskId != null) {
                         _editingTaskId.value = null
+                    }
+                    if (occurrenceInfo != null) {
+                        _editingOccurrenceInfo.value = null
                     }
                 }
 
@@ -607,6 +646,18 @@ class AddTaskViewModel @Inject constructor(
     private val _editingTaskId = MutableStateFlow<Int?>(null)
     val isEditing: StateFlow<Boolean> = _editingTaskId.map { it != null }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    private val _editingOccurrenceInfo = MutableStateFlow<Pair<Int, LocalDateTime>?>(null)
+    val editingOccurrenceInfo: StateFlow<Pair<Int, LocalDateTime>?> = _editingOccurrenceInfo.asStateFlow()
+
+    fun setEditingOccurrenceInfo(baseTaskId: Int, occurrenceDate: LocalDateTime) {
+        _editingOccurrenceInfo.value = baseTaskId to occurrenceDate
+    }
+
+    fun clearEditingState() {
+        _editingTaskId.value = null
+        _editingOccurrenceInfo.value = null
+    }
     // SAVE TASK
 
     // RESET DISMISS CLEAR

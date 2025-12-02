@@ -49,11 +49,43 @@ fun AddTaskScreen(
     val isEditing by viewModel.isEditing.collectAsState()
     val scrollState = rememberScrollState()
 
+    // Clear editing state when navigating to create new task
+    LaunchedEffect(taskId) {
+        if (taskId == null || taskId <= 0) {
+            viewModel.clearEditingState()
+        }
+    }
+
     // Load task for editing if taskId is provided
     LaunchedEffect(taskId) {
         taskId?.let { id ->
             if (id > 0) {
-                viewModel.loadTaskForEditingById(id)
+                // Check if this is a single occurrence edit
+                val baseTaskId = navController.previousBackStackEntry?.savedStateHandle?.get<Int>(
+                    TaskNavigationKeys.BASE_TASK_ID_FOR_OCCURRENCE_EDIT
+                )
+                val occurrenceDateMillis = navController.previousBackStackEntry?.savedStateHandle?.get<Long>(
+                    TaskNavigationKeys.OCCURRENCE_DATE_FOR_EDIT
+                )
+
+                if (baseTaskId != null && occurrenceDateMillis != null) {
+                    // This is a single occurrence edit
+                    val occurrenceDate = java.time.Instant.ofEpochMilli(occurrenceDateMillis)
+                        .atZone(java.time.ZoneId.systemDefault())
+                        .toLocalDateTime()
+                    viewModel.setEditingOccurrenceInfo(baseTaskId, occurrenceDate)
+                    viewModel.loadTaskAsSingleOccurrence(baseTaskId, occurrenceDate)
+                    // Clear the saved state handle
+                    navController.previousBackStackEntry?.savedStateHandle?.remove<Int>(
+                        TaskNavigationKeys.BASE_TASK_ID_FOR_OCCURRENCE_EDIT
+                    )
+                    navController.previousBackStackEntry?.savedStateHandle?.remove<Long>(
+                        TaskNavigationKeys.OCCURRENCE_DATE_FOR_EDIT
+                    )
+                } else {
+                    // Regular edit
+                    viewModel.loadTaskForEditingById(id)
+                }
             }
         }
     }

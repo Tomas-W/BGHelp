@@ -133,6 +133,59 @@ class SaveTaskHandler(
         }
     }
 
+    suspend fun saveTaskAsSingleOccurrence(
+        baseTaskId: Int,
+        occurrenceDate: LocalDateTime,
+        formState: AddTaskFormState,
+        validationState: AddTaskValidationState
+    ): SaveTaskResult {
+        val validationError = validationState.validateForm(formState)
+        if (validationError != null) {
+            return SaveTaskResult.ValidationError(validationError)
+        }
+
+        return try {
+            val imageAttachment = withContext(Dispatchers.IO) {
+                TaskImageStorage.persistIfNeeded(
+                    context = appContext,
+                    isOn = formState.imageSelection == UserImageSelection.ON,
+                    selected = formState.selectedImage
+                )
+            }
+
+            val selectedColor = getSelectedTaskColor(formState)
+
+            val assembleResult = AddTaskAssembler.buildOrError(
+                formState = formState,
+                color = selectedColor,
+                image = imageAttachment
+            )
+
+            when (assembleResult) {
+                is AddTaskAssembler.BuildResult.Error -> {
+                    SaveTaskResult.ValidationError(assembleResult.message)
+                }
+
+                is AddTaskAssembler.BuildResult.Success -> {
+                    // Save as new task
+                    val taskId = taskRepository.addTask(assembleResult.task)
+                    
+                    // Exclude this occurrence from the base task's rrule
+                    // Create a temporary task object with base task ID and occurrence date
+                    val baseTask = taskRepository.getTaskById(baseTaskId).first()
+                    if (baseTask != null) {
+                        val occurrenceTask = baseTask.copy(date = occurrenceDate)
+                        taskRepository.deleteRecurringTaskOccurrence(occurrenceTask)
+                    }
+                    
+                    SaveTaskResult.Success(taskId, assembleResult.task.startDate)
+                }
+            }
+        } catch (t: Throwable) {
+            SaveTaskResult.Error(t)
+        }
+    }
+
     private suspend fun getSelectedTaskColor(formState: AddTaskFormState): FeatureColor {
         val colorId = if (formState.colorSelection == UserColorSelection.OFF) {
             1
