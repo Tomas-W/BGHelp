@@ -27,6 +27,7 @@
     <string name="task_hide_end_time">Hide end time</string>
     <string name="task_show_end_time">Show end time</string>
     <string name="task_date_in_past">Date cannot be in the past</string>
+    <string name="task_date_range_not_allowed_with_repeat">Date range not allowed with repeat</string>
 
     <string name="task_dont_repeat">Don\'t repeat</string>
     <string name="task_repeat_weekly">Repeat weekly</string>

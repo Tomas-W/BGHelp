@@ -113,7 +113,19 @@ class AddTaskFormStateHolder(
     // REPEAT
     fun toggleRepeatSelection() {
         _formState.update { state ->
-            state.copy(repeatSelection = state.repeatSelection.toggle())
+            val newRepeatSelection = state.repeatSelection.toggle()
+            // If turning on repeat (WEEKLY or MONTHLY), hide end date
+            val updatedState = if ((newRepeatSelection == UserRepeatSelection.WEEKLY || newRepeatSelection == UserRepeatSelection.MONTHLY) 
+                && state.isEndDateVisible) {
+                state.copy(
+                    repeatSelection = newRepeatSelection,
+                    isEndDateVisible = false,
+                    endDate = null
+                )
+            } else {
+                state.copy(repeatSelection = newRepeatSelection)
+            }
+            updatedState
         }
         onRepeatRuleChanged()
     }

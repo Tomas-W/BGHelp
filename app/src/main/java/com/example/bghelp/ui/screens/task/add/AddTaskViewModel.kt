@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -105,8 +106,17 @@ class AddTaskViewModel @Inject constructor(
     val dateEndSelection: StateFlow<LocalDate?> = formState.map { it.endDate }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-    val isEndDateVisible: StateFlow<Boolean> = formState.map { it.isEndDateVisible }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    val isEndDateVisible: StateFlow<Boolean> = combine(
+        formState.map { it.isEndDateVisible },
+        formState.map { it.repeatSelection }
+    ) { isEndDateVisible, repeatSelection ->
+        // End date cannot be visible when repeat is active
+        if (repeatSelection == UserRepeatSelection.WEEKLY || repeatSelection == UserRepeatSelection.MONTHLY) {
+            false
+        } else {
+            isEndDateVisible
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     val timeStartSelection: StateFlow<LocalTime> = formState.map { it.startTime }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), LocalTime.of(12, 0))
@@ -145,6 +155,11 @@ class AddTaskViewModel @Inject constructor(
 
     fun toggleEndDateVisible() {
         val state = formState.value
+        // Prevent toggling end date when repeat is active
+        if (state.repeatSelection == UserRepeatSelection.WEEKLY || state.repeatSelection == UserRepeatSelection.MONTHLY) {
+            showSnackbar(appContext.getString(R.string.task_date_range_not_allowed_with_repeat))
+            return
+        }
         if (state.isEndDateVisible) {
             hiddenDateEndValue = state.endDate
             formStateHolder.toggleEndDateVisible()
@@ -268,6 +283,19 @@ class AddTaskViewModel @Inject constructor(
             )
 
     fun toggleRepeatSelection() {
+        val state = formState.value
+        val newRepeatSelection = state.repeatSelection.toggle()
+        
+        // If turning on repeat (WEEKLY or MONTHLY), hide end date
+        if ((newRepeatSelection == UserRepeatSelection.WEEKLY || newRepeatSelection == UserRepeatSelection.MONTHLY) 
+            && state.isEndDateVisible) {
+            hiddenDateEndValue = state.endDate
+            formStateHolder.toggleEndDateVisible()
+            if (_activeDateField.value == DateField.END) {
+                setCalendarVisible(false)
+            }
+        }
+        
         formStateHolder.toggleRepeatSelection()
     }
 
